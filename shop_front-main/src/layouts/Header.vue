@@ -1,0 +1,177 @@
+<template>
+  <div>
+    <header v-if="!onlySticky" class="header-main">
+      <button ref="menuBtn" class="menu-btn" @click="toggleMenu">☰</button>
+      <img
+        v-if="headerStore.site_logo"
+        :src="headerStore.site_logo"
+        alt="لوگو"
+        class="logo"
+      />
+      <img v-else src="/src/assets/image/logo.png" alt="لوگو" class="logo" />
+    </header>
+
+    <StickyHeader
+      :visible="showStickyHeader || onlySticky"
+      :compact="compactSticky"
+      @toggle-menu="toggleMenu"
+    />
+    <transition name="slide-fade">
+      <div
+        v-if="drawerOpen"
+        class="menu-box"
+        :style="menuStyle"
+        @click.self="drawerOpen = false"
+      >
+        <button class="close-btn" @click="drawerOpen = false">×</button>
+        <ul>
+          <li v-for="item in headerStore.menuItems" :key="item.id">
+            <router-link :to="item.url">{{ item.title }}</router-link>
+          </li>
+        </ul>
+      </div>
+    </transition>
+    <div v-if="!onlySticky" class="search-wrapper">
+      <SearchBox />
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, onUnmounted, nextTick } from "vue";
+import { useHeaderStore } from "@/stores/useHeaderStore";
+import SearchBox from "@/components/SearchBox.vue";
+import StickyHeader from "@/components/StickyHeader.vue";
+
+const props = defineProps({
+  onlySticky: { type: Boolean, default: false },
+  compactSticky: { type: Boolean, default: false }, 
+});
+
+const drawerOpen = ref(false);
+const showStickyHeader = ref(false);
+const headerStore = useHeaderStore();
+const menuBtn = ref(null);
+const menuStyle = ref({ top: "0px", left: "0px" });
+
+onMounted(() => {
+  headerStore.fetchHeader();
+  headerStore.fetchlogo();
+  window.addEventListener("scroll", handleScroll);
+});
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
+});
+
+function handleScroll() {
+  showStickyHeader.value = window.scrollY > 200;
+}
+
+async function toggleMenu() {
+  drawerOpen.value = !drawerOpen.value;
+  if (drawerOpen.value) {
+    await nextTick();
+    const rect = menuBtn.value?.getBoundingClientRect();
+    if (rect) {
+      menuStyle.value = {
+        position: "fixed",
+        top: `${rect.top}px`,
+        left: `${rect.right + 10}px`,
+      };
+    }
+  }
+}
+</script>
+
+<style scoped>
+.header-main {
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: white;
+  border-bottom: 1px solid gold;
+  position: relative;
+  direction: rtl;
+}
+.logo {
+  height: 300px;
+}
+.menu-btn {
+  position: absolute;
+  left: 20px;
+  top: 50px;
+  font-size: 30px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.search-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50px;
+  height: 100px;
+}
+
+.menu-box {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 15px 20px 20px;
+  z-index: 2000;
+  min-width: 220px;
+}
+
+.menu-box ul {
+  direction: rtl;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-box ul li {
+  margin-bottom: 12px;
+}
+
+.menu-box ul li a {
+  text-decoration: none;
+  font-weight: 600;
+  color: #333;
+  transition: color 0.3s;
+}
+
+.menu-box ul li a:hover {
+  color: gold;
+}
+
+.close-btn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: red;
+}
+
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.3s ease;
+}
+.slide-fade-enter-from {
+  transform: translateX(20px);
+  opacity: 0;
+}
+.slide-fade-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
+}
+
+</style>
