@@ -1,179 +1,249 @@
-import { defineStore } from 'pinia'
-import { userService } from '@/services/userService'
-import axios from 'axios'
-import { toast } from 'vue3-toastify'
-import 'vue3-toastify/dist/index.css'
+// 📁 src/stores/useUserStore.js
+import { defineStore } from "pinia";
+import { userService } from "@/services/userService";
+import { toast } from "vue3-toastify";
+import jalaali from "jalaali-js";
 
-export const useUserStore = defineStore('user', {
+
+function toJalali(gDate) {
+  if (!gDate) return "";
+  const [gy, gm, gd] = gDate.split("-").map(Number);
+  const { jy, jm, jd } = jalaali.toJalaali(gy, gm, gd);
+  return `${jy}/${String(jm).padStart(2, "0")}/${String(jd).padStart(2, "0")}`;
+}
+
+
+function toGregorian(jDate) {
+  if (!jDate) return "";
+  const [jy, jm, jd] = jDate.split("/").map(Number);
+  const { gy, gm, gd } = jalaali.toGregorian(jy, jm, jd);
+  return `${gy}-${String(gm).padStart(2, "0")}-${String(gd).padStart(2, "0")}`;
+}
+
+export const useUserStore = defineStore("user", {
   state: () => ({
     profile: {
-      username: '',
-      email: '',
-      phone: '',
-      birthdate: '',
+      username: "",
+      email: "",
+      phone: "",
+      birthdate: "",
       image: null,
-      imageUrl: '',
+      previewImage: null,
     },
     addresses: [],
-    bankAccounts: {},
+    bankAccounts: [],
     provinces: [],
     cities: [],
+    users: [],
     loading: false,
     error: null,
   }),
 
   actions: {
+
+    async fetchUsers() {
+      this.loading = true;
+      try {
+        const res = await userService.getUsers();
+        this.users = Array.isArray(res.data.data) ? res.data.data : [];
+      } catch (err) {
+        console.error("Fetch users error:", err);
+        toast.error("خطا در دریافت کاربران سایت");
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async deleteUser(userId) {
+      try {
+        await userService.deleteUser(userId);
+        this.users = this.users.filter((u) => u.id !== userId);
+        toast.success("کاربر حذف شد ");
+      } catch (err) {
+        console.error("Delete user error:", err);
+        toast.error("خطا در حذف کاربر");
+      }
+    },
+
     async fetchProfile() {
-      this.loading = true
-      this.error = null
+      this.loading = true;
       try {
-        const res = await userService.getProfile()
-        this.profile = { ...this.profile, ...res.data.data }
-      } catch (error) {
-        toast.error('خطا در دریافت پروفایل کاربر')
-        this.error = error
-      } finally {
-        this.loading = false
-      }
-    },
+        const res = await userService.getProfile();
+        const data = res.data.data || {};
 
-    async updateProfile(newProfile) {
-      this.loading = true
-      try {
-        let payload = newProfile
-        if (!(newProfile instanceof FormData)) {
-          payload = new FormData()
-          Object.keys(newProfile).forEach((key) => {
-            if (newProfile[key] !== null && newProfile[key] !== undefined) {
-              payload.append(key, newProfile[key])
-            }
-          })
+        let birthdate = "";
+        if (data.birthdate) {
+          birthdate = data.birthdate.includes("-") ? toJalali(data.birthdate) : data.birthdate;
         }
 
-        const res = await userService.updateProfile(payload)
-        const updated = res.data.data || res.data
         this.profile = {
-          ...this.profile,
-          ...updated,
-          imageUrl:
-            this.profile.image instanceof File
-              ? URL.createObjectURL(this.profile.image)
-              : updated.imageUrl,
-        }
-        toast.success('پروفایل با موفقیت ذخیره شد!')
+          username: data.username || "",
+          email: data.email || "",
+          phone: data.phone || "",
+          birthdate,
+          image: data.image || null,
+          previewImage: null,
+        };
       } catch (error) {
-        const message = error.response?.data?.message || error.message || 'خطا در ذخیره پروفایل'
-        toast.error(message)
+        console.error("Fetch profile error:", error);
+        toast.error("خطا در دریافت پروفایل");
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
-    updateProfileField(field, value) {
-      if (field in this.profile) this.profile[field] = value
+    async updateProfile(data) {
+      try {
+        let formData;
+        if (data instanceof FormData) {
+          formData = data;
+        } else {
+          formData = new FormData();
+          for (const [key, value] of Object.entries(data)) {
+            if (key === "birthdate" && value) {
+             
+              formData.append(key, toGregorian(value));
+            } else {
+              formData.append(key, value);
+            }
+          }
+        }
+
+        const res = await userService.updateProfile(formData);
+        const updated = res.data.data || {};
+
+        this.profile.username = updated.username || this.profile.username;
+        this.profile.email = updated.email || this.profile.email;
+        this.profile.phone = updated.phone || this.profile.phone;
+        this.profile.birthdate = updated.birthdate ? toJalali(updated.birthdate) : this.profile.birthdate;
+        this.profile.image = updated.image || this.profile.image;
+        this.profile.previewImage = null;
+
+        toast.success("پروفایل با موفقیت ذخیره شد ");
+      } catch (error) {
+        console.error("Update profile error:", error);
+        toast.error("خطا در ذخیره پروفایل");
+      }
     },
 
     updateProfileImage(file) {
-      this.profile.image = file
-      this.profile.imageUrl = URL.createObjectURL(file)
+      if (!file) return;
+      this.profile.image = file;
+      this.profile.previewImage = URL.createObjectURL(file);
     },
+
 
     async fetchAddresses() {
       try {
-        const res = await userService.getAddresses()
-        this.addresses = res.data || []
-      } catch (error) {
-        toast.error('خطا در دریافت آدرس‌ها')
+        const res = await userService.getAddresses();
+        this.addresses = Array.isArray(res.data) ? res.data : [];
+      } catch {
+        toast.error("خطا در دریافت آدرس‌ها");
       }
     },
 
-    addAddress(address) {
-      this.addresses.push(address)
-      toast.success('آدرس افزوده شد ✅')
+    async addAddress(address) {
+      try {
+        const res = await userService.addAddress(address);
+        if (res.data) this.addresses.push(res.data);
+        toast.success("آدرس ثبت شد ");
+      } catch {
+        toast.error("خطا در ثبت آدرس");
+      }
     },
 
-    updateAddress(index, field, value) {
-      if (this.addresses[index]) this.addresses[index][field] = value
-    },
-
-    deleteAddress(index) {
-      this.addresses.splice(index, 1)
-      toast.info('آدرس حذف شد')
+    async deleteAddress(index) {
+      const addr = this.addresses[index];
+      if (!addr?.id) {
+        this.addresses.splice(index, 1);
+        return;
+      }
+      try {
+        await userService.deleteAddress(addr.id);
+        this.addresses.splice(index, 1);
+        toast.success("آدرس حذف شد ");
+      } catch {
+        toast.error("خطا در حذف آدرس");
+      }
     },
 
     async saveAddresses() {
       try {
-        await userService.updateAddresses(this.addresses)
-        toast.success('آدرس‌ها ذخیره شد')
-      } catch (error) {
-        toast.error('خطا در ذخیره آدرس‌ها')
+        await userService.updateAddresses(this.addresses);
+        toast.success("آدرس‌ها ذخیره شد ");
+      } catch {
+        toast.error("خطا در ذخیره آدرس‌ها");
       }
     },
 
     async fetchBankAccounts() {
       try {
-        const res = await userService.getBankInfo()
-        this.bankAccounts = res.data?.bankAccounts || {}
+        const res = await userService.getBankInfo();
+        const data = res.data?.bankAccounts;
+        this.bankAccounts = Array.isArray(data) ? data : data ? [data] : [];
       } catch (error) {
-        toast.error('خطا در دریافت اطلاعات بانکی')
+        toast.error("خطا در دریافت اطلاعات بانکی");
+        this.bankAccounts = [];
       }
     },
+
     async addBankAccount(account) {
       try {
-        console.log('store.addBankAccount called with:', account)
-        const res = await userService.addBankAccount(account)
-        console.log('server response for addBankAccount:', res.data)
-        this.bankAccounts.push(res.data)
-        toast.success('حساب بانکی با موفقیت ثبت شد ✅')
+        const res = await userService.addBankAccount(account);
+        const newAccount = res.data;
+        if (!Array.isArray(this.bankAccounts)) this.bankAccounts = [];
+        this.bankAccounts.push({
+          ...newAccount,
+          bankName: account.bankName,
+          bankLogo: account.bankLogo,
+        });
+        toast.success("حساب بانکی با موفقیت ثبت شد ");
+        return this.bankAccounts[this.bankAccounts.length - 1];
       } catch (error) {
-        const message = error.response?.data?.message || 'خطا در ذخیره حساب بانکی'
-        toast.error(message)
-        throw error // تا کامپوننت هم بتونه خطا را catch کند
+        toast.error("خطا در ثبت حساب بانکی");
+        throw error;
       }
     },
-    async deleteBankAccount(index) {
-      const account = this.bankAccounts[index]
 
-      // اگر حساب هنوز id ندارد (جدید و روی سرور ثبت نشده)
+    async deleteBankAccount(indexOrId) {
+      const index =
+        typeof indexOrId === "number"
+          ? indexOrId
+          : this.bankAccounts.findIndex((a) => a.id === indexOrId);
+      if (index === -1) return;
+
+      const account = this.bankAccounts[index];
       if (!account?.id) {
-        this.bankAccounts.splice(index, 1) // حذف فقط در frontend
-        return
+        this.bankAccounts.splice(index, 1);
+        toast.info("حساب حذف شد");
+        return;
       }
 
-      // حذف واقعی از سرور
       try {
-        await userService.deleteBankAccount(account)
-        this.bankAccounts.splice(index, 1) // حذف از frontend بعد از موفقیت
-        toast.success('حساب بانکی حذف شد ✅')
-      } catch (error) {
-        toast.error('خطا در حذف حساب بانکی')
-      }
-    },
-    async saveBankAccounts() {
-      try {
-        await userService.updateBankInfo(this.bankAccounts)
-        toast.success('اطلاعات بانکی ذخیره شد')
-      } catch (error) {
-        toast.error('خطا در ذخیره اطلاعات بانکی')
+        await userService.deleteBankAccount(account.id);
+        this.bankAccounts.splice(index, 1);
+        toast.success("حساب بانکی حذف شد ");
+      } catch {
+        toast.error("خطا در حذف حساب بانکی");
       }
     },
 
     async fetchProvinces() {
       try {
-        const res = await axios.get('/api/provinces')
-        this.provinces = res.data
-      } catch (error) {
-        toast.error('خطا در دریافت استان‌ها')
+        const res = await userService.getProvinces();
+        this.provinces = res.data || [];
+      } catch {
+        toast.error("خطا در دریافت استان‌ها");
       }
     },
 
     async fetchCities(provinceId) {
       try {
-        const res = await axios.get(`/api/cities?provinceId=${provinceId}`)
-        this.cities = res.data
-      } catch (error) {
-        toast.error('خطا در دریافت شهرها')
+        const res = await userService.getCities(provinceId);
+        this.cities = res.data || [];
+      } catch {
+        toast.error("خطا در دریافت شهرها");
       }
     },
   },
-})
+});

@@ -1,336 +1,328 @@
 <template>
-  <div class="category-detail-page">
-    <Banner />
+  <div class="category-product-page">
     <StickyHeader :visible="true" />
-    <div class="products-container">
-      <h2 class="page-title">دسته‌بندی {{ categoryTitle }}</h2>
-      <div v-if="category" class="category-banner">
-        <img :src="category.image" :alt="category.title" />
-      </div>
-      <p v-if="!category" class="no-products">دسته‌ای یافت نشد.</p>
+    <Banner />
 
-      <div v-if="topProducts.length" class="top-products-grid">
-        <div
-          v-for="product in topProducts"
-          :key="product.id"
-          class="top-product-card"
-          @click="goToProduct(product.id)"
-        >
-          <div class="image-wrapper">
-            <img :src="product.image" :alt="product.title" />
-          </div>
-          <h3>{{ product.title }}</h3>
-          <p class="old-price">
-             {{ Number(product.product?.price || product.price).toLocaleString() }} تومان
-          </p>
-          <p class="final-price">
-            {{ Number(product.final_price).toLocaleString() }} تومان
-          </p>
+    <section class="featured-products" v-if="featuredProducts.length">
+      <router-link
+        v-for="(product, index) in featuredProducts"
+        :key="index"
+        :to="`/product/${product.id}`"
+        class="featured-card"
+      >
+        <div class="featured-image-wrapper">
+          <img :src="product.image" alt="محصول ویژه" class="featured-image" />
+          <span v-if="product.discount" class="featured-discount">
+            {{ product.discount }}%
+          </span>
+        </div>
+        <div class="featured-info">
+          <h3 class="featured-name">{{ product.title }}</h3>
+          <p class="featured-price">{{ toPersianNumber(product.price) }} ریال</p>
+        </div>
+      </router-link>
+    </section>
+
+    <section class="filter-bar">
+      <div class="filter-right" @click="toggleFilterMenu">
+        <i class="fas fa-sliders-h"></i>
+        <span>مرتب‌سازی</span>
+        <div v-if="isFilterOpen" class="filter-dropdown" @click.stop>
+          <button @click="sortBy('priceAsc')">ارزان‌ترین</button>
+          <button @click="sortBy('priceDesc')">گران‌ترین</button>
+          <button @click="sortBy('discount')">بیشترین تخفیف</button>
         </div>
       </div>
+    </section>
 
-      <div v-if="otherProducts.length" class="products-grid">
-        <div
-          v-for="product in otherProducts"
-          :key="product.id"
-          class="product-card"
-          @click="goToProduct(product.id)"
-        >
-          <div class="image-wrapper"> 
-            <img :src="product.image" :alt="product.title" />
-          </div>
-          <h3>{{ product.title }}</h3>
-          <p class="price">
-            {{ Number(product.final_price || product.price).toLocaleString() }} تومان
-          </p>
+    <section class="product-grid">
+      <router-link
+        v-for="(product, index) in paginatedProducts"
+        :key="index"
+        :to="`/product/${product.id}`"
+        class="product-card"
+      >
+        <div class="product-image-wrapper">
+          <img :src="product.image" alt="تصویر محصول" class="product-image" />
+          <span v-if="product.discount" class="discount-badge">
+            {{ product.discount }}%
+          </span>
         </div>
-      </div>
-      
-      <p v-else-if="category && !filteredProducts.length" class="no-products">
-        هنوز محصولی برای این دسته وجود ندارد.
-      </p>
-    </div>
+        <h4 class="product-name">{{ product.title }}</h4>
+        <p class="product-price">{{ toPersianNumber(product.price) }} ریال</p>
+      </router-link>
+    </section>
+
+    <section class="pagination" v-if="totalPages > 1">
+      <button
+        v-for="page in totalPages"
+        :key="page"
+        :class="{ active: currentPage === page }"
+        @click="changePage(page)"
+      >
+        {{ toPersianNumber(page) }}
+      </button>
+    </section>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useCategoryStore } from '@/stores/useCategoryStore'
-import Banner from '@/components/Banner.vue'
-import StickyHeader from '@/components/StickyHeader.vue'
+import { ref, computed, onMounted, watch } from "vue";
+import { useRoute } from "vue-router";
+import StickyHeader from "@/components/StickyHeader.vue";
+import Banner from "@/components/Banner.vue";
+import { useCategoryStore } from "@/stores/useCategoryStore";
 
-const route = useRoute()
-const router = useRouter()
-const categoryId = Number(route.params.id)
-const categoryStore = useCategoryStore()
+const categoryStore = useCategoryStore();
+const route = useRoute();
 
-const category = computed(() => categoryStore.getCategoryById(categoryId))
-const filteredProducts = computed(() => categoryStore.getProductsByCategory(categoryId))
-const topProducts = computed(() => filteredProducts.value.slice(0, 2))
-const otherProducts = computed(() => filteredProducts.value.slice(2))
-const categoryTitle = computed(() => category.value?.title || 'نامشخص')
+const isFilterOpen = ref(false);
+const selectedSort = ref("");
+const currentPage = ref(1);
+const itemsPerPage = 8;
 
-const goToProduct = (productId) => {
-  router.push({ name: 'ProductDetail', params: { id: productId } })
+const categoryId = Number(route.params.id);
+
+const allProducts = computed(() => categoryStore.getProductsByCategory(categoryId));
+
+const featuredProducts = computed(() => allProducts.value.slice(0, 2));
+
+const gridProducts = ref([]);
+
+watch(
+  allProducts,
+  () => {
+    gridProducts.value = allProducts.value.slice(2);
+    currentPage.value = 1;
+  },
+  { immediate: true }
+);
+
+function toggleFilterMenu() {
+  isFilterOpen.value = !isFilterOpen.value;
+}
+function sortBy(type) {
+  selectedSort.value = type;
+  if (type === "priceAsc") gridProducts.value.sort((a, b) => a.price - b.price);
+  if (type === "priceDesc") gridProducts.value.sort((a, b) => b.price - a.price);
+  if (type === "discount") gridProducts.value.sort((a, b) => b.discount - a.discount);
+  isFilterOpen.value = false;
+}
+
+const totalPages = computed(() => Math.ceil(gridProducts.value.length / itemsPerPage));
+const paginatedProducts = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return gridProducts.value.slice(start, start + itemsPerPage);
+});
+function changePage(page) {
+  currentPage.value = page;
+}
+
+function toPersianNumber(number) {
+  return number.toLocaleString("fa-IR");
 }
 
 onMounted(async () => {
-  if (!categoryStore.allCategories.length) await categoryStore.getAllCategories()
-  if (!categoryStore.allProducts.length) await categoryStore.getAllProducts()
-})
+  await categoryStore.getAllCategories();
+  await categoryStore.getAllProducts();
+});
+
+watch(
+  () => route.params.id,
+  () => {
+    currentPage.value = 1;
+  }
+);
 </script>
 
 <style scoped>
-.category-detail-page {
-  background: #f9f9f9;
-  font-family: 'Yekan', sans-serif;
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css");
+
+.category-product-page {
+  font-family: "Vazirmatn", sans-serif;
   direction: rtl;
-  padding-bottom: 80px;
+  background: #f9f9f9;
 }
 
-.products-container {
-  padding: 50px 20px;
-  text-align: center;
-}
-
-.page-title {
-  font-size: 32px;
-  font-weight: bold;
-  margin-bottom: 50px;
-  color: #2c2c2c;
+.filter-bar {
+  display: flex;
+  justify-content: flex-start;
+  margin: 25px 60px 5px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
   position: relative;
-  display: inline-block;
 }
-
-.page-title::after {
-  content: '';
+.filter-right {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  color: #4d6d58;
+  gap: 6px;
+  position: relative;
+}
+.filter-right i {
+  font-size: 18px;
+  color: #4d6d58;
+}
+.filter-dropdown {
   position: absolute;
-  bottom: -10px;
+  top: 35px;
   right: 0;
-  left: 0;
-  margin: auto;
-  width: 80px;
-  height: 4px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, #f9c710, #e0b60c);
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 6px 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+  z-index: 10;
+}
+.product-card,
+.featured-card {
+  text-decoration: none;
+  color: inherit;
+  display: block;
 }
 
-.category-banner img {
-  max-width: 500px;
-  border-radius: 20px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  margin-bottom: 50px;
+.filter-dropdown button {
+  background: none;
+  border: none;
+  text-align: right;
+  padding: 8px 14px;
+  font-size: 14px;
+  color: #4d6d58;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.filter-dropdown button:hover {
+  background: #f2f2f2;
 }
 
-
-.top-products-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 30px; 
-  margin: 60px auto;
-  max-width: 1400px; 
+.featured-products {
+  display: flex;
   justify-content: center;
-  align-items: stretch;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
-
-.top-product-card {
+.featured-card {
   position: relative;
-  border-radius: 20px;
+  width: 560px;
+  height: 950px;
   overflow: hidden;
   background: #fff;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  transition: all 0.4s ease;
-  cursor: pointer;
-  animation: fadeUp 0.7s ease forwards;
-  padding-bottom: 20px; 
+  text-align: right;
 }
-
-.top-product-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.15);
-}
-
-.top-product-card .image-wrapper {
+.featured-image-wrapper {
+  position: relative;
   width: 100%;
-  height: 500px;
-  overflow: hidden;
-  background: #fafafa;
+  height: 85%;
 }
-
-.top-product-card .image-wrapper img {
+.featured-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease, filter 0.3s ease;
 }
-
-.top-product-card:hover .image-wrapper img {
-  transform: scale(1.07);
-  filter: brightness(1.08);
-}
-
-.top-product-card h3 {
-  font-size: 24px; 
-  font-weight: 800;
-  color: #222;
-  margin: 25px 0 10px;
-}
-
-.top-product-card .old-price {
-    font-size: 16px;
-    color: #888;
-    text-decoration: line-through;
-    margin-bottom: 5px;
-}
-
-.top-product-card .final-price {
-  font-size: 20px;
-  color: #dc3545; 
+.featured-discount {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #2e5540;
   font-weight: bold;
-  margin-bottom: 20px;
+  font-size: 20px;
+}
+.featured-info {
+  padding: 10px;
+  height: 30%;
+}
+.featured-name {
+  font-size: 18px;
+  color: #4d6d58;
+}
+.featured-price {
+  font-size: 16px;
+  color: #4d6d58;
 }
 
-
-
-.products-grid {
+.product-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr); 
-  gap: 70px; 
-  max-width: 1400px;
-  margin: 50px auto 0 auto;
-  justify-content: center;
-  justify-items: center;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+  margin: 0px 20px 40px;
+}
+
+@media (max-width: 1200px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 900px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .product-card {
   background: #fff;
-  direction: rtl; 
-  border-radius: 20px; 
-  padding: 25px 20px; 
-  text-align: center;
-  color: #111;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-  cursor: pointer;
-  width: 100%; 
-  position: relative;
   overflow: hidden;
-  border: 1px solid #eee;
+  text-align: right;
+  padding-bottom: 10px;
 }
-
-
-.product-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -150%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(249, 199, 16, 0.3), transparent); 
-  transform: skewX(-20deg);
-  transition: all 0.6s ease-in-out;
-  z-index: 1; 
-}
-
-.product-card:hover::before {
-  left: 150%;
-}
-
-.product-card:hover {
-  transform: translateY(-10px); 
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); 
-  border-color: #f9c710; 
-}
-
-.product-card .image-wrapper {
+.product-image-wrapper {
+  position: relative;
   width: 100%;
-  max-width: 150px; 
-  height: 150px;
-  margin: 0 auto 45px auto;
-  display: flex; 
-  justify-content: center; 
-  align-items: center
+  height: 380px;
+  overflow: hidden;
 }
-
-.product-card img {
+.product-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 50%;
-  padding: 10px; 
-  background: #f9f9f9;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  border: 3px solid #f9c710;
-  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-
-.product-card:hover img {
-  transform: scale(1.05) rotate(2deg); 
-  box-shadow: 0 4px 15px rgba(249, 199, 16, 0.6);
-}
-
-.product-card h3 {
-  font-size: 18px; 
-  font-weight: 700;
-  color: #1a1a1a;
-  margin-top: 5px;
-  transition: color 0.3s;
-}
-
-.product-card:hover h3 {
-  color: #f9c710; 
-}
-
-.product-card .price {
-  color: #004a64;
+.discount-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: #2e5540;
   font-weight: bold;
   font-size: 16px;
-  margin-top: 8px;
+}
+.product-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  color: #4d6d58;
+}
+.product-price {
+  color: #4d6d58;
+  font-weight: bold;
 }
 
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0;
+  gap: 8px;
 }
-
-
-@media (max-width: 1300px) {
-  .products-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
+.pagination button {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
 }
-
-@media (max-width: 1024px) {
-  .products-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 992px) {
-  .top-products-grid {
-    grid-template-columns: 1fr; 
-  }
-  .top-product-card .image-wrapper {
-    height: 400px;
-  }
-}
-
-@media (max-width: 768px) {
-  .products-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 480px) {
-  .products-grid {
-    grid-template-columns: 1fr;
-  }
+.pagination button.active {
+  background: #4d6d58;
+  color: #fff;
+  border-color: #4d6d58;
 }
 </style>

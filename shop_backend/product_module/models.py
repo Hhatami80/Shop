@@ -19,7 +19,7 @@ class ProductCategory(models.Model):
     parent = models.ForeignKey('ProductCategory', null=True, blank=True, on_delete=models.CASCADE,
                                related_name='children')
     image = models.ImageField(verbose_name='عکس دسته بندی', upload_to='images/categories', null=True, blank=True)
-    link = models.CharField(verbose_name='لینک مقصد', null=True, blank=True)
+    link = models.CharField(verbose_name='لینک مقصد',max_length=200, null=True, blank=True)
     slug = models.SlugField(default='', null=True, blank=True)
 
     def save(self, *args, **kwargs):
@@ -63,14 +63,14 @@ class Product(models.Model):
     title = models.CharField(max_length=150, verbose_name='عنوان محصول')
     image = models.ImageField(verbose_name='عکس محصول', upload_to='images/products', null=True, blank=True)
     slug = models.SlugField(default='', null=True, blank=True)
-    short_description = models.CharField(verbose_name='توضیحات کوتاه', null=True, blank=True)
-    description_title = models.CharField(verbose_name='عنوان توضیحات', null=True, blank=True)
+    short_description = models.CharField(verbose_name='توضیحات کوتاه', max_length=300,null=True, blank=True)
+    description_title = models.CharField(verbose_name='عنوان توضیحات',max_length=200, null=True, blank=True)
     description = models.TextField(verbose_name='توضیحات تکمیلی', null=True, blank=True)
-    price = models.CharField(verbose_name='قیمت محصولات')
+    price = models.CharField(verbose_name='قیمت محصولات',max_length=100)
     discount = models.CharField(verbose_name='تخفیف', null=True, blank=True, max_length=20)
     discounted_price = models.CharField(verbose_name='قیمت تخفیف خورده', null=True, blank=True, max_length=20)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, verbose_name='برند محصول', null=True, blank=True)
-    category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE, verbose_name='دسته بندی محصول', default=1,
+    category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE,max_length=255, verbose_name='دسته بندی محصول', default=1,
                                  related_name='categories')
     final_price = models.IntegerField(null=True, blank=True, verbose_name='قیمت نهایی')
     # product_tag = models.ManyToManyField(ProductTag, verbose_name='تگ محصول')
@@ -129,7 +129,7 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField(default=1)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2 , max_length=200)
 
 
 class ProductRating(models.Model):

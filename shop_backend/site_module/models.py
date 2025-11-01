@@ -19,7 +19,7 @@ class BannerImages(models.Model):
 
 class Header(models.Model):
     title = models.CharField(verbose_name='عنوان هدر', max_length=20)
-    url = models.CharField(verbose_name='لینک', null=True, blank=True)
+    url = models.CharField(verbose_name='لینک',max_length=200, null=True, blank=True)
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -62,7 +62,7 @@ class FooterLinkBox(models.Model):
 
 class FooterLink(models.Model):
     title = models.CharField(verbose_name='دسته بندی لینک', max_length=40)
-    url = models.CharField(verbose_name='لینک', null=True, blank=True)
+    url = models.CharField(verbose_name='لینک',max_length=200, null=True, blank=True)
     footer_link_box = models.ForeignKey(FooterLinkBox, on_delete=models.CASCADE, verbose_name='دسته بندی',
                                         related_name='footer_link')
 

@@ -16,6 +16,12 @@ export const walletService = {
   withdraw(payload) {
     return api.post('/wallet/withdraw/', payload)
   },
+  createPayment(payload) {
+  return api.post('/wallet/payment/', payload)
+},
+walletVerify(payload) {
+  return api.post('/wallet/verify/', payload)
 }
+} 
 
 export default walletService

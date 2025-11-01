@@ -1,0 +1,3 @@
+install python same as mani
+run pip install -r requirements.txt in code directory of backend
+run python manage.py runserver

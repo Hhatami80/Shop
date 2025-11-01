@@ -11,7 +11,6 @@
       </p>
 
       <button class="btn-view-orders" @click="goToOrders">مشاهده سفارش‌ها</button>
-      <button class="btn-continue-shopping" @click="goToHome">ادامه خرید</button>
     </div>
   </div>
 </template>
@@ -38,7 +37,7 @@ onMounted(() => {
   fetchOrder();
 });
 
-const goToOrders = () => router.push({ name: "OrdersPage" });
+const goToOrders = () => router.push({ name: "user" });
 const goToHome = () => router.push({ name: "HomePage" });
 </script>
 

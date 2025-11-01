@@ -2,9 +2,7 @@
   <div class="bank-section">
     <h3>حساب‌های بانکی من</h3>
 
-    <!-- فرم افزودن حساب -->
     <div class="bank-inputs">
-      <!-- شماره کارت با شناسایی بانک -->
       <div class="input-card">
         <label>شماره کارت</label>
         <input
@@ -39,8 +37,7 @@
       <button class="btn gold-btn" @click="handleAddBank">➕ افزودن حساب</button>
     </div>
 
-    <!-- جدول حساب‌ها -->
-    <table class="bank-table" v-if="store.bankAccounts.id">
+    <table class="bank-table" v-if="store.bankAccounts.length">
       <thead>
         <tr>
           <th>لوگو</th>
@@ -52,16 +49,16 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td><img src="" class="bank-logo" /></td>
-          <td>نامشخص</td>
-          <td>{{ maskCard(store.bankAccounts.cardNumber) }}</td>
-          <td>{{ store.bankAccounts.accountNumber }}</td>
-          <td>{{ store.bankAccounts.iban }}</td>
+        <tr v-for="(account, idx) in store.bankAccounts" :key="account.id">
           <td>
-            <button class="delete-btn" @click="handleDeleteBank(store.bankAccounts.id)">
-              🗑 حذف
-            </button>
+            <img :src="account.bankLogo || '/logos/default.png'" class="bank-logo" />
+          </td>
+          <td>{{ account.bankName || "نامشخص" }}</td>
+          <td>{{ maskCard(account.cardNumber) }}</td>
+          <td>{{ account.accountNumber }}</td>
+          <td>{{ account.iban }}</td>
+          <td>
+            <button class="delete-btn" @click="handleDeleteBank(idx)">🗑 حذف</button>
           </td>
         </tr>
       </tbody>
@@ -85,37 +82,32 @@ import {
 
 const store = useUserStore();
 
-// فرم reactive
 const newBank = reactive({
   cardNumber: "",
   accountNumber: "",
   iban: "",
 });
 
-// شناسایی بانک در لحظه تایپ
 const detectedBank = computed(() => {
   const cardClean = newBank.cardNumber.replace(/\s+/g, "");
   return getBankFromCard(cardClean) || {};
 });
 
-// بارگذاری حساب‌های بانکی
-onMounted(() => {
-  store.fetchBankAccounts();
+onMounted(async () => {
+  await store.fetchProfile();
+  await store.fetchBankAccounts();
 });
 
-// ماسک شماره کارت برای جدول
 function maskCard(cardNumber) {
   if (!cardNumber) return "";
   return "**** **** **** " + cardNumber.slice(-4);
 }
 
-// فرمت خودکار input شماره کارت
 function onCardInput(e) {
   let digits = e.target.value.replace(/\D/g, "").slice(0, 16);
   newBank.cardNumber = digits.replace(/(.{4})/g, "$1 ").trim();
 }
 
-// افزودن حساب
 const handleAddBank = async () => {
   const card = newBank.cardNumber.replace(/\s+/g, "");
   const accountNum = newBank.accountNumber.trim();
@@ -123,34 +115,23 @@ const handleAddBank = async () => {
 
   if (!card || !accountNum || !iban) return toast.error("لطفاً همه فیلدها را پر کنید");
 
-  // اعتبارسنجی
   if (!validateBankCardNumber(card)) return toast.error("شماره کارت معتبر نیست");
   if (!validateAccountNumber(accountNum))
     return toast.error("شماره حساب معتبر نیست (حداکثر 12 رقم)");
-  if (!validateIranianIBAN(iban)) return toast.error("شماره شبا معتبر نیست");
+  let ibanIsValid = validateIranianIBAN(iban);
+  if (!ibanIsValid) return toast.error("شماره شبا معتبر نیست");
 
   const bankInfo = {
     cardNumber: card,
     accountNumber: accountNum,
     iban,
-    bankName: detectedBank.value.bank_title || "نامشخص",
-    bankLogo: detectedBank.value.bank_logo || "/logos/default.png",
-    user: store.profile.id || 2,
   };
 
   try {
     const added = await store.addBankAccount(bankInfo);
+    added.bankName = detectedBank.value.bank_title || "نامشخص";
+    added.bankLogo = detectedBank.value.bank_logo || "/logos/default.png";
 
-    // اگر backend فقط id, cardNumber, accountNumber, iban, user برمی‌گرداند
-    store.bankAccounts.push({
-      ...added,
-      bankName: bankInfo.bankName,
-      bankLogo: bankInfo.bankLogo,
-    });
-
-    toast.success("حساب بانکی افزوده شد ✅");
-
-    // ریست فرم
     newBank.cardNumber = "";
     newBank.accountNumber = "";
     newBank.iban = "";
@@ -160,7 +141,6 @@ const handleAddBank = async () => {
   }
 };
 
-// حذف حساب
 const handleDeleteBank = async (index) => {
   await store.deleteBankAccount(index);
 };
@@ -187,6 +167,7 @@ h3 {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
   margin-bottom: 25px;
+  outline: none;
 }
 .input-card {
   background: #fff;
@@ -204,6 +185,7 @@ input {
   border-radius: 10px;
   border: 1px solid #ddd;
   font-size: 0.92rem;
+  outline: none;
 }
 .bank-detect {
   display: flex;

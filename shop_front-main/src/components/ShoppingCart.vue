@@ -1,6 +1,8 @@
 <template>
   <div class="cart-grid">
-    <div v-if="cartStore.items.length === 0" class="empty-cart">سبد خرید شما خالی است</div>
+    <div v-if="cartStore.items.length === 0" class="empty-cart">
+      سبد خرید شما خالی است
+    </div>
 
     <div v-else class="cart-items">
       <div v-for="item in cartStore.items" :key="item.id" class="cart-item">
@@ -39,7 +41,11 @@
             </div>
 
             <div class="qty-section">
-              <button v-if="item.quantity > 1" @click="decrease(item)" class="qty-btn increase-btn">
+              <button
+                v-if="item.quantity > 1"
+                @click="decrease(item)"
+                class="qty-btn increase-btn"
+              >
                 <i class="fas fa-minus"></i>
               </button>
               <button v-else @click="removeItem(item.id)" class="qty-btn delete-btn">
@@ -60,28 +66,35 @@
         <span>تعداد کالاها:</span> <span>{{ cartStore.totalQuantity }}</span>
       </p>
       <p class="total">
-        <span>جمع کل:</span> <span>{{ cartStore.totalPrice.toLocaleString() }} تومان</span>
+        <span>جمع کل:</span>
+        <span>{{ cartStore.totalPrice.toLocaleString() }} تومان</span>
       </p>
-      <button class="checkout-btn">تایید و تکمیل سفارش</button>
+      <button class="checkout-btn" @click="goToCheckout">تایید و تکمیل سفارش</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
-import { useCartStore } from '@/stores/useCartStore'
+import { onMounted } from "vue";
+import { useCartStore } from "@/stores/useCartStore";
+import { useRouter } from "vue-router";
+const router = useRouter();
 
-const cartStore = useCartStore()
-onMounted(() => cartStore.fetchCart())
+function goToCheckout() {
+  router.push({ name: "checkout" });
+}
+
+const cartStore = useCartStore();
+onMounted(() => cartStore.fetchCart());
 
 function increase(item) {
-  cartStore.updateItem(item.id, item.quantity + 1)
+  cartStore.updateItem(item.id, item.quantity + 1);
 }
 function decrease(item) {
-  if (item.quantity > 1) cartStore.updateItem(item.id, item.quantity - 1)
+  if (item.quantity > 1) cartStore.updateItem(item.id, item.quantity - 1);
 }
 function removeItem(id) {
-  cartStore.removeItem(id)
+  cartStore.removeItem(id);
 }
 </script>
 
@@ -101,7 +114,7 @@ function removeItem(id) {
   grid-template-columns: 2.5fr 1fr;
   gap: 30px;
   direction: rtl;
-  font-family: 'Vazirmatn', sans-serif;
+  font-family: "Vazirmatn", sans-serif;
   max-width: 1200px;
   margin: 40px auto;
   padding: 20px;

@@ -9,21 +9,21 @@
       <fa-icon :icon="['fas', 'spinner']" pulse /> در حال بارگذاری سفارش‌ها...
     </div>
 
-    <table v-else class="orders-table" v-if="orderStore.orders.length">
+    <table v-else-if="orderStore.orders.length" class="orders-table">
       <thead>
         <tr>
           <th>شماره سفارش</th>
           <th>تاریخ</th>
           <th>جمع کل</th>
           <th>وضعیت</th>
-          <th>عملیات</th>
+          <th>جزئیات</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="order in orderStore.orders" :key="order.id">
           <td>#{{ order.id }}</td>
-          <td>{{ new Date(order.created_at).toLocaleDateString() }}</td>
-          <td>{{ order.total_price.toLocaleString() }} تومان</td>
+          <td>{{ formatDate(order.created_at) }}</td>
+          <td>{{ formatPrice(order.total_price) }} تومان</td>
           <td>
             <select v-model="order.status" @change="changeStatus(order)">
               <option value="pending">در انتظار</option>
@@ -33,8 +33,8 @@
             </select>
           </td>
           <td>
-            <button class="btn-delete" @click="deleteOrder(order.id)">
-              <fa-icon :icon="['fas', 'trash']" /> حذف
+            <button class="btn-details" @click="openModal(order)">
+              <fa-icon :icon="['fas', 'eye']" /> مشاهده
             </button>
           </td>
         </tr>
@@ -42,28 +42,85 @@
     </table>
 
     <div v-else class="empty-state">سفارشی برای نمایش وجود ندارد.</div>
+
+    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
+      <div class="modal">
+        <h3>جزئیات سفارش #{{ selectedOrder.id }}</h3>
+        <table class="modal-table">
+          <thead>
+            <tr>
+              <th>نام محصول</th>
+              <th>تعداد</th>
+              <th>قیمت واحد</th>
+              <th>جمع</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in selectedOrder.items" :key="item.id">
+              <td>{{ item.product_detail.title }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ formatPrice(item.price) }} تومان</td>
+              <td>{{ formatPrice(item.quantity * item.price) }} تومان</td>
+            </tr>
+            <tr v-if="!selectedOrder.items.length">
+              <td colspan="4" style="text-align: center">
+                هیچ محصولی در این سفارش موجود نیست.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="modal-actions">
+          <button class="btn-delete" @click="deleteOrder(selectedOrder.id)">
+            <fa-icon :icon="['fas', 'trash']" /> حذف سفارش
+          </button>
+          <button class="btn-close" @click="closeModal">بستن</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { useOrderStore } from "@/stores/useOrderStore";
 import { toast } from "vue3-toastify";
 
 const orderStore = useOrderStore();
+const showModal = ref(false);
+const selectedOrder = ref({});
+
+onMounted(() => {
+  orderStore.fetchOrders();
+});
+
+const formatDate = (dateStr) =>
+  dateStr ? new Date(dateStr).toLocaleDateString("fa-IR") : "-";
+const formatPrice = (price) => (price ? Number(price).toLocaleString("fa-IR") : 0);
 
 const changeStatus = async (order) => {
   await orderStore.updateOrderStatus(order.id, order.status);
 };
 
-const deleteOrder = async (orderId) => {
-  if (!confirm("آیا از حذف این سفارش مطمئن هستید؟")) return;
-  await orderStore.deleteOrder(orderId);
+const openModal = (order) => {
+  selectedOrder.value = order;
+  showModal.value = true;
 };
 
-onMounted(() => {
-  orderStore.fetchOrders();
-});
+const closeModal = () => {
+  showModal.value = false;
+};
+
+const deleteOrder = async (orderId) => {
+  if (!confirm("آیا از حذف این سفارش مطمئن هستید؟")) return;
+  try {
+    await orderStore.deleteOrder(orderId);
+    toast.success("سفارش حذف شد");
+    closeModal();
+  } catch (err) {
+    console.error(err);
+    toast.error("خطا در حذف سفارش");
+  }
+};
 </script>
 
 <style scoped>
@@ -75,20 +132,7 @@ onMounted(() => {
   padding: 25px;
   border-radius: 16px;
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
-}
-
-h1 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 24px;
-  margin-bottom: 20px;
-  color: #222;
-}
-
-.title-icon {
-  color: #f9c710;
-  font-size: 1.5rem;
+  direction: rtl;
 }
 
 .orders-table {
@@ -106,7 +150,6 @@ h1 {
 
 .orders-table th {
   background: #ffd700;
-  color: #1a1a1a;
   font-weight: 700;
 }
 
@@ -121,16 +164,82 @@ select {
   cursor: pointer;
 }
 
-.btn-delete {
-  background: #dc3545;
+.btn-details {
+  background: #007bff;
   color: #fff;
   border: none;
   padding: 6px 10px;
   border-radius: 6px;
   cursor: pointer;
-  transition: 0.3s;
+}
+.btn-details:hover {
+  background: #0056b3;
 }
 
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 600px;
+  width: 90%;
+}
+
+.modal h3 {
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.modal-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 15px;
+}
+.modal-table th,
+.modal-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.btn-close {
+  background: #6c757d;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-close:hover {
+  background: #5a6268;
+}
+
+.btn-delete {
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
 .btn-delete:hover {
   background: #c82333;
 }
@@ -140,11 +249,5 @@ select {
   text-align: center;
   padding: 30px;
   color: #777;
-  font-size: 16px;
-}
-
-.loading-state .fa-icon {
-  color: #ffd700;
-  margin-left: 6px;
 }
 </style>

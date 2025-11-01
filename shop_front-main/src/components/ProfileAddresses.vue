@@ -6,7 +6,7 @@
     <div class="address-form">
       <div class="form-group">
         <label>استان:</label>
-        <select v-model="newAddress.provinceId" @change="updateCities">
+        <select v-model="newAddress.province_id" @change="updateCities">
           <option disabled value="">انتخاب کنید</option>
           <option
             v-for="province in store.provinces"
@@ -20,7 +20,7 @@
 
       <div class="form-group">
         <label>شهر:</label>
-        <select v-model="newAddress.cityId" :disabled="!newAddress.provinceId">
+        <select v-model="newAddress.city_id" :disabled="!newAddress.province_id">
           <option disabled value="">انتخاب کنید</option>
           <option v-for="city in store.cities" :key="city.id" :value="city.id">
             {{ city.name }}
@@ -44,13 +44,13 @@
 
       <div class="form-group">
         <label>پلاک:</label>
-        <input v-model="newAddress.plaque" type="text" placeholder="مثلاً ۲۳" />
+        <input v-model="newAddress.plate" type="text" placeholder="مثلاً ۲۳" />
       </div>
 
       <div class="form-group full">
         <label>آدرس کامل:</label>
         <textarea
-          v-model="newAddress.fullAddress"
+          v-model="newAddress.full_address"
           rows="2"
           placeholder="مثلاً تهران، نیاوران، کوچه گلستان، پلاک ۲۳..."
         ></textarea>
@@ -74,12 +74,12 @@
       </thead>
       <tbody>
         <tr v-for="(addr, idx) in store.addresses" :key="idx">
-          <td>{{ addr.provinceName }}</td>
-          <td>{{ addr.cityName }}</td>
+          <td>{{ addr.province.name }}</td>
+          <td>{{ addr.city.name }}</td>
           <td>{{ addr.neighborhood }}</td>
           <td>{{ addr.street }}</td>
-          <td>{{ addr.plaque }}</td>
-          <td>{{ addr.fullAddress }}</td>
+          <td>{{ addr.plate }}</td>
+          <td>{{ addr.full_address }}</td>
           <td>
             <button class="delete-btn" @click="deleteAddress(idx)">🗑</button>
           </td>
@@ -97,12 +97,12 @@ import { toast } from "vue3-toastify";
 const store = useUserStore();
 
 const newAddress = reactive({
-  provinceId: "",
-  cityId: "",
+  province_id: "",
+  city_id: "",
   neighborhood: "",
   street: "",
-  plaque: "",
-  fullAddress: "",
+  plate: "",
+  full_address: "",
 });
 
 onMounted(async () => {
@@ -111,46 +111,41 @@ onMounted(async () => {
 });
 
 watch(
-  () => newAddress.provinceId,
+  () => newAddress.province_id,
   async (val) => {
-    newAddress.cityId = "";
+    newAddress.city_id = "";
     if (val) await store.fetchCities(val);
   }
 );
 
 const addAddress = async () => {
-  if (!newAddress.provinceId || !newAddress.cityId) {
+  if (!newAddress.province_id || !newAddress.city_id) {
     return toast.error("لطفاً استان و شهر را انتخاب کنید");
   }
 
-  const province = store.provinces.find((p) => p.id === Number(newAddress.provinceId));
-  const city = store.cities.find((c) => c.id === Number(newAddress.cityId));
-
   const addressToAdd = {
-    provinceId: newAddress.provinceId,
-    provinceName: province?.name || "",
-    cityId: newAddress.cityId,
-    cityName: city?.name || "",
+    province_id: newAddress.province_id,
+    city_id: newAddress.city_id,
     neighborhood: newAddress.neighborhood,
     street: newAddress.street,
-    plaque: newAddress.plaque,
-    fullAddress: newAddress.fullAddress,
+    plate: newAddress.plate,
+    full_address: newAddress.full_address,
   };
 
   try {
-    // اضافه شدن به store و ارسال به backend
     await store.addAddress(addressToAdd);
 
-    // فرم رو reset کن
-    newAddress.provinceId = "";
-    newAddress.cityId = "";
+    // پاک‌کردن فرم
+    newAddress.province_id = "";
+    newAddress.city_id = "";
     newAddress.neighborhood = "";
     newAddress.street = "";
-    newAddress.plaque = "";
-    newAddress.fullAddress = "";
+    newAddress.plate = "";
+    newAddress.full_address = "";
 
     toast.success("آدرس با موفقیت افزوده شد ✅");
   } catch (error) {
+    console.error(error.response?.data);
     toast.error("خطا در افزودن آدرس");
   }
 };
@@ -158,7 +153,6 @@ const addAddress = async () => {
 const deleteAddress = async (idx) => {
   try {
     await store.deleteAddress(idx);
-    toast.info("آدرس حذف شد");
   } catch {
     toast.error("خطا در حذف آدرس");
   }

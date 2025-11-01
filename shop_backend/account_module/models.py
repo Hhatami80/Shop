@@ -30,11 +30,11 @@ class User(AbstractUser):
         (ROLE_CHOICE_USER, 'user'),
     )
 
-    phone = models.CharField(unique=True, null=False, blank=False, default=0, error_messages={
+    phone = models.CharField(unique=True, null=False,max_length=13, blank=False, default=0, error_messages={
         'unique': 'این شماره تلفن در سیستم وجود دارد.'
     })
     is_active = models.BooleanField(default=True)
-    fullname = models.CharField(null=True, blank=True, verbose_name='نام کاربری')
+    fullname = models.CharField(null=True, blank=True,max_length=255, verbose_name='نام کاربری')
     image = models.ImageField(verbose_name='پروفایل کاربر', upload_to='images/profiles', null=True, blank=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICE, default=ROLE_CHOICE_USER)
     birthdate = models.DateField(blank=True, null=True)

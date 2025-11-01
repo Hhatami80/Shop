@@ -29,9 +29,8 @@ export const useLoginStore = defineStore('login', {
         if (response.status === 200) {
           this.token = response.data.token
           this.user = response.data.user
-
           VueCookies.set('token', this.token, '1d')
-          VueCookies.set('user', JSON.stringify(this.user), '1d')
+          VueCookies.set('user', this.user, '1d')
           return true
         }
       } catch (error) {
@@ -56,7 +55,15 @@ export const useLoginStore = defineStore('login', {
     loadFromCookies() {
       this.token = VueCookies.get('token')
       const userCookie = VueCookies.get('user')
-      this.user = userCookie ? JSON.parse(userCookie) : null
+      try {
+        if (typeof userCookie === 'string') {
+          this.user = JSON.parse(userCookie)
+        } else {
+          this.user = userCookie
+        }
+      } catch {
+        this.user = userCookie
+      }
     }
   }
 })

@@ -3,7 +3,6 @@
     <h2 class="title">مدیریت کاربران</h2>
 
     <div v-if="store.loading" class="loading">در حال بارگذاری...</div>
-    <div v-else-if="store.error" class="error">خطا در بارگذاری کاربران</div>
 
     <table v-else class="user-table">
       <thead>
@@ -22,9 +21,7 @@
           <td>{{ user.email }}</td>
           <td>{{ user.phone }}</td>
           <td>
-            <button class="btn btn-delete" @click="handleDelete(user.id)">
-              حذف
-            </button>
+            <button class="btn btn-delete" @click="handleDelete(user.id)">حذف</button>
           </td>
         </tr>
       </tbody>
@@ -33,55 +30,55 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue"
-import { useUserStore } from "@/stores/useUserStore"
-import Swal from 'sweetalert2'
+import { onMounted } from "vue";
+import { useUserStore } from "@/stores/useUserStore";
+import Swal from "sweetalert2";
 
-const store = useUserStore()
+const store = useUserStore();
 
 onMounted(() => {
-  store.fetchUser()
-})
+  store.fetchUsers();
+});
 
 const handleDelete = (id) => {
   Swal.fire({
     title: '<span style="font-weight:bold; font-size:20px;">آیا مطمئنی؟</span>',
     html: '<p style="font-size:16px;">با حذف این کاریر دیگر قابل بازیابی نیست!</p>',
-    icon: 'warning',
+    icon: "warning",
     showCancelButton: true,
-    confirmButtonColor: '#e63946',
-    cancelButtonColor: '#adb5bd',
+    confirmButtonColor: "#e63946",
+    cancelButtonColor: "#adb5bd",
     confirmButtonText: '<i class="fa fa-trash"></i> حذف کاریر',
     cancelButtonText: '<i class="fa fa-times"></i> لغو',
     buttonsStyling: false,
     customClass: {
-      popup: 'my-swal-popup',
-      confirmButton: 'my-swal-confirm',
-      cancelButton: 'my-swal-cancel',
+      popup: "my-swal-popup",
+      confirmButton: "my-swal-confirm",
+      cancelButton: "my-swal-cancel",
     },
   }).then((result) => {
     if (result.isConfirmed) {
-      store.deleteUser(id)
+      store.deleteUser(id);
       Swal.fire({
         title: '<span style="font-weight:bold; font-size:20px;">حذف شد!</span>',
         html: '<p style="font-size:16px;">کاریر موردنظر با موفقیت حذف شد.</p>',
-        icon: 'success',
-        confirmButtonText: 'باشه',
+        icon: "success",
+        confirmButtonText: "باشه",
         buttonsStyling: false,
         customClass: {
-          popup: 'my-swal-popup',
-          confirmButton: 'my-swal-confirm',
+          popup: "my-swal-popup",
+          confirmButton: "my-swal-confirm",
         },
-      })
+      });
     }
-  })
-}
+  });
+};
 </script>
 
 <style scoped>
 .user-list-container {
   --primary-color: #ffd700;
-  --primary-color-hover: #E6C200;
+  --primary-color-hover: #e6c200;
   --secondary-color: #34495e;
   --danger-color: #dc3545;
   --bg-light: #f8f9fa;
@@ -95,7 +92,7 @@ const handleDelete = (id) => {
   border-radius: 12px;
   box-shadow: 0 8px 20px var(--shadow-color);
   direction: rtl;
-  font-family: 'Vazirmatn', sans-serif;
+  font-family: "Vazirmatn", sans-serif;
 }
 
 .title {
@@ -184,7 +181,7 @@ const handleDelete = (id) => {
 }
 
 :global(.my-swal-popup) {
-  font-family: 'Vazirmatn', sans-serif;
+  font-family: "Vazirmatn", sans-serif;
   border-radius: 12px;
   direction: rtl;
 }

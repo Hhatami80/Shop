@@ -2,10 +2,12 @@
   <div class="profile-section">
     <h3>فرم پروفایل</h3>
 
-    <!-- فرم پروفایل -->
     <form @submit.prevent="saveProfile" class="profile-form">
       <div class="avatar-section">
-        <img :src="store.profile.imageUrl || defaultAvatar" alt="Profile" />
+        <img
+          :src="store.profile.previewImage || store.profile.image || defaultAvatar"
+          alt="Profile"
+        />
         <label class="upload-label">
           <input type="file" accept="image/*" @change="onFileChange" />
           تغییر تصویر
@@ -55,7 +57,6 @@
       <button type="submit" class="btn gold-btn">ذخیره تغییرات</button>
     </form>
 
-    <!-- جدول پیش‌نمایش -->
     <h4>پیش‌نمایش مقادیر فرم</h4>
     <table class="preview-table">
       <thead>
@@ -64,6 +65,7 @@
           <th>ایمیل</th>
           <th>شماره تماس</th>
           <th>تاریخ تولد</th>
+          <th>عکس</th>
           <th>ویرایش</th>
         </tr>
       </thead>
@@ -72,8 +74,21 @@
           <td>{{ store.profile.username }}</td>
           <td>{{ store.profile.email }}</td>
           <td>{{ store.profile.phone }}</td>
-          <td>{{ store.profile.birthdate }}</td>
-          <td><button class="btn edit-btn">ویرایش</button></td>
+          <td>{{ birthdateShamsi }}</td>
+          <td>
+            <img
+              v-if="store.profile.previewImage || store.profile.image"
+              :src="store.profile.previewImage || store.profile.image"
+              alt="profile"
+              width="50"
+              height="50"
+              style="border-radius: 50%; object-fit: cover"
+            />
+            <span v-else>-</span>
+          </td>
+          <td>
+            <button class="btn edit-btn" @click="editProfile">ویرایش</button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -81,8 +96,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useUserStore } from "@/stores/useUserStore";
+import jalaali from "jalaali-js";
 
 const store = useUserStore();
 const defaultAvatar = "/logos/default.png";
@@ -90,17 +106,32 @@ const defaultAvatar = "/logos/default.png";
 const DatePicker = ref(null);
 const datePickerLoaded = ref(false);
 
+function toJalali(gDate) {
+  if (!gDate) return "";
+  const [gy, gm, gd] = gDate.split("-").map(Number);
+  const { jy, jm, jd } = jalaali.toJalaali(gy, gm, gd);
+  return `${jy}/${String(jm).padStart(2, "0")}/${String(jd).padStart(2, "0")}`;
+}
+
+const birthdateShamsi = computed(() => {
+  const date = store.profile.birthdate;
+  if (!date) return "-";
+
+  if (date.includes("/")) return date;
+
+  return toJalali(date);
+});
+
 onMounted(async () => {
   const module = await import("vue3-persian-datetime-picker");
   DatePicker.value = module.default;
   datePickerLoaded.value = true;
+  await store.fetchProfile();
 });
 
 const onFileChange = (e) => {
   const file = e.target.files[0];
-  if (file) {
-    store.updateProfileImage(file);
-  }
+  if (file) store.updateProfileImage(file);
 };
 
 const saveProfile = async () => {
@@ -108,11 +139,15 @@ const saveProfile = async () => {
   formData.append("username", store.profile.username);
   formData.append("email", store.profile.email);
   formData.append("phone", store.profile.phone);
-  formData.append("birthdate", store.profile.birthdate);
+
+  if (store.profile.birthdate) formData.append("birthdate", store.profile.birthdate);
+
   if (store.profile.image instanceof File) formData.append("image", store.profile.image);
 
   await store.updateProfile(formData);
 };
+
+const editProfile = () => {};
 </script>
 
 <style scoped>
@@ -125,7 +160,6 @@ const saveProfile = async () => {
   padding: 20px;
 }
 
-/* فرم پروفایل */
 .profile-form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -230,7 +264,6 @@ component:focus {
   box-shadow: 0 6px 14px rgba(191, 162, 52, 0.5);
 }
 
-/* جدول پیش‌نمایش */
 .preview-table {
   width: 100%;
   border-collapse: collapse;

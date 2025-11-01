@@ -2,7 +2,6 @@
   <div class="profile-card">
     <h3>پروفایل کاربری</h3>
 
-    <!-- تب‌ها -->
     <div class="profile-tabs">
       <button :class="{ active: tab === 'info' }" @click="tab = 'info'">
         مشخصات فردی
@@ -15,18 +14,14 @@
       </button>
     </div>
 
-    <!-- مشخصات فردی -->
-    <!-- مشخصات فردی -->
     <div v-if="tab === 'info'">
       <ProfileInfo />
     </div>
 
-    <!-- آدرس‌ها -->
     <div v-if="tab === 'addresses'" class="profile-form">
       <ProfileAddresses />
     </div>
 
-    <!-- حساب بانکی -->
     <div v-if="tab === 'bank'">
       <BankAccounts />
     </div>
@@ -77,7 +72,6 @@ const saveProfile = async () => {
 </script>
 
 <style scoped>
-/* ==== کارت اصلی ==== */
 .profile-card {
   background: linear-gradient(180deg, #ffffff 0%, #fdfaf3 100%);
   border-radius: 20px;
@@ -95,7 +89,6 @@ const saveProfile = async () => {
   color: #333;
 }
 
-/* ==== تب‌ها ==== */
 .profile-tabs {
   display: flex;
   justify-content: center;
@@ -128,7 +121,6 @@ const saveProfile = async () => {
   transform: translateY(-2px);
 }
 
-/* ==== فرم ==== */
 .profile-form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -139,7 +131,6 @@ const saveProfile = async () => {
   box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.03);
 }
 
-/* ==== آواتار ==== */
 .avatar-section {
   grid-column: 1 / -1;
   text-align: center;
@@ -186,7 +177,6 @@ const saveProfile = async () => {
   outline: none !important;
 }
 
-/* ==== فیلدها ==== */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -211,7 +201,6 @@ input:focus {
   outline: none;
 }
 
-/* ==== دکمه‌ها ==== */
 .btn {
   grid-column: 1 / -1;
   border: none;
@@ -235,7 +224,6 @@ input:focus {
   box-shadow: 0 6px 14px rgba(191, 162, 52, 0.5);
 }
 
-/* ==== انیمیشن ==== */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -247,7 +235,6 @@ input:focus {
   }
 }
 
-/* ==== ریسپانسیو ==== */
 @media (max-width: 768px) {
   .profile-form {
     grid-template-columns: 1fr;

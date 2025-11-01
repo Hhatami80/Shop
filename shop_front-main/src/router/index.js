@@ -26,6 +26,8 @@ import UserPanel from '@/layouts/UserPanel.vue'
 import ForgotPassword from '@/views/ForgotPassword.vue'
 import CategoryPage from '@/views/CategoryPage.vue'
 import ProductDetailPage from '@/views/ProductDetailPage.vue'
+import ContactUs from '@/views/ContactUs.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -40,19 +42,97 @@ const router = createRouter({
     { path: '/forgotPassword', name: 'forgotPassword', component: ForgotPassword },
     { path: '/categories', name: 'categoryPage', component: CategoryPage },
     {
+      path: '/payment',
+      name: 'payment',
+      component: () => import('@/views/PaymentPage.vue'),
+      meta: { title: 'پرداخت سفارش' },
+    },
+    {
+      path:'/contactus',
+      name:'contactus',
+      component:ContactUs
+    },
+    {
+      path: '/payment/verify',
+      name: 'PaymentVerify',
+      component: () => import('@/views/PaymentVerify.vue'),
+      meta: { title: 'بررسی پرداخت' },
+    },
+    {
       path: '/categories/:id',
       name: 'CategoryDetail',
       component: () => import('@/views/CategoryDetail.vue'),
       props: true,
     },
     {
+      path: '/checkout',
+      name: 'checkout',
+      component: () => import('@/views/CheckoutPage.vue'),
+      meta: { title: 'تسویه حساب' },
+    },
+    {
       path: '/product/:id',
       name: 'ProductDetail',
-      component:ProductDetailPage,
+      component: ProductDetailPage,
+    },
+    {
+      path: '/payment/gateway',
+      name: 'payment-gateway',
+      component: () => import('@/views/PaymentGatewayPage.vue'),
+      meta: { title: 'انتخاب درگاه پرداخت' },
+    },
+    {
+      path: '/user/orders',
+      name: 'UserOrders',
+      component: () => import('@/components/UserOrders.vue'),
+      meta: { requiresAuth: true },
     },
 
-    { path: '/user', name: 'user', component: UserPanel },
+    {
+      path: '/user',
+      component: UserPanel,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: 'wallet',
+          name: 'Wallet',
+          component: () => import('@/components/Wallet.vue'),
+          meta: { title: 'کیف پول من' },
+        },
 
+        {
+          path: 'wallet/verify',
+          name: 'WalletVerify',
+          component: () => import('@/views/WalletVerify.vue'),
+          meta: { title: 'تأیید پرداخت کیف پول' },
+        },
+
+        {
+          path: 'order-success',
+          name: 'OrderSuccess',
+          component: () => import('@/views/OrderSuccessPage.vue'),
+          meta: { title: 'ثبت موفق سفارش' },
+        },
+      ],
+    },
+    {
+      path: '/order-success',
+      name: 'OrderSuccess',
+      component: () => import('@/views/OrderSuccessPage.vue'),
+      meta: { title: 'ثبت موفق سفارش' },
+    },
+    {
+      path: '/wallet/payment',
+      name: 'WalletPayment',
+      component: () => import('@/views/WalletPaymentPage.vue'),
+      meta: { title: 'شارژ کیف پول' },
+    },
+    {
+      path: '/wallet/verify',
+      name: 'WalletVerify',
+      component: () => import('@/views/WalletVerify.vue'),
+      meta: { title: 'تأیید پرداخت کیف پول' },
+    },
     {
       path: '/admin',
       component: AdminPanel,

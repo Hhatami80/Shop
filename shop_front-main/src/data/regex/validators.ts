@@ -26,37 +26,34 @@ export function validateIranianNationalId(id: string): boolean {
 }
 
 export function validateBankCardNumber(cardNumber: string): boolean {
-    // Remove all non-digit characters (like spaces or dashes)
-    const sanitized = cardNumber.replace(/\D/g, '');
-
-    // Card numbers are usually 13-19 digits
-    if (!/^\d{13,19}$/.test(sanitized)) return false;
-
-    let sum = 0;
-    const len = sanitized.length;
-    
-    // Luhn algorithm
-    for (let i = 0; i < len; i++) {
-        let digit = Number(sanitized[len - 1 - i]); // start from right
-        if (i % 2 === 1) {
-            digit *= 2;
-            if (digit > 9) digit -= 9;
-        }
-        sum += digit;
-    }
-
-    return sum % 10 === 0;
+  const sanitized = cardNumber.replace(/\D/g, '');
+  
+  return /^\d{16}$/.test(sanitized);
 }
 
-export function validateIranianIBAN(iban: string): boolean {
-    const sanitized = iban.replace(/\s+/g, '').toUpperCase()
-    if (!/^IR\d{24}$/.test(sanitized)) return false
 
-    const rearranged = sanitized.slice(4) + sanitized.slice(0, 4)
-    let numeric = ''
-    for (const c of rearranged) numeric += /[A-Z]/.test(c) ? (c.charCodeAt(0) - 55).toString() : c
 
-    return BigInt(numeric) % 97n === 1n
+export function validateIranianIBAN(iban) {
+  if (!iban) return false
+  const sanitized = iban.replace(/\s+/g, '').toUpperCase()
+
+  // Must start with IR + 24 digits (26 chars total)
+  if (!/^IR\d{24,26}$/.test(sanitized)) return false
+
+  const rearranged = sanitized.slice(4) + sanitized.slice(0, 4)
+
+  let numeric = ''
+  for (const c of rearranged) {
+    numeric += /[A-Z]/.test(c) ? (c.charCodeAt(0) - 55).toString() : c
+  }
+
+  // Safe mod97
+  let remainder = 0
+  for (let i = 0; i < numeric.length; i += 9) {
+    remainder = Number((remainder + numeric.substring(i, i + 9)) % 97)
+  }
+
+  return remainder === 1
 }
 
 // Recognize bank by IBAN code

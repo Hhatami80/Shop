@@ -1,54 +1,57 @@
 import api from './AxiosService'
 
 export const userService = {
-  async getUsers() {
+
+  getUsers() {
     return api.get('/users')
   },
-
-  async deleteUser(id) {
+  deleteUser(id) {
     return api.delete(`/users/${id}`)
   },
 
-  async getProfile() {
+
+  getProfile() {
     return api.get('/user/profile/')
   },
-
-  async updateProfile(data) {
+  updateProfile(data) {
     return api.put('/user/profile/', data, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+      headers: { 'Content-Type': 'multipart/form-data' },
     })
   },
-  async getAddresses() {
+
+
+  getAddresses() {
     return api.get('/user/addresses/')
   },
-
-  async updateAddresses(data) {
-    return api.put('/user/addresses/', { addresses: data })
+  addAddress(address) {
+    return api.post('/user/addresses/', address)
+  },
+  updateAddresses(addresses) {
+    return api.put('/user/addresses/', { addresses })
+  },
+  deleteAddress(id) {
+    return api.delete(`/user/addresses/${id}`)
   },
 
-  async getBankInfo() {
-    return api.get('/user/bank-accounts/') 
-  },
 
-  async addBankAccount(account) {
+  getBankInfo() {
+    return api.get('/user/bank-accounts/')
+  },
+  addBankAccount(account) {
     return api.post('/user/bank-accounts/', account)
   },
   updateBankInfo(data) {
     return api.put('/user/bank-accounts/', data)
   },
-
-
-  async deleteBankAccount(account) {
-    
-    return api.delete(`/user/bank-accounts/${account.id || account.cardNumber}`)
+  deleteBankAccount(id) {
+    return api.delete(`/user/bank-accounts-delete/${id}`)
   },
-  async getProvinces() {
-  return api.get('/locations/provinces/') 
-},
 
-async getCities(province) {
-  return api.get(`/locations/cities?province=${encodeURIComponent(province)}`) 
-},
+
+  getProvinces() {
+    return api.get('/locations/provinces/')
+  },
+  getCities(provinceId) {
+    return api.get(`/locations/cities?province=${encodeURIComponent(provinceId)}`)
+  },
 }

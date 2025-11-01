@@ -8,6 +8,10 @@
         </button>
       </div>
 
+      <button class="home-btn" @click="goHome">
+        <i class="fas fa-home"></i> صفحه اصلی
+      </button>
+
       <nav>
         <ul>
           <li :class="{ active: activeTab === 'profile' }" @click="activeTab = 'profile'">
@@ -23,6 +27,11 @@
           <li :class="{ active: activeTab === 'wallet' }" @click="activeTab = 'wallet'">
             <i class="fas fa-wallet"></i>
             <span v-if="!isCollapsed">کیف پول</span>
+          </li>
+
+          <li :class="{ active: activeTab === 'orders' }" @click="activeTab = 'orders'">
+            <i class="fas fa-box"></i>
+            <span v-if="!isCollapsed">سفارش‌های من</span>
           </li>
 
           <li @click="logout">
@@ -47,31 +56,45 @@
       </section>
 
       <section v-if="activeTab === 'wallet'" class="wallet-section">
-        <BankCard
-          card-number="6037991234567890"
-          sheba-number="IR123456789012345678901234"
-          amount="1200000"
-        />
         <Wallet />
+      </section>
+
+      <section v-if="activeTab === 'orders'">
+        <UserOrders />
       </section>
     </main>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { toast } from "vue3-toastify";
+import { useWalletStore } from "@/stores/useWalletStore";
+import { useUserStore } from "@/stores/useUserStore";
 
 import ShoppingCart from "@/components/ShoppingCart.vue";
 import UserProfile from "@/components/UserProfile.vue";
 import Wallet from "@/components/Wallet.vue";
-import BankCard from "@/components/BankCard.vue";
+import UserOrders from "@/components/UserOrders.vue";
+import { useLoginStore } from "@/stores/useLoginStore";
+
+import { useRouter } from "vue-router";
+const loginStore = useLoginStore();
 
 const isCollapsed = ref(false);
 const activeTab = ref("profile");
+const walletStore = useWalletStore();
+const userStore = useUserStore();
+const router = useRouter();
 
-const logout = () => {
-  toast.info("شما از حساب خارج شدید!");
+onMounted(async () => {
+  await walletStore.fetchBalance();
+  await walletStore.fetchTransactions();
+  await userStore.fetchBankAccounts();
+});
+
+const goHome = () => {
+  router.push("/");
 };
 
 const pageTitle = computed(() => {
@@ -82,18 +105,25 @@ const pageTitle = computed(() => {
       return "سبد خرید";
     case "wallet":
       return "کیف پول من";
+    case "orders":
+      return "سفارش‌های من";
     default:
       return "";
   }
 });
+const logout = () => {
+  loginStore.logout();
+  toast.info("شما از حساب خارج شدید!");
+  router.push("/login");
+};
 </script>
 
 <style scoped>
 .admin-panel {
+  font-family: "Yekan";
   display: flex;
   min-height: 100vh;
   direction: rtl;
-  font-family: sans-serif;
   background: #f5f5f5;
 }
 
@@ -105,9 +135,33 @@ const pageTitle = computed(() => {
   flex-direction: column;
   padding: 20px;
   transition: width 0.3s;
+  position: relative;
 }
 .sidebar.collapsed {
   width: 60px;
+}
+
+.home-btn {
+  margin: 10px 0;
+  padding: 8px 12px;
+  background: #f9c710;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+.home-btn i {
+  margin-left: 5px;
+}
+.home-btn:hover {
+  background: #f8b900;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }
 
 .top-bar {

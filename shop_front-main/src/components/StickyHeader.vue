@@ -2,11 +2,32 @@
   <transition name="fade">
     <div v-if="visible" :class="['header-sticky', { blurred: isBlurred }]">
       <div class="icons">
-        <router-link to="/"><i class="fas fa-home"></i></router-link>
-        <router-link to="/shop-cart"><i class="fas fa-shopping-cart"></i></router-link>
+        <router-link to="/">
+          <i class="fas fa-home"></i>
+        </router-link>
+        <router-link to="/shop-cart">
+          <i class="fas fa-shopping-cart"></i>
+        </router-link>
         <i class="fas fa-heart"></i>
-        <router-link to="/login"><i class="fas fa-user"></i></router-link>
+        <template v-if="loginStore.isAuthenticated">
+          <router-link
+            v-if="loginStore.isAdmin"
+            to="/admin"
+            class="user-icon"
+            title="پنل ادمین"
+          >
+            <i class="fas fa-crown"></i>
+          </router-link>
+
+          <router-link v-else to="/user" class="user-icon" title="پروفایل کاربری">
+            <i class="fas fa-user-circle"></i>
+          </router-link>
+        </template>
+        <router-link v-else to="/login">
+          <i class="fas fa-sign-in-alt"></i>
+        </router-link>
       </div>
+
       <button ref="stickyMenuBtn" class="menu-btn" @click="toggleMenu">☰</button>
     </div>
   </transition>
@@ -16,7 +37,9 @@
       <ul>
         <li v-for="item in headerStore.menuItems" :key="item.id">
           <template v-if="item.url?.startsWith?.('#')">
-            <a href="#" @click.prevent="scrollToSection(item.url)">{{ item.title }}</a>
+            <a href="#" @click.prevent="scrollToSection(item.url)">
+              {{ item.title }}
+            </a>
           </template>
           <template v-else>
             <router-link :to="item.url">{{ item.title }}</router-link>
@@ -28,35 +51,40 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useHeaderStore } from '@/stores/useHeaderStore'
+import { ref, onMounted, onUnmounted } from "vue";
+import { useHeaderStore } from "@/stores/useHeaderStore";
+import { useLoginStore } from "@/stores/useLoginStore";
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
-})
+});
 
-const drawerOpen = ref(false)
-const headerStore = useHeaderStore()
-const isBlurred = ref(false)
+const drawerOpen = ref(false);
+const headerStore = useHeaderStore();
+const loginStore = useLoginStore();
+const isBlurred = ref(false);
 
 function toggleMenu() {
-  drawerOpen.value = !drawerOpen.value
+  drawerOpen.value = !drawerOpen.value;
 }
 
 function scrollToSection(selector) {
-  const el = document.querySelector(selector)
+  const el = document.querySelector(selector);
   if (el) {
-    el.scrollIntoView({ behavior: 'smooth' })
-    drawerOpen.value = false
+    el.scrollIntoView({ behavior: "smooth" });
+    drawerOpen.value = false;
   }
 }
 
 const handleScroll = () => {
-  isBlurred.value = window.scrollY > 50
-}
+  isBlurred.value = window.scrollY > 50;
+};
 
-onMounted(() => window.addEventListener('scroll', handleScroll))
-onUnmounted(() => window.removeEventListener('scroll', handleScroll))
+onMounted(() => {
+  window.addEventListener("scroll", handleScroll);
+  loginStore.loadFromCookies();
+});
+onUnmounted(() => window.removeEventListener("scroll", handleScroll));
 </script>
 
 <style scoped>
@@ -71,12 +99,18 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
   z-index: 1500;
   direction: rtl;
   display: block;
+  transition: all 0.3s ease-in-out;
+}
+
+.header-sticky.blurred {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .icons {
   position: absolute;
   top: 50%;
-  right: 20px;
+  left: 20px;
   transform: translateY(-50%);
   display: flex;
   gap: 18px;
@@ -86,28 +120,29 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
 .icons a,
 .icons i {
   color: #222;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   cursor: pointer;
   transition: color 0.2s ease, transform 0.15s ease;
 }
+
 .icons a:hover,
 .icons i:hover {
   color: #f9c710;
   transform: scale(1.08);
 }
-.header-sticky.blurred {
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.5);
-  transition: all 0.3s ease-in-out;
+
+.user-icon i {
+  color: #444;
+  font-size: 1.25rem;
 }
-.header-sticky {
-  transition: all 0.3s ease-in-out;
+.user-icon:hover i {
+  color: #f9c710;
 }
 
 .menu-btn {
   position: absolute;
   top: 50%;
-  left: 20px;
+  right: 20px;
   transform: translateY(-50%);
   font-size: 24px;
   background: none;
@@ -119,7 +154,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
 .sticky-menu-box {
   position: fixed;
   top: 65px;
-  left: 20px;
+  right: 20px;
   background: white;
   border: 1px solid #ddd;
   border-radius: 12px;
@@ -135,6 +170,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
   margin: 0;
   padding: 0;
 }
+
 .sticky-menu-box ul li {
   margin-bottom: 10px;
 }
@@ -147,7 +183,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
   font-weight: 600;
 }
 .sticky-menu-box ul li a:hover {
-  color: gold;
+  color: #f9c710;
 }
 .sticky-close-btn {
   position: absolute;
@@ -161,6 +197,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
 .sticky-close-btn:hover {
   color: #e63946;
 }
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.25s ease;
@@ -194,10 +231,12 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
     overflow-y: auto;
     border-radius: 8px;
   }
+
   .icons {
     right: 14px;
     gap: 12px;
   }
+
   .menu-btn {
     left: 14px;
   }

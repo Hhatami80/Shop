@@ -19,7 +19,7 @@ class ArticleCategory(models.Model):
 class Article(models.Model):
     title = models.CharField(verbose_name='عنوان مقاله', max_length=100)
     image = models.ImageField(verbose_name='تصویر مقاله', upload_to='images/articles', null=True, blank=True)
-    short_description = models.CharField(verbose_name='توضیحات کوتاه مقاله')
+    short_description = models.CharField(verbose_name='توضیحات کوتاه مقاله',max_length=300)
     full_description = models.TextField(verbose_name='توضیحات تکمیلی مقاله', null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
     jalali_created_date = models.CharField(max_length=200, blank=True, null=True)

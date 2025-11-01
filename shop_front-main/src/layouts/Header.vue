@@ -8,7 +8,7 @@
         alt="لوگو"
         class="logo"
       />
-      <img v-else src="/src/assets/image/logo.png" alt="لوگو" class="logo" />
+      <img v-else src="" alt="لوگو" class="logo" />
     </header>
 
     <StickyHeader
@@ -26,7 +26,14 @@
         <button class="close-btn" @click="drawerOpen = false">×</button>
         <ul>
           <li v-for="item in headerStore.menuItems" :key="item.id">
-            <router-link :to="item.url">{{ item.title }}</router-link>
+            <template v-if="item.url?.startsWith?.('#')">
+              <a href="#" @click.prevent="scrollToSection(item.url)">
+                {{ item.title }}
+              </a>
+            </template>
+            <template v-else>
+              <router-link :to="item.url">{{ item.title }}</router-link>
+            </template>
           </li>
         </ul>
       </div>
@@ -45,7 +52,7 @@ import StickyHeader from "@/components/StickyHeader.vue";
 
 const props = defineProps({
   onlySticky: { type: Boolean, default: false },
-  compactSticky: { type: Boolean, default: false }, 
+  compactSticky: { type: Boolean, default: false },
 });
 
 const drawerOpen = ref(false);
@@ -66,6 +73,13 @@ onUnmounted(() => {
 function handleScroll() {
   showStickyHeader.value = window.scrollY > 200;
 }
+function scrollToSection(selector) {
+  const el = document.querySelector(selector);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth" });
+    drawerOpen.value = false;
+  }
+}
 
 async function toggleMenu() {
   drawerOpen.value = !drawerOpen.value;
@@ -73,11 +87,22 @@ async function toggleMenu() {
     await nextTick();
     const rect = menuBtn.value?.getBoundingClientRect();
     if (rect) {
-      menuStyle.value = {
-        position: "fixed",
-        top: `${rect.top}px`,
-        left: `${rect.right + 10}px`,
-      };
+      const menuWidth = 230;
+      const topOffset = 10;
+
+      if (rect.right + menuWidth > window.innerWidth) {
+        menuStyle.value = {
+          position: "fixed",
+          top: `${rect.bottom + topOffset}px`,
+          left: `${rect.left - menuWidth}px`,
+        };
+      } else {
+        menuStyle.value = {
+          position: "fixed",
+          top: `${rect.bottom + topOffset}px`,
+          left: `${rect.right + 10}px`,
+        };
+      }
     }
   }
 }
@@ -100,7 +125,7 @@ async function toggleMenu() {
 }
 .menu-btn {
   position: absolute;
-  left: 20px;
+  right: 20px;
   top: 50px;
   font-size: 30px;
   background: none;
@@ -173,5 +198,4 @@ async function toggleMenu() {
   transform: translateX(20px);
   opacity: 0;
 }
-
 </style>
