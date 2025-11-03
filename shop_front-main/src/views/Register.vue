@@ -28,6 +28,8 @@
                 type="text"
                 placeholder="شماره تماس شما"
                 v-model="registers.registerUser.phone"
+                maxlength="11"
+                pattern="^\d{11}$"
               />
             </div>
 
@@ -40,7 +42,11 @@
                 v-model="registers.registerUser.password"
               />
               <i
-                :class="['fa', showPassword ? 'fa-eye-slash' : 'fa-eye', 'toggle-password']"
+                :class="[
+                  'fa',
+                  showPassword ? 'fa-eye-slash' : 'fa-eye',
+                  'toggle-password',
+                ]"
                 @click="showPassword = !showPassword"
               ></i>
             </div>
@@ -54,13 +60,19 @@
                 v-model="registers.registerUser.confirm_password"
               />
               <i
-                :class="['fa', showConfirmPassword ? 'fa-eye-slash' : 'fa-eye', 'toggle-password']"
+                :class="[
+                  'fa',
+                  showConfirmPassword ? 'fa-eye-slash' : 'fa-eye',
+                  'toggle-password',
+                ]"
                 @click="showConfirmPassword = !showConfirmPassword"
               ></i>
             </div>
 
             <div class="text-center">
-              <button type="submit" class="btn big_btn btn-main-masai">ارسال کد تأیید</button>
+              <button type="submit" class="btn big_btn btn-main-masai">
+                ارسال کد تأیید
+              </button>
             </div>
 
             <div class="footer_login_reg text-center">
@@ -83,7 +95,9 @@
             </div>
 
             <div class="text-center">
-              <button type="submit" class="btn big_btn btn-main-masai">تأیید و ثبت‌نام</button>
+              <button type="submit" class="btn big_btn btn-main-masai">
+                تأیید و ثبت‌نام
+              </button>
             </div>
 
             <div class="footer_login_reg text-center">
@@ -100,27 +114,31 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-import { useRegisterStore } from '@/stores/useRegisterStore'
-import { ref } from 'vue'
-import {storeToRefs} from 'pinia'
+import { useRouter } from "vue-router";
+import { useRegisterStore } from "@/stores/useRegisterStore";
+import { ref } from "vue";
+import { storeToRefs } from "pinia";
 
-const router = useRouter()
-const registers = useRegisterStore()
-const { step } = storeToRefs(registers)
+const router = useRouter();
+const registers = useRegisterStore();
+const { step } = storeToRefs(registers);
 
-const showPassword = ref(false)
-const showConfirmPassword = ref(false)
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
 
 const sendOtp = async () => {
-  const success = await registers.requestOtp()
-  if (!success) {}
-}
+  const success = await registers.requestOtp();
+  if (!success) {
+    toast.error(registers.errors.username[0]);
+  } else {
+    toast.error("خطایی رخ داد. لطفا دوباره تلاش کنید.");
+  }
+};
 
 const verifyOtp = async () => {
-  const result = await registers.verifyAndActivate()
-  if (result) router.push('/login')
-}
+  const result = await registers.verifyAndActivate();
+  if (result) router.push("/login");
+};
 </script>
 
 <style scoped>
@@ -128,15 +146,14 @@ const verifyOtp = async () => {
 *::before,
 *::after {
   box-sizing: border-box;
-  
 }
 
 .wrapper {
   direction: rtl;
-  background-color: #f9f9f9; 
+  background-color: #f9f9f9;
   min-height: 100vh;
   padding: 60px 20px;
-  font-family: 'Yekan', sans-serif;
+  font-family: "Yekan", sans-serif;
   color: #333;
   display: flex;
   justify-content: center;
@@ -203,7 +220,7 @@ const verifyOtp = async () => {
 }
 
 .input_second.input_all {
-  font-family: 'Yekan';
+  font-family: "Yekan";
   width: 100%;
   padding: 12px 14px;
   font-size: 15px;
@@ -216,7 +233,7 @@ const verifyOtp = async () => {
 }
 
 .input_second.input_all:focus {
-  font-family: 'Yekan';
+  font-family: "Yekan";
   border-color: #ffd700;
   background-color: #fff;
   box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
@@ -231,7 +248,7 @@ const verifyOtp = async () => {
 }
 
 .password-wrapper input {
-  padding-left: 40px; 
+  padding-left: 40px;
 }
 
 .toggle-password {
@@ -275,6 +292,7 @@ const verifyOtp = async () => {
 
 .footer_login_reg {
   margin-top: 20px;
+  font-family: "Yekan";
   font-size: 14px;
   color: #666;
 }

@@ -43,6 +43,9 @@ import {
   faRulerCombined,
   faStar,
   faEye,
+  faMinusCircle,
+  faChevronLeft,
+  faChevronRight
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -70,6 +73,9 @@ library.add(
   faRulerCombined,
   faStar,
   faEye,
+  faMinusCircle,
+  faChevronLeft,
+  faChevronRight
 )
 
 const app = createApp(App)

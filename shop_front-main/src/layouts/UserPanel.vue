@@ -128,6 +128,7 @@ const logout = () => {
 }
 
 .sidebar {
+  font-family: "Yekan";
   width: 220px;
   background: #111;
   color: white;

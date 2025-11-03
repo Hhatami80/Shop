@@ -27,10 +27,14 @@ export const orderService = {
   updateOrder(id, data) {
     return api.patch(`/orders/${id}/`, data)
   },
+  requestChangeStatus(orderId, status) {
+  return api.patch(`/admin/orders/${orderId}/change_status/`, { status });
+},
+
 
 
   deleteOrder(id) {
-    return api.delete(`/orders/${id}/`)
+    return api.delete(`/admin/orders/${id}/`)
   },
 }
 

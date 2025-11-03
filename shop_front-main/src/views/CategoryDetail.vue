@@ -3,6 +3,22 @@
     <StickyHeader :visible="true" />
     <Banner />
 
+    <div class="breadcrumb">
+      <router-link to="/">صفحه اصلی</router-link>
+      <span v-if="categoryName"> / {{ categoryName }}</span>
+    </div>
+    <section class="filter-bar">
+      <div class="filter-right" @click="toggleFilterMenu">
+        <i class="fas fa-sliders-h"></i>
+        <span>مرتب‌سازی</span>
+        <div v-if="isFilterOpen" class="filter-dropdown" @click.stop>
+          <button @click="sortBy('priceAsc')">ارزان‌ترین</button>
+          <button @click="sortBy('priceDesc')">گران‌ترین</button>
+          <button @click="sortBy('discount')">بیشترین تخفیف</button>
+        </div>
+      </div>
+    </section>
+
     <section class="featured-products" v-if="featuredProducts.length">
       <router-link
         v-for="(product, index) in featuredProducts"
@@ -21,18 +37,6 @@
           <p class="featured-price">{{ toPersianNumber(product.price) }} ریال</p>
         </div>
       </router-link>
-    </section>
-
-    <section class="filter-bar">
-      <div class="filter-right" @click="toggleFilterMenu">
-        <i class="fas fa-sliders-h"></i>
-        <span>مرتب‌سازی</span>
-        <div v-if="isFilterOpen" class="filter-dropdown" @click.stop>
-          <button @click="sortBy('priceAsc')">ارزان‌ترین</button>
-          <button @click="sortBy('priceDesc')">گران‌ترین</button>
-          <button @click="sortBy('discount')">بیشترین تخفیف</button>
-        </div>
-      </div>
     </section>
 
     <section class="product-grid">
@@ -81,12 +85,14 @@ const selectedSort = ref("");
 const currentPage = ref(1);
 const itemsPerPage = 8;
 
-const categoryId = Number(route.params.id);
+const categoryName = ref("");
 
-const allProducts = computed(() => categoryStore.getProductsByCategory(categoryId));
+const currentCategoryId = computed(() => Number(route.params.id));
 
+const allProducts = computed(() =>
+  categoryStore.getProductsByCategory(currentCategoryId.value)
+);
 const featuredProducts = computed(() => allProducts.value.slice(0, 2));
-
 const gridProducts = ref([]);
 
 watch(
@@ -94,6 +100,15 @@ watch(
   () => {
     gridProducts.value = allProducts.value.slice(2);
     currentPage.value = 1;
+  },
+  { immediate: true }
+);
+
+watch(
+  [() => categoryStore.allCategories, currentCategoryId],
+  () => {
+    const cat = categoryStore.getCategoryById(currentCategoryId.value);
+    categoryName.value = cat ? cat.title || cat.name : "";
   },
   { immediate: true }
 );
@@ -119,7 +134,8 @@ function changePage(page) {
 }
 
 function toPersianNumber(number) {
-  return number.toLocaleString("fa-IR");
+  if (number === null || number === undefined) return "";
+  return Number(number).toLocaleString("fa-IR");
 }
 
 onMounted(async () => {
@@ -139,9 +155,22 @@ watch(
 @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css");
 
 .category-product-page {
-  font-family: "Vazirmatn", sans-serif;
+  font-family: "Yekan", sans-serif;
   direction: rtl;
   background: #f9f9f9;
+}
+
+.breadcrumb {
+  margin: 15px 60px;
+  font-size: 14px;
+  color: #333;
+}
+.breadcrumb a {
+  color: #333;
+  text-decoration: none;
+}
+.breadcrumb a:hover {
+  text-decoration: underline;
 }
 
 .filter-bar {
@@ -158,13 +187,13 @@ watch(
   font-weight: 600;
   font-size: 15px;
   cursor: pointer;
-  color: #4d6d58;
+  color: #333;
   gap: 6px;
   position: relative;
 }
 .filter-right i {
   font-size: 18px;
-  color: #4d6d58;
+  color: #333;
 }
 .filter-dropdown {
   position: absolute;
@@ -180,25 +209,12 @@ watch(
   min-width: 150px;
   z-index: 10;
 }
+
 .product-card,
 .featured-card {
   text-decoration: none;
   color: inherit;
   display: block;
-}
-
-.filter-dropdown button {
-  background: none;
-  border: none;
-  text-align: right;
-  padding: 8px 14px;
-  font-size: 14px;
-  color: #4d6d58;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.filter-dropdown button:hover {
-  background: #f2f2f2;
 }
 
 .featured-products {
@@ -231,7 +247,7 @@ watch(
   position: absolute;
   top: 10px;
   right: 10px;
-  color: #2e5540;
+  color: #ffd700;
   font-weight: bold;
   font-size: 20px;
 }
@@ -240,12 +256,14 @@ watch(
   height: 30%;
 }
 .featured-name {
-  font-size: 18px;
-  color: #4d6d58;
+  font-size: 20px;
+  color: #000;
+  font-weight: 600;
 }
 .featured-price {
   font-size: 16px;
-  color: #4d6d58;
+  color: #000;
+  font-weight: bold;
 }
 
 .product-grid {
@@ -254,7 +272,6 @@ watch(
   gap: 25px;
   margin: 0px 20px 40px;
 }
-
 @media (max-width: 1200px) {
   .product-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -292,18 +309,18 @@ watch(
   position: absolute;
   top: 8px;
   right: 8px;
-  color: #2e5540;
+  color: #ffd700;
   font-weight: bold;
   font-size: 16px;
 }
 .product-name {
-  font-size: 14px;
+  font-size: 20px;
   font-weight: 600;
   margin-bottom: 2px;
-  color: #4d6d58;
+  color: #000;
 }
 .product-price {
-  color: #4d6d58;
+  color: #000;
   font-weight: bold;
 }
 
@@ -311,6 +328,7 @@ watch(
   display: flex;
   justify-content: center;
   margin: 30px 0;
+  padding-bottom: 20px;
   gap: 8px;
 }
 .pagination button {
@@ -321,8 +339,8 @@ watch(
   cursor: pointer;
 }
 .pagination button.active {
-  background: #4d6d58;
+  background: gold;
   color: #fff;
-  border-color: #4d6d58;
+  border-color: gold;
 }
 </style>

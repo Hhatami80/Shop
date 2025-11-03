@@ -2,7 +2,6 @@
   <div class="addresses-section">
     <h3>آدرس‌ها</h3>
 
-    <!-- فرم افزودن آدرس -->
     <div class="address-form">
       <div class="form-group">
         <label>استان:</label>
@@ -58,8 +57,6 @@
 
       <button class="btn gold-btn" @click="addAddress">افزودن آدرس</button>
     </div>
-
-    <!-- جدول آدرس‌ها -->
     <table class="addresses-table" v-if="store.addresses.length">
       <thead>
         <tr>
@@ -135,7 +132,6 @@ const addAddress = async () => {
   try {
     await store.addAddress(addressToAdd);
 
-    // پاک‌کردن فرم
     newAddress.province_id = "";
     newAddress.city_id = "";
     newAddress.neighborhood = "";
@@ -193,9 +189,9 @@ label {
 }
 
 input,
-select,
-textarea {
+select {
   padding: 10px 12px;
+  font-family: "Yekan";
   border-radius: 10px;
   border: 1px solid #ddd;
   font-size: 0.9rem;
@@ -204,12 +200,34 @@ textarea {
 }
 
 textarea {
-  resize: none;
+  resize: vertical;
+  min-height: 60px;
+  max-height: 180px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid #ddd;
+  font-family: "Yekan", sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  background: #fff;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
+}
+
+textarea:focus {
+  border-color: #f8b900;
+  box-shadow: 0 0 0 4px rgba(249, 199, 16, 0.2), inset 0 1px 5px rgba(249, 199, 16, 0.15);
+  background: #fffdfa;
+  outline: none;
+}
+
+textarea::placeholder {
+  color: #aaa;
+  font-size: 0.9rem;
 }
 
 input:focus,
-select:focus,
-textarea:focus {
+select:focus {
   border-color: #f8b900;
   box-shadow: 0 0 0 3px rgba(249, 199, 16, 0.2);
   outline: none;
@@ -239,6 +257,7 @@ textarea:focus {
 
 .addresses-table {
   width: 100%;
+  font-family: "Yekan";
   border-collapse: collapse;
   margin-top: 20px;
 }

@@ -181,6 +181,7 @@ h3 {
 }
 input {
   width: 100%;
+  direction: ltr;
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid #ddd;

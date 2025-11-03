@@ -73,28 +73,30 @@ const banners = [
 }
 
 .banner-content {
-  text-align: center;
+  text-align: left;
   color: #fff;
   z-index: 10;
-  position: relative;
-  background: rgba(0, 0, 0, 0.45);
-  padding: 25px 40px;
-  border-radius: 16px;
+  position: absolute;
+  top: 60%;
+  left: 5%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.35);
+  padding: 20px 30px;
+  border-radius: 12px;
   backdrop-filter: blur(6px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-  animation: fadeIn 1.2s ease forwards;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .banner-title {
-  font-size: 2.6rem;
+  font-size: 1.8rem;
   font-weight: 900;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   letter-spacing: -0.5px;
 }
 
 .banner-subtitle {
-  font-size: 1.2rem;
-  opacity: 0.95;
+  font-size: 1rem;
+  opacity: 0.9;
   font-weight: 400;
 }
 

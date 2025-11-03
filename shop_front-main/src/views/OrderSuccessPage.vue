@@ -6,8 +6,9 @@
       <p>
         شماره سفارش شما: <strong>#{{ order?.id }}</strong>
       </p>
-      <p>
-        جمع کل: <strong>{{ order?.total_price.toLocaleString() }} تومان</strong>
+      <p v-if="order && order.total_price">
+        جمع کل:
+        <strong>{{ formatPrice(order.total_price) }} تومان</strong>
       </p>
 
       <button class="btn-view-orders" @click="goToOrders">مشاهده سفارش‌ها</button>
@@ -32,6 +33,12 @@ const fetchOrder = async () => {
     console.error(err);
   }
 };
+const formatPrice = (price) => {
+  if (!price) return "—";
+  const num = Number(price);
+  if (isNaN(num)) return price;
+  return num.toLocaleString("fa-IR");
+};
 
 onMounted(() => {
   fetchOrder();
@@ -47,7 +54,7 @@ const goToHome = () => router.push({ name: "HomePage" });
   justify-content: center;
   align-items: center;
   height: 80vh;
-  background: #f9f9f9;
+  /* background: #f9f9f9; */
   font-family: "Vazirmatn", sans-serif;
 }
 

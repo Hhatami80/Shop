@@ -1,3 +1,7 @@
+*{
+  font-family: 'Yekan', sans-serif;
+
+}
 html, body {
   /* direction: rtl; */
   font-family: 'Yekan', sans-serif;
@@ -9,4 +13,10 @@ html, body {
 }
 button{
   font-family: 'Yekan';
+}
+
+.Toastify__toast,
+.Toastify__toast-body,
+.Toastify__toast-container {
+  font-family: "Yekan", sans-serif !important;
 }

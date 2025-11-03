@@ -13,42 +13,54 @@
       <fa-icon :icon="['fas', 'inbox']" /> هنوز سفارشی ثبت نکرده‌اید.
     </div>
 
-    <table v-else class="orders-table">
-      <thead>
-        <tr>
-          <th>شماره سفارش</th>
-          <th>تاریخ</th>
-          <th>جمع کل</th>
-          <th>وضعیت</th>
-          <th>جزییات</th>
-          <th>عملیات</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="order in orderStore.orders" :key="order.id">
-          <td>#{{ order.id }}</td>
-          <td>{{ formatDate(order.created_at) }}</td>
-          <td>{{ formatPrice(order.total_price) }} تومان</td>
-          <td>
-            <span :class="['status', getStatusClass(order.status)]">
-              {{ getStatusText(order.status) }}
-            </span>
-          </td>
-          <td>
-            <button class="btn-details" @click="openModal(order)">مشاهده</button>
-          </td>
-          <td>
-            <button
-              class="btn-cancel"
-              :disabled="order.status !== 'pending'"
-              @click="cancelOrder(order)"
-            >
-              لغو سفارش
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div v-else>
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>شماره سفارش</th>
+            <th>تاریخ</th>
+            <th>جمع کل</th>
+            <th>وضعیت</th>
+            <th>جزییات</th>
+            <th>عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="order in paginatedOrders" :key="order.id">
+            <td>#{{ order.id }}</td>
+            <td>{{ formatDate(order.created_at) }}</td>
+            <td>{{ formatPrice(order.total_price) }} تومان</td>
+            <td>
+              <span :class="['status', getStatusClass(order.status)]">
+                {{ getStatusText(order.status) }}
+              </span>
+            </td>
+            <td>
+              <button class="btn-details" @click="openModal(order)">مشاهده</button>
+            </td>
+            <td>
+              <button
+                class="btn-cancel"
+                :disabled="order.status !== 'pending'"
+                @click="cancelOrder(order)"
+              >
+                لغو سفارش
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="pagination">
+        <button @click="prevPage" :disabled="currentPage === 1">
+          <fa-icon :icon="['fas', 'chevron-left']" />
+        </button>
+        <span>صفحه {{ currentPage }} از {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="currentPage === totalPages">
+          <fa-icon :icon="['fas', 'chevron-right']" />
+        </button>
+      </div>
+    </div>
 
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal">
@@ -87,7 +99,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useOrderStore } from "@/stores/useOrderStore";
 import { toast } from "vue3-toastify";
 
@@ -95,15 +107,31 @@ const orderStore = useOrderStore();
 const showModal = ref(false);
 const selectedOrder = ref({});
 
+const currentPage = ref(1);
+const perPage = 5;
+
 onMounted(() => {
   orderStore.fetchOrders();
 });
+
+const totalPages = computed(() => Math.ceil(orderStore.orders.length / perPage));
+
+const paginatedOrders = computed(() => {
+  const start = (currentPage.value - 1) * perPage;
+  return orderStore.orders.slice(start, start + perPage);
+});
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) currentPage.value++;
+};
+const prevPage = () => {
+  if (currentPage.value > 1) currentPage.value--;
+};
 
 const openModal = (order) => {
   selectedOrder.value = order;
   showModal.value = true;
 };
-
 const closeModal = () => {
   showModal.value = false;
 };
@@ -123,7 +151,7 @@ const getStatusText = (status) =>
   ({
     pending: "در انتظار پرداخت",
     paid: "پرداخت‌شده",
-    shipped: "ارسال‌شده",
+    completed: "ارسال‌شده",
     canceled: "لغو‌شده",
   }[status] || "نامشخص");
 
@@ -131,29 +159,19 @@ const getStatusClass = (status) =>
   ({
     pending: "status-pending",
     paid: "status-paid",
-    shipped: "status-shipped",
+    completed: "status-completed",
     canceled: "status-canceled",
   }[status] || "");
 
 const cancelOrder = async (order) => {
   if (!confirm("آیا مطمئن هستید می‌خواهید این سفارش را لغو کنید؟")) return;
 
-  try {
-    await orderStore.deleteOrder(order.id);
-    toast.success("سفارش با موفقیت لغو شد");
-    await orderStore.fetchOrders();
-  } catch (err) {
-    console.error(err);
-    toast.error("لغو سفارش موفقیت آمیز نبود");
-  }
+  await orderStore.cancelUserOrder(order.id);
 };
 
 const formatPaymentMethod = (method) =>
-  ({
-    online: "پرداخت آنلاین",
-    cod: "پرداخت در محل",
-    wallet: "کیف پول",
-  }[method] || "نامشخص");
+  ({ online: "پرداخت آنلاین", cod: "پرداخت در محل", wallet: "کیف پول" }[method] ||
+  "نامشخص");
 </script>
 
 <style scoped>
@@ -208,7 +226,7 @@ h2 {
 .status-paid {
   background: #28a745;
 }
-.status-shipped {
+.status-completed {
   background: #007bff;
 }
 .status-canceled {
@@ -301,5 +319,30 @@ h2 {
   text-align: center;
   color: #777;
   font-style: italic;
+}
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+.pagination button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #ffd700;
+  color: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pagination button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+.pagination span {
+  font-weight: bold;
 }
 </style>

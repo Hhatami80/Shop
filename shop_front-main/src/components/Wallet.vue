@@ -4,7 +4,7 @@
       <div class="wallet-card-wrapper" v-if="bank">
         <BankCard
           :card-number="bank.cardNumber"
-          :sheba-number="bank.shebaNumber"
+          :sheba-number="bank.iban"
           :amount="wallet.balance"
           :bank-logo="bank.bankLogo"
         />
@@ -14,10 +14,6 @@
         <h3>مدیریت کیف پول</h3>
         <div class="action-row">
           <input v-model.number="amount" type="number" placeholder="مبلغ (تومان)" />
-          <select v-model="method">
-            <option value="card">شارژ با کارت</option>
-            <option value="iban">شارژ با شبا</option>
-          </select>
           <button class="btn-charge" @click="goToPayment">
             <fa-icon :icon="['fas', 'plus-circle']" /> شارژ
           </button>
@@ -42,7 +38,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="tx in wallet.transactions" :key="tx.id">
+          <tr v-for="tx in paginatedTransactions" :key="tx.id">
             <td>{{ formatDate(tx.date) }}</td>
             <td :class="tx.type">{{ tx.type === "credit" ? "واریز" : "برداشت" }}</td>
             <td>{{ formatPrice(tx.amount) }} تومان</td>
@@ -55,6 +51,19 @@
       <div v-else class="empty-state">
         <fa-icon :icon="['fas', 'receipt']" />
         <p>تاکنون تراکنشی ثبت نشده است.</p>
+      </div>
+
+      <!-- Pagination -->
+      <div v-if="totalPages > 1" class="pagination">
+        <button @click="prevPage" :disabled="currentPage === 1">
+          <fa-icon :icon="['fas', 'chevron-left']" />
+        </button>
+
+        <span>صفحه {{ currentPage }} از {{ totalPages }}</span>
+
+        <button @click="nextPage" :disabled="currentPage === totalPages">
+          <fa-icon :icon="['fas', 'chevron-right']" />
+        </button>
       </div>
     </div>
   </div>
@@ -73,7 +82,6 @@ const userStore = useUserStore();
 const router = useRouter();
 
 const amount = ref(0);
-const method = ref("card");
 
 const bank = computed(() =>
   userStore.bankAccounts.length > 0 ? userStore.bankAccounts[0] : null
@@ -87,6 +95,24 @@ onMounted(async () => {
   ]);
 });
 
+const currentPage = ref(1);
+const pageSize = ref(5);
+
+const totalPages = computed(() => Math.ceil(wallet.transactions.length / pageSize.value));
+
+const paginatedTransactions = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value;
+  return wallet.transactions.slice(start, start + pageSize.value);
+});
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) currentPage.value++;
+};
+
+const prevPage = () => {
+  if (currentPage.value > 1) currentPage.value--;
+};
+
 const goToPayment = async () => {
   if (amount.value <= 0) return toast.error("مبلغ وارد شده صحیح نیست");
   wallet.pendingAmount = amount.value;
@@ -95,7 +121,7 @@ const goToPayment = async () => {
 
 const withdraw = async () => {
   if (amount.value <= 0) return toast.error("مبلغ وارد شده صحیح نیست");
-  await wallet.withdraw({ amount: amount.value, method: method.value });
+  await wallet.withdraw({ amount: amount.value, method: "card" });
   amount.value = 0;
 };
 
@@ -119,7 +145,7 @@ const formatPrice = (amount) => Number(amount)?.toLocaleString("fa-IR") || "0";
   display: flex;
   flex-direction: column;
   gap: 60px;
-  font-family: "Vazirmatn", sans-serif;
+  font-family: "Yekan", sans-serif;
   background: linear-gradient(165deg, #f6f7fc, #e6ebf5);
   border-radius: 32px;
   box-shadow: inset 0 0 50px rgba(255, 255, 255, 0.25);
@@ -174,31 +200,28 @@ const formatPrice = (amount) => Number(amount)?.toLocaleString("fa-IR") || "0";
 
 .action-row {
   display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
+  gap: 8px;
+  flex-wrap: nowrap;
   align-items: center;
 }
 
-.action-row input,
-.action-row select {
-  flex: 1 1 160px;
-  padding: 14px 16px;
-  border-radius: 14px;
+.action-row input {
+  flex: 0 0 120px;
+  padding: 10px 12px;
+  border-radius: 10px;
   border: 1px solid #dcdfe3;
-  font-size: 1rem;
+  font-size: 0.95rem;
   background: #fafafa;
   outline: none;
 }
 
 .action-row button {
-  border: none;
-  border-radius: 14px;
-  padding: 12px 22px;
-  font-weight: 700;
-  font-size: 1rem;
+  flex: 0 0 auto;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: none;
 }
 
 .btn-charge {
@@ -273,6 +296,37 @@ const formatPrice = (amount) => Number(amount)?.toLocaleString("fa-IR") || "0";
 
 .empty-state .fa-icon {
   font-size: 3.5rem;
+}
+
+/* ✅ Pagination like UserOrders */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+.pagination button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #ffd700;
+  color: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.pagination button:hover {
+  background: #e5c100;
+}
+.pagination button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+.pagination span {
+  font-weight: bold;
 }
 
 @media (max-width: 1000px) {

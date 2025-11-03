@@ -2,7 +2,9 @@
   <div class="product-container">
     <h4 class="page-title">مدیریت محصولات کارت اسلایدری</h4>
 
-    <h5 class="form-title-section">{{ isEditing ? 'ویرایش محصول' : 'افزودن محصول جدید' }}</h5>
+    <h5 class="form-title-section">
+      {{ isEditing ? "ویرایش محصول" : "افزودن محصول جدید" }}
+    </h5>
     <form @submit.prevent="submitForm" class="product-form">
       <div class="row">
         <div class="col-half">
@@ -21,7 +23,11 @@
           <label for="category" class="label">دسته‌بندی</label>
           <select id="category" v-model="form.category_id" class="input select" required>
             <option value="">انتخاب دسته‌بندی</option>
-            <option v-for="cat in categoryStore.allCategories" :key="cat.id" :value="cat.id">
+            <option
+              v-for="cat in categoryStore.allCategories"
+              :key="cat.id"
+              :value="cat.id"
+            >
               {{ cat.title }}
             </option>
           </select>
@@ -80,7 +86,11 @@
 
         <div class="col-full properties-section">
           <h6 class="section-title">ویژگی‌ها (اختیاری)</h6>
-          <div class="row prop-row" v-for="(property, index) in form.properties" :key="index">
+          <div
+            class="row prop-row"
+            v-for="(property, index) in form.properties"
+            :key="index"
+          >
             <div class="col-5">
               <input
                 type="text"
@@ -100,7 +110,11 @@
               />
             </div>
             <div class="col-2 remove-prop-btn-col">
-              <button type="button" class="btn btn-remove-prop" @click="removeProperty(index)">
+              <button
+                type="button"
+                class="btn btn-remove-prop"
+                @click="removeProperty(index)"
+              >
                 <fa-icon :icon="['fas', 'minus-circle']" />
               </button>
             </div>
@@ -113,7 +127,7 @@
         <div class="col-full form-actions">
           <button type="submit" class="btn btn-submit" :disabled="productStore.loading">
             <fa-icon v-if="productStore.loading" :icon="['fas', 'spinner']" pulse />
-            {{ isEditing ? 'ذخیره تغییرات' : 'افزودن محصول' }}
+            {{ isEditing ? "ذخیره تغییرات" : "افزودن محصول" }}
           </button>
           <button type="button" class="btn btn-cancel" @click="resetForm">انصراف</button>
         </div>
@@ -143,7 +157,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(product, index) in productStore.products" :key="product.id || index">
+          <tr v-for="(product, index) in paginatedProducts" :key="product.id || index">
             <td><img :src="product.image" class="product-img-thumb" /></td>
             <td class="product-title-cell">{{ product.title }}</td>
             <td>{{ product.category?.title }}</td>
@@ -152,7 +166,6 @@
             <td class="description-cell">
               {{ truncateDescription(product.description) }}
             </td>
-
             <td>
               <ul class="prop-list">
                 <li
@@ -180,9 +193,28 @@
           </tr>
         </tbody>
       </table>
-      <div v-else class="empty-state">محصولی برای نمایش وجود ندارد.</div>
+
+      <!-- ✅ Pagination -->
+      <div v-if="totalPages > 1" class="pagination">
+        <button class="pagination-btn" :disabled="currentPage === 1" @click="prevPage">
+          قبلی
+        </button>
+        <span>صفحه {{ currentPage }} از {{ totalPages }}</span>
+        <button
+          class="pagination-btn"
+          :disabled="currentPage === totalPages"
+          @click="nextPage"
+        >
+          بعدی
+        </button>
+      </div>
+
+      <div v-else-if="!productStore.products.length" class="empty-state">
+        محصولی برای نمایش وجود ندارد.
+      </div>
     </div>
 
+    <!-- Modal -->
     <Teleport to="body">
       <div v-if="isModalOpen" class="modal-overlay" @click="closeModal">
         <div class="modal-content" @click.stop>
@@ -192,19 +224,26 @@
             <hr class="modal-divider" />
 
             <div class="modal-main-info">
-              <img :src="selectedProduct.image" alt="تصویر محصول" class="modal-product-image" />
+              <img
+                :src="selectedProduct.image"
+                alt="تصویر محصول"
+                class="modal-product-image"
+              />
               <div class="modal-text-info">
                 <p class="modal-price">
                   قیمت نهایی:
                   <span
                     >{{
-                      (selectedProduct.final_price || selectedProduct.price).toLocaleString()
+                      (
+                        selectedProduct.final_price || selectedProduct.price
+                      ).toLocaleString()
                     }}
                     تومان</span
                   >
                 </p>
                 <p class="modal-category">
-                  قیمت اصلی: <span>{{ selectedProduct.price.toLocaleString() }} تومان</span>
+                  قیمت اصلی:
+                  <span>{{ selectedProduct.price.toLocaleString() }} تومان</span>
                 </p>
                 <p class="modal-category">
                   دسته‌بندی: <span>{{ selectedProduct.category?.title }}</span>
@@ -240,8 +279,8 @@
               class="modal-edit-btn"
               @click="
                 () => {
-                  editProduct(selectedProduct)
-                  closeModal()
+                  editProduct(selectedProduct);
+                  closeModal();
                 }
               "
             >
@@ -253,98 +292,113 @@
     </Teleport>
   </div>
 </template>
+
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { useProductStore } from '@/stores/useProductStore'
-import { useCategoryStore } from '@/stores/useCategoryStore'
-import { toast } from 'vue3-toastify'
-import 'vue3-toastify/dist/index.css'
+import { ref, reactive, onMounted, computed } from "vue";
+import { useProductStore } from "@/stores/useProductStore";
+import { useCategoryStore } from "@/stores/useCategoryStore";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
-const productStore = useProductStore()
-const categoryStore = useCategoryStore()
+const productStore = useProductStore();
+const categoryStore = useCategoryStore();
 
-const isEditing = ref(false)
-const editingIndex = ref(-1)
+const isEditing = ref(false);
+const editingIndex = ref(-1);
 
-const isModalOpen = ref(false)
-const selectedProduct = ref(null)
+const isModalOpen = ref(false);
+const selectedProduct = ref(null);
 
 const form = reactive({
   id: null,
-  title: '',
-  category_id: '',
+  title: "",
+  category_id: "",
   price: null,
-  discount: '',
-  description: '',
+  discount: "",
+  description: "",
   imageFile: null,
   imagePreview: null,
   properties: [],
-})
+});
 
-const submitSuccess = ref(false)
-const submitError = ref(null)
+const submitSuccess = ref(false);
+const submitError = ref(null);
 
+// 🔹 Pagination
+const currentPage = ref(1);
+const pageSize = 5;
+const paginatedProducts = computed(() => {
+  const start = (currentPage.value - 1) * pageSize;
+  return productStore.products.slice(start, start + pageSize);
+});
+const totalPages = computed(() => Math.ceil(productStore.products.length / pageSize));
+function nextPage() {
+  if (currentPage.value < totalPages.value) currentPage.value++;
+}
+function prevPage() {
+  if (currentPage.value > 1) currentPage.value--;
+}
+
+// --- Existing Methods ---
 function resetForm() {
-  form.id = null
-  form.title = ''
-  form.category_id = ''
-  form.price = null
-  form.discount = ''
-  form.description = ''
-  form.imageFile = null
-  form.imagePreview = null
-  form.properties = []
-  isEditing.value = false
-  editingIndex.value = -1
-  submitSuccess.value = false
-  submitError.value = null
+  form.id = null;
+  form.title = "";
+  form.category_id = "";
+  form.price = null;
+  form.discount = "";
+  form.description = "";
+  form.imageFile = null;
+  form.imagePreview = null;
+  form.properties = [];
+  isEditing.value = false;
+  editingIndex.value = -1;
+  submitSuccess.value = false;
+  submitError.value = null;
 }
 
 function addProperty() {
-  form.properties.push({ key: '', value: '' })
+  form.properties.push({ key: "", value: "" });
 }
-
 function truncateDescription(text, maxLength = 60) {
-  if (!text) return ''
-  return text.length > maxLength ? text.slice(0, maxLength) + '...' : text
+  if (!text) return "";
+  return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
 }
-
 function removeProperty(index) {
-  form.properties.splice(index, 1)
+  form.properties.splice(index, 1);
 }
-
 function handleImageUpload(event) {
-  const file = event.target.files[0]
+  const file = event.target.files[0];
   if (file) {
-    form.imageFile = file
-    form.imagePreview = URL.createObjectURL(file)
+    form.imageFile = file;
+    form.imagePreview = URL.createObjectURL(file);
   }
 }
+
 async function submitForm() {
-  submitSuccess.value = false
-  submitError.value = null
+  submitSuccess.value = false;
+  submitError.value = null;
 
   if (!form.title || !form.category_id || form.price === null || !form.description) {
-    toast.warning('لطفاً همه فیلدهای ضروری را پر کنید.')
-    return
+    toast.warning("لطفاً همه فیلدهای ضروری را پر کنید.");
+    return;
   }
   if (!isEditing.value && !form.imageFile) {
-    toast.warning('لطفاً یک تصویر برای محصول انتخاب کنید.')
-    return
+    toast.warning("لطفاً یک تصویر برای محصول انتخاب کنید.");
+    return;
   }
 
-  let payload
+  let payload;
   if (form.imageFile) {
-    payload = new FormData()
-    payload.append('title', form.title)
-    payload.append('category_id', form.category_id)
-    payload.append('price', form.price)
-    payload.append('discount', form.discount)
-    payload.append('description', form.description)
-    payload.append('image', form.imageFile)
-    payload.append('properties', JSON.stringify(form.properties || []))
+    payload = new FormData();
+    payload.append("title", form.title);
+    payload.append("category_id", form.category_id);
+    payload.append("price", form.price);
+    payload.append("discount", form.discount);
+    payload.append("description", form.description);
+    payload.append("image", form.imageFile);
+    payload.append("properties", JSON.stringify(form.properties || []));
     if (isEditing.value) {
-      payload.append('_method', 'PUT')
+      payload.append("_method", "PUT");
     }
   } else {
     payload = {
@@ -354,28 +408,29 @@ async function submitForm() {
       discount: form.discount,
       description: form.description,
       properties: JSON.stringify(form.properties || []),
-    }
+    };
   }
 
   try {
     if (isEditing.value && form.id) {
-      await productStore.updateProduct(form.id, payload)
+      await productStore.updateProduct(form.id, payload);
       productStore.products[editingIndex.value] = {
         ...productStore.products[editingIndex.value],
         title: form.title,
-        category: categoryStore.allCategories.find((cat) => cat.id === form.category_id) || null,
+        category:
+          categoryStore.allCategories.find((cat) => cat.id === form.category_id) || null,
         price: form.price,
         final_price: form.price * (1 - (form.discount || 0) / 100),
         discount: form.discount,
         description: form.description,
         properties: [...form.properties],
         image: form.imagePreview,
-      }
-      toast.success('محصول با موفقیت ویرایش شد.')
+      };
+      toast.success("محصول با موفقیت ویرایش شد.");
     } else {
-      const newProduct = await productStore.addProduct(payload)
+      const newProduct = await productStore.addProduct(payload);
       const category =
-        categoryStore.allCategories.find((cat) => cat.id === form.category_id) || null
+        categoryStore.allCategories.find((cat) => cat.id === form.category_id) || null;
       productStore.products.unshift({
         ...newProduct,
         title: form.title,
@@ -386,78 +441,105 @@ async function submitForm() {
         description: form.description,
         properties: [...form.properties],
         image: form.imagePreview,
-      })
-      toast.success('محصول با موفقیت اضافه شد.')
+      });
+      toast.success("محصول با موفقیت اضافه شد.");
     }
 
-    resetForm()
+    resetForm();
   } catch (error) {
-    const message = productStore.error || 'خطا در ذخیره محصول. لطفاً اتصال و داده‌ها را بررسی کنید.'
-    submitError.value = message
-    toast.error(message)
+    const message =
+      productStore.error || "خطا در ذخیره محصول. لطفاً اتصال و داده‌ها را بررسی کنید.";
+    submitError.value = message;
+    toast.error(message);
   }
 }
 
 async function removeProduct(productId, index) {
-  if (!confirm('آیا از حذف این محصول مطمئن هستید؟')) return
+  if (!confirm("آیا از حذف این محصول مطمئن هستید؟")) return;
   try {
-    await productStore.deleteProduct(productId)
-    productStore.products.splice(index, 1)
-    toast.success('محصول با موفقیت حذف شد.')
+    await productStore.deleteProduct(productId);
+    productStore.products.splice(index, 1);
+    toast.success("محصول با موفقیت حذف شد.");
   } catch (error) {
-    const message = productStore.error || 'خطا در حذف محصول'
-    toast.error(message)
+    const message = productStore.error || "خطا در حذف محصول";
+    toast.error(message);
   }
 }
 
 function editProduct(product, index) {
-  isEditing.value = true
-  editingIndex.value = index
+  isEditing.value = true;
+  editingIndex.value = index;
 
-  form.id = product.id || null
-  form.title = product.title || ''
-  form.category_id = product.category?.id || product.category_id || ''
-  form.price = product.price || null
-  form.discount = product.discount || ''
-  form.description = product.description || ''
-  form.imageFile = null
-  form.imagePreview = product.image || null
+  form.id = product.id || null;
+  form.title = product.title || "";
+  form.category_id = product.category?.id || product.category_id || "";
+  form.price = product.price || null;
+  form.discount = product.discount || "";
+  form.description = product.description || "";
+  form.imageFile = null;
+  form.imagePreview = product.image || null;
 
-  if (typeof product.properties === 'string') {
+  if (typeof product.properties === "string") {
     try {
-      form.properties = JSON.parse(product.properties)
+      form.properties = JSON.parse(product.properties);
     } catch {
-      form.properties = []
+      form.properties = [];
     }
   } else if (Array.isArray(product.properties)) {
-    form.properties = [...product.properties]
+    form.properties = [...product.properties];
   } else {
-    form.properties = []
+    form.properties = [];
   }
 }
 
 function showProductDetails(product) {
-  selectedProduct.value = product
-  isModalOpen.value = true
+  selectedProduct.value = product;
+  isModalOpen.value = true;
 }
 function closeModal() {
-  isModalOpen.value = false
-  selectedProduct.value = null
+  isModalOpen.value = false;
+  selectedProduct.value = null;
 }
 
 onMounted(() => {
-  productStore.getAllProducts()
-  categoryStore.getAllCategories()
-})
+  productStore.getAllProducts();
+  categoryStore.getAllCategories();
+});
 </script>
+
 <style scoped>
 .product-container {
   padding: 30px;
   direction: rtl;
-  font-family: 'Vazirmatn', 'Yekan', sans-serif;
+  font-family: "Yekan", sans-serif;
   background-color: #f9f9f9;
 }
 
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.pagination-btn {
+  background-color: #ffd700;
+  color: #1a1a1a;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.pagination-btn:hover:not(:disabled) {
+  background-color: #e5c100;
+}
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 .page-title {
   font-size: 24px;
   font-weight: 800;
@@ -513,7 +595,7 @@ onMounted(() => {
 textarea.input {
   width: 100%;
   padding: 12px 14px;
-  font-family: 'Vazirmatn';
+  font-family: "Vazirmatn";
   font-size: 15px;
   border: 1px solid #ddd;
   border-radius: 10px;
@@ -531,7 +613,9 @@ textarea.input:focus,
 }
 .input.select {
   appearance: none;
-  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%23666' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E") no-repeat left 12px center;
+  background: #fff
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%23666' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E")
+    no-repeat left 12px center;
   background-size: 10px;
   cursor: pointer;
 }
@@ -621,8 +705,8 @@ textarea.input {
 }
 .form-actions .btn {
   flex: 1;
-  padding: 10px 0; 
-  font-size: 14px; 
+  padding: 10px 0;
+  font-size: 14px;
   border-radius: 8px;
 }
 
@@ -632,8 +716,8 @@ textarea.input {
   max-width: 200px;
 }
 .btn-submit:hover {
-  background-color: #ffd700; 
-  box-shadow: none; 
+  background-color: #ffd700;
+  box-shadow: none;
 }
 
 .btn-cancel {
@@ -643,7 +727,7 @@ textarea.input {
 }
 
 .btn-cancel:hover {
-  background-color: #6c757d; 
+  background-color: #6c757d;
   box-shadow: none;
 }
 .divider {

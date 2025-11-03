@@ -32,11 +32,11 @@
               </p>
               <p class="item-price">
                 {{
-                  (
-                    (item.product.discounted_price || item.product.price) * item.quantity
+                  Number(
+                    item.product.discounted_price || item.product.price
                   ).toLocaleString()
                 }}
-                تومان
+                تومان / واحد
               </p>
             </div>
 
@@ -114,7 +114,7 @@ function removeItem(id) {
   grid-template-columns: 2.5fr 1fr;
   gap: 30px;
   direction: rtl;
-  font-family: "Vazirmatn", sans-serif;
+  font-family: "Yekan", sans-serif;
   max-width: 1200px;
   margin: 40px auto;
   padding: 20px;

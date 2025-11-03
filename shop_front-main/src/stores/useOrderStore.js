@@ -7,36 +7,30 @@ export const useOrderStore = defineStore('orderStore', {
   state: () => ({
     loading: false,
     orders: [],
-    paymentMethod: 'online', 
-    gateway: 'zarinpal',     
+    paymentMethod: 'online',
+    gateway: 'zarinpal',
   }),
 
   actions: {
-
     async fetchOrders() {
-  this.loading = true
-  try {
-    const response = await orderService.getAllOrders()
-   
-    if (Array.isArray(response?.data?.data)) {
-      this.orders = response.data.data
-    } 
-  
-    else if (Array.isArray(response?.data)) {
-      this.orders = response.data
-    } else {
-      this.orders = []
-    }
-  } catch (err) {
-    console.error('Fetch orders error:', err)
-    toast.error('خطا در دریافت سفارش‌ها')
-  } finally {
-    this.loading = false
-  }
-}
-,
+      this.loading = true
+      try {
+        const response = await orderService.getAllOrders()
 
-   
+        if (Array.isArray(response?.data?.data)) {
+          this.orders = response.data.data
+        } else if (Array.isArray(response?.data)) {
+          this.orders = response.data
+        } else {
+          this.orders = []
+        }
+      } catch (err) {
+        console.error('Fetch orders error:', err)
+        toast.error('خطا در دریافت سفارش‌ها')
+      } finally {
+        this.loading = false
+      }
+    },
     async submitOrder(payload) {
       const cartStore = useCartStore()
 
@@ -48,7 +42,6 @@ export const useOrderStore = defineStore('orderStore', {
       this.loading = true
       try {
         if (this.paymentMethod === 'online') {
-          
           const response = await orderService.requestZarinpalPayment(payload)
           const result = response?.data?.data || response?.data || {}
           const paymentUrl = result?.paymentUrl
@@ -80,36 +73,47 @@ export const useOrderStore = defineStore('orderStore', {
     },
 
     async verifyPayment(authority, order_id, status) {
-  this.loading = true
-  try {
-    const response = await orderService.verifyZarinpalPayment({ authority, order_id, status})
-    const data = response?.data
-    if (data?.success == true) {
-      toast.success('پردات با موفقیت انجام شد ')
-      return true
-    } else {
-      toast.error('پرداخت ناموفق بود ')
-      return false
-    }
-  } catch (err) {
-    console.error('Verify payment error:', err)
-    toast.error('خطا در بررسی پرداخت')
-    return false
-  } finally {
-    this.loading = false
-  }
-},
+      this.loading = true
+      try {
+        const response = await orderService.verifyZarinpalPayment({ authority, order_id, status })
+        const data = response?.data
+        if (data?.success == true) {
+          toast.success('پردات با موفقیت انجام شد ')
+          return true
+        } else {
+          toast.error('پرداخت ناموفق بود ')
+          return false
+        }
+      } catch (err) {
+        console.error('Verify payment error:', err)
+        toast.error('خطا در بررسی پرداخت')
+        return false
+      } finally {
+        this.loading = false
+      }
+    },
 
     async updateOrderStatus(orderId, status) {
       try {
-        await orderService.updateOrder(orderId, { status })
+        await orderService.requestChangeStatus(orderId, status)
         toast.success('وضعیت سفارش به‌روزرسانی شد ')
       } catch (err) {
         console.error('Update order status error:', err)
         toast.error('خطا در تغییر وضعیت سفارش')
       }
     },
+    async cancelUserOrder(orderId) {
+      try {
+        await orderService.updateOrder(orderId, { status: 'canceled' })
+        const index = this.orders.findIndex((o) => o.id === orderId)
+        if (index !== -1) this.orders[index].status = 'canceled'
 
+        toast.success('سفارش با موفقیت لغو شد')
+      } catch (err) {
+        console.error('Cancel order error:', err)
+        toast.error('لغو سفارش موفقیت‌آمیز نبود')
+      }
+    },
     async deleteOrder(orderId) {
       try {
         await orderService.deleteOrder(orderId)

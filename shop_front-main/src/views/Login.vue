@@ -40,7 +40,9 @@
         </label>
 
         <div class="form-actions">
-          <router-link to="/forgotPassword" class="forgot-link">رمز عبور را فراموش کرده‌اید؟</router-link>
+          <router-link to="/forgotPassword" class="forgot-link"
+            >رمز عبور را فراموش کرده‌اید؟</router-link
+          >
         </div>
 
         <button type="submit" class="login-button">ورود</button>
@@ -55,22 +57,22 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useLoginStore } from '@/stores/useLoginStore'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useLoginStore } from "@/stores/useLoginStore";
 
-const login = useLoginStore()
-const router = useRouter()
-const showPassword = ref(false)
+const login = useLoginStore();
+const router = useRouter();
+const showPassword = ref(false);
 
 async function loginUser() {
   try {
-    const response = await login.login()
-    if (response) router.push('/admin')
-    login.loginUser.username = ''
-    login.loginUser.password = ''
+    const response = await login.login();
+    if (response) router.push("/user");
+    login.loginUser.username = "";
+    login.loginUser.password = "";
   } catch (error) {
-    console.error('Error in Login =>', error)
+    console.error("Error in Login =>", error);
   }
 }
 </script>
@@ -84,8 +86,8 @@ async function loginUser() {
 
 .login-wrapper {
   direction: rtl;
-  font-family: 'Yekan', sans-serif;
-  background-color: #f9f9f9; 
+  font-family: "Yekan", sans-serif;
+  background-color: #f9f9f9;
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -144,11 +146,13 @@ async function loginUser() {
 
 input {
   width: 100%;
+  font-family: "Yekan", Arial, sans-serif;
+
   padding: 12px 14px;
   font-family: inherit;
   border: 1.5px solid #e0e0e0;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 15px;
   margin-top: 6px;
   background-color: #fafafa;
   transition: all 0.3s ease;
@@ -156,6 +160,7 @@ input {
 
 input:focus {
   border-color: #ffd700;
+  font-family: "Yekan";
   background-color: #fff;
   box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
   outline: none;
@@ -166,7 +171,7 @@ input:focus {
 }
 
 .password-wrapper input {
-  padding-left: 42px; 
+  padding-left: 42px;
 }
 
 .toggle-password {
@@ -192,6 +197,7 @@ input:focus {
 
 .forgot-link {
   font-size: 13px;
+  font-family: "Yekan", sans-serif;
   color: #1976d2;
   text-decoration: none;
   transition: color 0.3s ease;
@@ -221,6 +227,7 @@ input:focus {
 
 .register-link {
   text-align: center;
+  font-family: "Yekan", sans-serif;
   margin-top: 1rem;
   font-size: 14px;
 }

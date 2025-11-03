@@ -5,10 +5,16 @@
         <button class="close-btn" @click="close">✕</button>
 
         <div class="tabs">
-          <button :class="{ active: activeTab === 'details' }" @click="activeTab = 'details'">
+          <button
+            :class="{ active: activeTab === 'details' }"
+            @click="activeTab = 'details'"
+          >
             مشخصات
           </button>
-          <button :class="{ active: activeTab === 'reviews' }" @click="activeTab = 'reviews'">
+          <button
+            :class="{ active: activeTab === 'reviews' }"
+            @click="activeTab = 'reviews'"
+          >
             نظرات
           </button>
         </div>
@@ -18,27 +24,32 @@
             <div class="product-details">
               <h2>{{ product.title }}</h2>
               <div class="meta">
-                <p class="sku">شناسه محصول: {{ product.id || 'ندارد' }}</p>
+                <p class="sku">شناسه محصول: {{ product.id || "ندارد" }}</p>
                 <hr />
               </div>
               <div class="price">
                 <template v-if="product.discounted_price">
-                  <span class="old-price">{{ product.price.toLocaleString('fa-IR') }} تومان</span>
+                  <span class="old-price"
+                    >{{ product.price.toLocaleString("fa-IR") }} تومان</span
+                  >
                   <span class="new-price"
-                    >{{ product.discounted_price.toLocaleString('fa-IR') }} تومان</span
+                    >{{ product.discounted_price.toLocaleString("fa-IR") }} تومان</span
                   >
                 </template>
                 <template v-else>
-                  {{ product.price ? product.price.toLocaleString('fa-IR') : '0' }} تومان
+                  {{ product.price ? product.price.toLocaleString("fa-IR") : "0" }} تومان
                 </template>
               </div>
 
               <div class="rating-display">
-                <span v-for="i in 5" :key="i" :class="{ filled: i <= product.average_rating }"
+                <span
+                  v-for="i in 5"
+                  :key="i"
+                  :class="{ filled: i <= product.average_rating }"
                   >★</span
                 >
               </div>
-              <p class="description">{{ product.description || 'توضیحات موجود نیست' }}</p>
+              <p class="description">{{ product.description || "توضیحات موجود نیست" }}</p>
               <div class="actions">
                 <div class="quantity-control">
                   <button @click="decrease">-</button>
@@ -73,13 +84,20 @@
                 >★</span
               >
             </div>
-            <textarea v-model="newComment" placeholder="نظر خود را وارد کنید..."></textarea>
+            <textarea
+              v-model="newComment"
+              placeholder="نظر خود را وارد کنید..."
+            ></textarea>
             <button @click="submitComment">ارسال نظر</button>
           </div>
 
           <div class="reviews-list">
             <div v-if="productComments.length">
-              <div v-for="(comment, index) in productComments" :key="index" class="review">
+              <div
+                v-for="(comment, index) in productComments"
+                :key="index"
+                class="review"
+              >
                 <!-- <p class="review-author">{{ comment.author_name }}</p> -->
                 <!-- <div class="review-rating">
                   <span v-for="i in 5" :key="i" :class="{ filled: i <= comment.rating }">★</span>
@@ -99,69 +117,73 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { useCartStore } from '@/stores/useCartStore'
-import { useProductCommentStore } from '@/stores/useProductCommentStore'
+import { ref, computed, watch } from "vue";
+import { useCartStore } from "@/stores/useCartStore";
+import { useProductCommentStore } from "@/stores/useProductCommentStore";
 
 const props = defineProps({
   show: Boolean,
   product: Object,
-})
-const emit = defineEmits(['close'])
+});
+const emit = defineEmits(["close"]);
 
-const cartStore = useCartStore()
-const commentStore = useProductCommentStore()
+const cartStore = useCartStore();
+const commentStore = useProductCommentStore();
 
-const count = ref(1)
-const activeTab = ref('details')
-const userRating = ref(0)
-const hoverRating = ref(0)
-const newComment = ref('')
+const count = ref(1);
+const activeTab = ref("details");
+const userRating = ref(0);
+const hoverRating = ref(0);
+const newComment = ref("");
 
 watch(
   () => props.product,
   async (newVal) => {
     if (newVal?.id) {
-      await commentStore.fetchApprovedComments(newVal.id)
+      await commentStore.fetchApprovedComments(newVal.id);
     }
   }
-)
+);
 
 const productComments = computed(() => {
-  if (!props.product?.id) return []
-  return commentStore.comments
-})
+  if (!props.product?.id) return [];
+  return commentStore.comments;
+});
 
 function close() {
-  emit('close')
+  emit("close");
 }
 function increase() {
-  count.value++
+  count.value++;
 }
 function decrease() {
-  if (count.value > 1) count.value--
+  if (count.value > 1) count.value--;
 }
 async function addToCart() {
-  if (!props.product?.id) return
-  await cartStore.addItem(props.product.id, count.value)
+  if (!props.product?.id) return;
+  await cartStore.addItem(props.product.id, count.value);
 }
 
 async function submitComment() {
-  if (!newComment.value || userRating.value === 0 || !props.product?.id) return
+  if (!newComment.value || userRating.value === 0 || !props.product?.id) return;
   try {
-    await commentStore.submitComment(props.product.id, newComment.value, userRating.value)
-    newComment.value = ''
-    userRating.value = 0
-    alert('نظر شما با موفقیت ارسال شد و بعد از تایید ادمین نمایش داده می‌شود.')
+    await commentStore.submitComment(
+      props.product.id,
+      newComment.value,
+      userRating.value
+    );
+    newComment.value = "";
+    userRating.value = 0;
+    alert("نظر شما با موفقیت ارسال شد و بعد از تایید ادمین نمایش داده می‌شود.");
   } catch (err) {
-    console.error(err)
+    console.error(err);
   }
 }
 </script>
 
-
 <style scoped>
 .modal-overlay {
+  font-family: "Yekan";
   position: fixed;
   top: 0;
   left: 0;
@@ -174,6 +196,7 @@ async function submitComment() {
   z-index: 2000;
 }
 .modal-content {
+  font-family: "Yekan";
   background: white;
   border-radius: 16px;
   max-width: 900px;
@@ -244,8 +267,12 @@ async function submitComment() {
   background: #facc15;
   color: #fff;
 }
+.description {
+  text-align: justify;
+}
 .tab-content {
   display: flex;
+  font-family: "Yekan";
   flex-direction: column;
   gap: 20px;
 }
@@ -257,7 +284,7 @@ async function submitComment() {
   padding: 25px;
   border-radius: 16px;
   direction: rtl;
-  font-family: Tahoma, sans-serif;
+  font-family: "Yekan";
 }
 .product-image img {
   width: 100%;
@@ -434,5 +461,8 @@ async function submitComment() {
 }
 .new-price {
   color: #e11d48;
+}
+textarea {
+  font-family: "Yekan";
 }
 </style>

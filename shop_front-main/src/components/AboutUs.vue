@@ -15,21 +15,21 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useAboutUsStore } from '@/stores/useAboutUsStore'
+import { onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { useAboutUsStore } from "@/stores/useAboutUsStore";
 
-const aboutStore = useAboutUsStore()
-const { title, text, imageurl, loading, error } = storeToRefs(aboutStore)
+const aboutStore = useAboutUsStore();
+const { title, text, imageurl, loading, error } = storeToRefs(aboutStore);
 
 onMounted(() => {
-  aboutStore.fetchAbout()
-})
+  aboutStore.fetchAbout();
+});
 </script>
-
 
 <style scoped>
 .about-us {
+  font-family: "Yekan";
   display: flex;
   justify-content: center;
   align-items: center;

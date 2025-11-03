@@ -102,8 +102,6 @@ function submitForm() {
   padding: 60px 20px 40px;
   background: linear-gradient(135deg, #ffd700 0%, #e5c100 100%);
   color: white;
-  border-bottom-left-radius: 50px;
-  border-bottom-right-radius: 50px;
 }
 .contact-header h1 {
   font-size: 2.2rem;
@@ -124,6 +122,7 @@ function submitForm() {
 
 .contact-form,
 .contact-info {
+  font-family: "Yekan", sans-serif;
   background: #fafafa;
   padding: 30px;
   border-radius: 20px;

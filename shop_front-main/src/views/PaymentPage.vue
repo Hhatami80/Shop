@@ -23,7 +23,7 @@
       </div>
 
       <div v-else class="cod-section">
-        <p>سفارش شما در محل پرداخت خواهد شد.</p>
+        <p>سفارش شما در محل پرداخت خواهد شد</p>
         <button class="btn gold-btn" @click="confirmCOD" :disabled="loading">
           تأیید و ثبت سفارش
         </button>
@@ -115,7 +115,7 @@ const confirmCOD = async () => {
     const res = await orderStore.submitOrder(payload);
     if (res?.orderId) {
       toast.success("سفارش با موفقیت ثبت شد ");
-      router.push({ name: "user-orders" });
+      router.push({ name: "user" });
     }
   } catch (err) {
     console.error(err);
@@ -128,6 +128,7 @@ const confirmCOD = async () => {
 
 <style scoped>
 .payment-page {
+  font-family: "Yekan";
   max-width: 100vw;
   margin: 50px auto;
   background: #fff;
@@ -151,6 +152,8 @@ h2 {
 
 p {
   margin: 10px 0;
+  font-family: "Yekan";
+
   font-size: 1rem;
 }
 
