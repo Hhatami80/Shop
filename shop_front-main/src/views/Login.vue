@@ -40,9 +40,9 @@
         </label>
 
         <div class="form-actions">
-          <router-link to="/forgotPassword" class="forgot-link"
-            >رمز عبور را فراموش کرده‌اید؟</router-link
-          >
+          <router-link to="/forgotPassword" class="forgot-link">
+            رمز عبور را فراموش کرده‌اید؟
+          </router-link>
         </div>
 
         <button type="submit" class="login-button">ورود</button>
@@ -60,6 +60,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useLoginStore } from "@/stores/useLoginStore";
+import { toast } from "vue3-toastify";
 
 const login = useLoginStore();
 const router = useRouter();
@@ -68,9 +69,23 @@ const showPassword = ref(false);
 async function loginUser() {
   try {
     const response = await login.login();
-    if (response) router.push("/user");
-    login.loginUser.username = "";
-    login.loginUser.password = "";
+
+    if (response) {
+      
+      const role = login.user?.role;
+
+      if (role === "admin") {
+        toast.success("خوش آمدید مدیر محترم 🌟");
+        router.push("/admin");
+      } else {
+        toast.success("ورود با موفقیت انجام شد ");
+        router.push("/user");
+      }
+
+   
+      login.loginUser.username = "";
+      login.loginUser.password = "";
+    }
   } catch (error) {
     console.error("Error in Login =>", error);
   }
@@ -78,6 +93,7 @@ async function loginUser() {
 </script>
 
 <style scoped>
+
 *,
 *::before,
 *::after {
@@ -147,7 +163,6 @@ async function loginUser() {
 input {
   width: 100%;
   font-family: "Yekan", Arial, sans-serif;
-
   padding: 12px 14px;
   font-family: inherit;
   border: 1.5px solid #e0e0e0;
@@ -160,7 +175,6 @@ input {
 
 input:focus {
   border-color: #ffd700;
-  font-family: "Yekan";
   background-color: #fff;
   box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
   outline: none;
@@ -197,7 +211,6 @@ input:focus {
 
 .forgot-link {
   font-size: 13px;
-  font-family: "Yekan", sans-serif;
   color: #1976d2;
   text-decoration: none;
   transition: color 0.3s ease;
@@ -208,7 +221,6 @@ input:focus {
 }
 
 .login-button {
-  position: relative;
   background: linear-gradient(135deg, #ffd740, #ffc107);
   color: #212121;
   padding: 12px 0;
@@ -227,7 +239,6 @@ input:focus {
 
 .register-link {
   text-align: center;
-  font-family: "Yekan", sans-serif;
   margin-top: 1rem;
   font-size: 14px;
 }
