@@ -341,7 +341,7 @@ watch(
 }
 .price {
   font-size: 20px;
-  color: #2f3e34;
+  color: #333;
   font-weight: bold;
   margin: 20px 0;
 }
@@ -410,9 +410,9 @@ watch(
   border-radius: 4px;
 }
 .tabs button.active {
-  background: #4d6d58;
+  background: #333;
   color: white;
-  border-color: #4d6d58;
+  border-color: #333;
 }
 .details,
 .comments {
@@ -449,7 +449,7 @@ watch(
 .related-products h3 {
   font-size: 20px;
   margin-bottom: 25px;
-  color: #2f3e34;
+  color: #333;
 }
 .related-grid {
   display: grid;
@@ -480,7 +480,7 @@ watch(
   color: #333;
 }
 .product-card .price {
-  color: #4d6d58;
+  color: #333;
   font-weight: bold;
   margin-top: 5px;
 }
@@ -534,7 +534,7 @@ watch(
   margin-top: 10px;
 }
 .modal-actions button:first-child {
-  background: #4d6d58;
+  background: #333;
   color: white;
   padding: 8px 16px;
   border-radius: 5px;
