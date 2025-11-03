@@ -8,7 +8,11 @@
       <span v-if="categoryName"> / {{ categoryName }}</span>
     </div>
     <section class="filter-bar">
-      <div class="filter-right" @click="toggleFilterMenu">
+      <div
+        class="filter-right"
+        :class="{ active: isFilterOpen }"
+        @click="toggleFilterMenu"
+      >
         <i class="fas fa-sliders-h"></i>
         <span>مرتب‌سازی</span>
         <div v-if="isFilterOpen" class="filter-dropdown" @click.stop>
@@ -181,6 +185,7 @@ watch(
   border-bottom: 1px solid #ddd;
   position: relative;
 }
+
 .filter-right {
   display: flex;
   align-items: center;
@@ -190,24 +195,76 @@ watch(
   color: #333;
   gap: 6px;
   position: relative;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 10px 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
+
+.filter-right:hover {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+}
+
+.filter-right.active {
+  background-color: #ffe082;
+  border-color: #ffca28;
+  color: #000;
+  box-shadow: 0 2px 8px rgba(255, 202, 40, 0.4);
+}
+
 .filter-right i {
   font-size: 18px;
-  color: #333;
+  color: inherit;
+  transition: transform 0.3s ease;
 }
+
+.filter-right.active i {
+  transform: rotate(90deg);
+}
+
 .filter-dropdown {
   position: absolute;
-  top: 35px;
+  top: 48px;
   right: 0;
   background: #fff;
   border: 1px solid #ddd;
-  border-radius: 8px;
+  border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   padding: 6px 0;
   display: flex;
   flex-direction: column;
-  min-width: 150px;
+  min-width: 160px;
   z-index: 10;
+  animation: dropdownFade 0.3s ease forwards;
+}
+
+@keyframes dropdownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.filter-dropdown button {
+  background: none;
+  border: none;
+  padding: 10px 16px;
+  text-align: right;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #333;
+}
+
+.filter-dropdown button:hover {
+  background-color: #fff8e1;
+  color: #000;
 }
 
 .product-card,
@@ -225,6 +282,7 @@ watch(
   margin-top: 20px;
   margin-bottom: 20px;
 }
+
 .featured-card {
   position: relative;
   width: 560px;
@@ -233,16 +291,19 @@ watch(
   background: #fff;
   text-align: right;
 }
+
 .featured-image-wrapper {
   position: relative;
   width: 100%;
   height: 85%;
 }
+
 .featured-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
+
 .featured-discount {
   position: absolute;
   top: 10px;
@@ -251,15 +312,18 @@ watch(
   font-weight: bold;
   font-size: 20px;
 }
+
 .featured-info {
   padding: 10px;
   height: 30%;
 }
+
 .featured-name {
   font-size: 20px;
   color: #000;
   font-weight: 600;
 }
+
 .featured-price {
   font-size: 16px;
   color: #000;
@@ -272,16 +336,19 @@ watch(
   gap: 25px;
   margin: 0px 20px 40px;
 }
+
 @media (max-width: 1200px) {
   .product-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
 @media (max-width: 900px) {
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
 @media (max-width: 600px) {
   .product-grid {
     grid-template-columns: 1fr;
@@ -294,17 +361,20 @@ watch(
   text-align: right;
   padding-bottom: 10px;
 }
+
 .product-image-wrapper {
   position: relative;
   width: 100%;
   height: 380px;
   overflow: hidden;
 }
+
 .product-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
+
 .discount-badge {
   position: absolute;
   top: 8px;
@@ -313,12 +383,14 @@ watch(
   font-weight: bold;
   font-size: 16px;
 }
+
 .product-name {
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 2px;
   color: #000;
 }
+
 .product-price {
   color: #000;
   font-weight: bold;
@@ -331,6 +403,7 @@ watch(
   padding-bottom: 20px;
   gap: 8px;
 }
+
 .pagination button {
   padding: 6px 12px;
   border: 1px solid #ccc;
@@ -338,6 +411,7 @@ watch(
   border-radius: 6px;
   cursor: pointer;
 }
+
 .pagination button.active {
   background: gold;
   color: #fff;

@@ -298,7 +298,6 @@ const formatPrice = (amount) => Number(amount)?.toLocaleString("fa-IR") || "0";
   font-size: 3.5rem;
 }
 
-/* ✅ Pagination like UserOrders */
 .pagination {
   display: flex;
   justify-content: center;

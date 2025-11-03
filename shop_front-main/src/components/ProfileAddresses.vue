@@ -29,11 +29,7 @@
 
       <div class="form-group">
         <label>محله:</label>
-        <input
-          v-model="newAddress.neighborhood"
-          type="text"
-          placeholder="مثلاً نیاوران"
-        />
+        <input v-model="newAddress.neighborhood" type="text" placeholder="مثال نیاوران" />
       </div>
 
       <div class="form-group">
@@ -43,7 +39,16 @@
 
       <div class="form-group">
         <label>پلاک:</label>
-        <input v-model="newAddress.plate" type="text" placeholder="مثلاً ۲۳" />
+        <input v-model="newAddress.plate" type="text" placeholder="مثال ۲۳" />
+      </div>
+
+      <div class="form-group">
+        <label>کد پستی:</label>
+        <input
+          v-model="newAddress.postal_code"
+          type="text"
+          placeholder="مثال 1234567890"
+        />
       </div>
 
       <div class="form-group full">
@@ -51,12 +56,13 @@
         <textarea
           v-model="newAddress.full_address"
           rows="2"
-          placeholder="مثلاً تهران، نیاوران، کوچه گلستان، پلاک ۲۳..."
+          placeholder="مثال تهران، نیاوران، کوچه گلستان، پلاک ۲۳..."
         ></textarea>
       </div>
 
       <button class="btn gold-btn" @click="addAddress">افزودن آدرس</button>
     </div>
+
     <table class="addresses-table" v-if="store.addresses.length">
       <thead>
         <tr>
@@ -65,6 +71,7 @@
           <th>محله</th>
           <th>کوچه</th>
           <th>پلاک</th>
+          <th>کد پستی</th>
           <th>آدرس کامل</th>
           <th>عملیات</th>
         </tr>
@@ -76,6 +83,7 @@
           <td>{{ addr.neighborhood }}</td>
           <td>{{ addr.street }}</td>
           <td>{{ addr.plate }}</td>
+          <td>{{ addr.postal_code }}</td>
           <td>{{ addr.full_address }}</td>
           <td>
             <button class="delete-btn" @click="deleteAddress(idx)">🗑</button>
@@ -99,6 +107,7 @@ const newAddress = reactive({
   neighborhood: "",
   street: "",
   plate: "",
+  postal_code: "",
   full_address: "",
 });
 
@@ -116,8 +125,24 @@ watch(
 );
 
 const addAddress = async () => {
-  if (!newAddress.province_id || !newAddress.city_id) {
-    return toast.error("لطفاً استان و شهر را انتخاب کنید");
+  if (
+    !newAddress.province_id ||
+    !newAddress.city_id ||
+    !newAddress.neighborhood ||
+    !newAddress.street ||
+    !newAddress.plate ||
+    !newAddress.postal_code ||
+    !newAddress.full_address
+  ) {
+    return toast.error("لطفاً همه فیلدها را تکمیل کنید");
+  }
+
+  if (!/^\d+$/.test(newAddress.plate)) {
+    return toast.error("پلاک باید فقط شامل عدد باشد");
+  }
+
+  if (!/^\d{10}$/.test(newAddress.postal_code)) {
+    return toast.error("کد پستی باید ۱۰ رقم عدد باشد");
   }
 
   const addressToAdd = {
@@ -126,6 +151,7 @@ const addAddress = async () => {
     neighborhood: newAddress.neighborhood,
     street: newAddress.street,
     plate: newAddress.plate,
+    postal_code: newAddress.postal_code,
     full_address: newAddress.full_address,
   };
 
@@ -137,9 +163,10 @@ const addAddress = async () => {
     newAddress.neighborhood = "";
     newAddress.street = "";
     newAddress.plate = "";
+    newAddress.postal_code = "";
     newAddress.full_address = "";
 
-    toast.success("آدرس با موفقیت افزوده شد ✅");
+    toast.success("آدرس با موفقیت افزوده شد ");
   } catch (error) {
     console.error(error.response?.data);
     toast.error("خطا در افزودن آدرس");

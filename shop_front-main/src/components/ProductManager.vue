@@ -324,7 +324,6 @@ const form = reactive({
 const submitSuccess = ref(false);
 const submitError = ref(null);
 
-// 🔹 Pagination
 const currentPage = ref(1);
 const pageSize = 5;
 const paginatedProducts = computed(() => {
@@ -339,7 +338,6 @@ function prevPage() {
   if (currentPage.value > 1) currentPage.value--;
 }
 
-// --- Existing Methods ---
 function resetForm() {
   form.id = null;
   form.title = "";
