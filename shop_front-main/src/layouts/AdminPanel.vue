@@ -86,7 +86,7 @@ function goHome() {
     router.push('/')
 }
 
-const logout = async () => {
+const logout = () => {
   loginStore.logout();
   toast.info("شما از حساب خارج شدید!");
   router.push("/login");
