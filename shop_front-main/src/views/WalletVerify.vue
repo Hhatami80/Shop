@@ -53,7 +53,7 @@ onMounted(async () => {
 
     if (verified) {
       if (verified.success) toast.success("پرداخت با موفقیت انجام شد ");
-      setTimeout(() => router.push({ name: "Wallet" }), 2500);
+      setTimeout(() => router.push("/user/wallet"), 2500);
     } else {
       toast.error("پرداخت ناموفق بود");
     }

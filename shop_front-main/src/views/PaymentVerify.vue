@@ -5,11 +5,11 @@
     <p v-if="loading">در حال بررسی وضعیت پرداخت...</p>
 
     <p v-else-if="success" class="success">
-      پرداخت با موفقیت انجام شد. <br />
+      ✅ پرداخت با موفقیت انجام شد. <br />
       شما به صفحه‌ی موفقیت هدایت می‌شوید...
     </p>
 
-    <p v-else-if="success == false" class="error">
+    <p v-else-if="success === false" class="error">
       ❌ پرداخت ناموفق بود یا توسط کاربر لغو شد.
     </p>
   </div>
@@ -23,10 +23,10 @@ import { toast } from "vue3-toastify";
 
 const router = useRouter();
 const route = useRoute();
-const order = useOrderStore();
+const orderStore = useOrderStore();
 
 const loading = ref(true);
-const success = ref(false);
+const success = ref(null);
 
 onMounted(async () => {
   try {
@@ -36,25 +36,36 @@ onMounted(async () => {
 
     if (!authority || !orderId) {
       toast.error("پارامترهای پرداخت ناقص است");
+      loading.value = false;
       return;
     }
 
+    // اگر پرداخت لغو شده باشد
     if (statusParam !== "OK") {
-      toast.error("پرداخت توسط کاربر لغو شد ");
+      toast.error("پرداخت توسط کاربر لغو شد");
       success.value = false;
+      loading.value = false;
       return;
     }
 
-    const verified = await order.verifyPayment(authority, orderId, statusParam);
+    // بررسی پرداخت در سرور
+    const verified = await orderStore.verifyPayment(authority, orderId, statusParam);
     success.value = verified;
 
     if (verified) {
-      toast.success("پرداخت با موفقیت انجام شد ");
-      setTimeout(() => router.push({ name: "OrderSuccess" }), 2000);
+      toast.success("پرداخت با موفقیت انجام شد");
+      setTimeout(() => {
+        // انتقال به صفحه موفقیت با orderId
+        router.push({
+          name: "OrderSuccess",
+          query: { id: orderId },
+        });
+      }, 2000);
     }
   } catch (err) {
-    console.log(err);
-    toast.error("خطا");
+    console.error(err);
+    toast.error("خطا در بررسی پرداخت");
+    success.value = false;
   } finally {
     loading.value = false;
   }
@@ -70,6 +81,7 @@ onMounted(async () => {
   border-radius: 16px;
   text-align: center;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  font-family: "Yekan", sans-serif;
 }
 
 h2 {

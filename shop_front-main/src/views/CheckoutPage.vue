@@ -117,7 +117,7 @@ const proceedToPayment = async () => {
       if (res?.orderId) {
         toast.success("پرداخت با کیف پول با موفقیت انجام شد ");
         await wallet.fetchBalance();
-        router.push({ name: "user" });
+        router.push("user/orders");
       }
     } else if (paymentMethod.value === "online") {
       router.push({ name: "payment-gateway" });

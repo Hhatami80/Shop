@@ -31,6 +31,21 @@ export const useOrderStore = defineStore('orderStore', {
         this.loading = false
       }
     },
+
+    async fetchOrderById(orderId) {
+      this.loading = true
+      try {
+        const response = await orderService.getOrderById(orderId)
+        return response?.data || null
+      } catch (err) {
+        console.error('Fetch order by ID error:', err)
+        toast.error('خطا در دریافت جزئیات سفارش')
+        return null
+      } finally {
+        this.loading = false
+      }
+    },
+
     async submitOrder(payload) {
       const cartStore = useCartStore()
 
@@ -78,7 +93,6 @@ export const useOrderStore = defineStore('orderStore', {
         const response = await orderService.verifyZarinpalPayment({ authority, order_id, status })
         const data = response?.data
         if (data?.success == true) {
-          toast.success('پردات با موفقیت انجام شد ')
           return true
         } else {
           toast.error('پرداخت ناموفق بود ')
@@ -102,6 +116,7 @@ export const useOrderStore = defineStore('orderStore', {
         toast.error('خطا در تغییر وضعیت سفارش')
       }
     },
+
     async cancelUserOrder(orderId) {
       try {
         await orderService.updateOrder(orderId, { status: 'canceled' })
@@ -114,6 +129,7 @@ export const useOrderStore = defineStore('orderStore', {
         toast.error('لغو سفارش موفقیت‌آمیز نبود')
       }
     },
+
     async deleteOrder(orderId) {
       try {
         await orderService.deleteOrder(orderId)

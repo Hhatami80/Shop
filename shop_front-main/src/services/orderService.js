@@ -36,6 +36,10 @@ export const orderService = {
   deleteOrder(id) {
     return api.delete(`/admin/orders/${id}/`)
   },
+  getOrderById(id) {
+  return api.get(`/orders/${id}/`)
+},
+
 }
 
 export default orderService
