@@ -26,16 +26,16 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-
+import { toast } from 'vue3-toastify'
 import TheSidebar from '@/components/TheSidebar.vue'
 import TheHeader from '@/components/TheHeader.vue' 
 import ChangePasswordModal from '@/components/ChangePasswordModal.vue'
 
-// import { useLoginStore } from '@/stores/useLoginStore' 
+import { useLoginStore } from '@/stores/useLoginStore' 
 
 const router = useRouter()
 const route = useRoute()
-// const loginStore = useLoginStore() 
+const loginStore = useLoginStore() 
 const showPasswordModal = ref(false)
 
 const menuStatus = ref({

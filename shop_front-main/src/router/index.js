@@ -168,6 +168,10 @@ router.beforeEach((to) => {
     return { name: 'Login' }
   }
 
+  if (to.path.startsWith("/user") && !isAuthenticated) {
+    return { name: 'Login'}
+  }
+
   if (to.path.startsWith('/admin') && isAuthenticated && !isAdmin) {
     return { name: 'MainPage' }
   }
