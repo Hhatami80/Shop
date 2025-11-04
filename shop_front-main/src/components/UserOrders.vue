@@ -51,12 +51,12 @@
         </tbody>
       </table>
 
-      <div class="pagination">
-        <button @click="prevPage" :disabled="currentPage === 1">
+      <div class="pagination" style="direction: ltr;">
+        <button @click="nextPage" :disabled="currentPage === totalPages">
           <fa-icon :icon="['fas', 'chevron-left']" />
         </button>
         <span>صفحه {{ currentPage }} از {{ totalPages }}</span>
-        <button @click="nextPage" :disabled="currentPage === totalPages">
+        <button @click="prevPage" :disabled="currentPage === 1">
           <fa-icon :icon="['fas', 'chevron-right']" />
         </button>
       </div>
