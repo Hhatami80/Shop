@@ -228,7 +228,7 @@ input:focus {
 
 .save-button {
   background-color: var(--primary-gold);
-  color: #fff;
+  color:  var(--text-dark);
   font-weight: 800;
   width: 100%;
   margin-top: 50px;
