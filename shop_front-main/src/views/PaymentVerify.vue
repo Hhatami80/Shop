@@ -40,7 +40,7 @@ onMounted(async () => {
       return;
     }
 
-    // اگر پرداخت لغو شده باشد
+    
     if (statusParam !== "OK") {
       toast.error("پرداخت توسط کاربر لغو شد");
       success.value = false;
@@ -48,14 +48,14 @@ onMounted(async () => {
       return;
     }
 
-    // بررسی پرداخت در سرور
+  
     const verified = await orderStore.verifyPayment(authority, orderId, statusParam);
     success.value = verified;
 
     if (verified) {
       toast.success("پرداخت با موفقیت انجام شد");
       setTimeout(() => {
-        // انتقال به صفحه موفقیت با orderId
+       
         router.push({
           name: "OrderSuccess",
           query: { id: orderId },

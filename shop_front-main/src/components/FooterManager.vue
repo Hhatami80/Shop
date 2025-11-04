@@ -227,7 +227,7 @@ input:focus {
 }
 
 .save-button {
-  background-color: var(--text-dark);
+  background-color: var(--primary-gold);
   color: #fff;
   font-weight: 800;
   width: 100%;
@@ -241,7 +241,7 @@ input:focus {
 }
 
 .save-button:hover {
-  background-color: #2c3e50;
+  
   box-shadow: 0 12px 30px rgba(52, 73, 94, 0.6);
   transform: translateY(-2px);
 }

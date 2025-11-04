@@ -216,7 +216,7 @@ button {
   font-weight: 800;
   font-size: 18px;
   background-color: var(--primary-gold);
-  color: var(--text-dark);
+  color: white;
   padding: 15px;
   border-radius: 10px;
   border: none;
