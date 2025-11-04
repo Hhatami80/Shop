@@ -18,9 +18,14 @@ from account_module.serializers import UserSerializer, UserAdminSerializer
 from article_module.models import Article
 from article_module.serializers import ArticleSerializer
 from rest_framework.decorators import action
+from rest_framework.permissions import BasePermission
+from django.core.exceptions import ObjectDoesNotExist
 
+# permissions
+class IsAdmin(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.role == "admin"
 
-# Create your views here.
 
 
 # region Product
@@ -143,19 +148,21 @@ class AddCategoryView(APIView):
 
 
 class DeleteCategoryView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def get_object(self, category_id: int):
         try:
-            category = ProductCategory.objects.get(pk=category_id)
-            return category
-        except ProductCategory.DoesNotExist:
-            return Response({'errors': 'دسته بندی وجود ندارد'}, status.HTTP_404_NOT_FOUND)
+            return ProductCategory.objects.get(pk=category_id)
+        except ObjectDoesNotExist:
+            return None
 
     def delete(self, request: Request, category_id: int):
         category = self.get_object(category_id)
-        category.delete()
-        return Response({'data': 'دسته بندی با موفقیت حذف شد'}, status.HTTP_204_NO_CONTENT)
+        if category is not None:
+            category.delete()
+            return Response({'data': 'دسته بندی با موفقیت حذف شد'}, status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({"error": "خطا در حذف دسته بندی !"}, status.HTTP_404_NOT_FOUND)
 
 
 class UpdateCategoryView(APIView):

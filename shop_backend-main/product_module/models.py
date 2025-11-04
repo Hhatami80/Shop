@@ -70,7 +70,7 @@ class Product(models.Model):
     discount = models.CharField(verbose_name='تخفیف', null=True, blank=True, max_length=20)
     discounted_price = models.CharField(verbose_name='قیمت تخفیف خورده', null=True, blank=True, max_length=20)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, verbose_name='برند محصول', null=True, blank=True)
-    category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE, verbose_name='دسته بندی محصول', default=1,
+    category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE, verbose_name='دسته بندی محصول',
                                  related_name='categories')
     final_price = models.IntegerField(null=True, blank=True, verbose_name='قیمت نهایی')
     # product_tag = models.ManyToManyField(ProductTag, verbose_name='تگ محصول')
@@ -127,7 +127,7 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     quantity = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2)
 

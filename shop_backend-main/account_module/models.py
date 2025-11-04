@@ -69,7 +69,7 @@ class Address(models.Model):
     full_address = models.CharField(max_length=500)
     plate = models.IntegerField()
     # unit = models.IntegerField()
-    # postal_code = models.IntegerField()
+    postal_code = models.CharField(max_length=10, null=True, blank=True)
     neighborhood = models.CharField(null=True, max_length=255)
     street = models.CharField(null=True ,max_length=255)
 

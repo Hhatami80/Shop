@@ -121,5 +121,5 @@ class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
         fields = ['id', 'user', 'full_address', 'plate', 'city', 'city_id', 'province',
-                  'province_id', 'street', 'neighborhood']
+                  'province_id', 'postal_code','street', 'neighborhood']
 

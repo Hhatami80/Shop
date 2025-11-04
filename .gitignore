@@ -3,3 +3,4 @@ node_modules/
 .env
 shop_front-main/.env
 __pycache__/
+shop_backend-main/db.sqlite3
