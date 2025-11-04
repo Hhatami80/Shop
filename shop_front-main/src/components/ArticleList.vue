@@ -76,7 +76,7 @@ h2 {
 
 .article-list-header .btn {
   background-color: var(--primary-gold);
-  color: var(--text-dark);
+  color: white;
   font-weight: 700;
   padding: 10px 22px;
   border-radius: 8px; 
@@ -185,7 +185,7 @@ h2 {
 
 .btn-edit {
   background-color: var(--gold-hover); 
-  color: var(--text-dark);
+  color: white;
 }
 
 .btn-edit:hover {
