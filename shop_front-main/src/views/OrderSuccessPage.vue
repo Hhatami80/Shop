@@ -41,7 +41,7 @@ const fetchOrder = async () => {
   if (data) order.value = data;
 };
 
-onMounted(fetchOrder);
+onMounted(() => fetchOrder());
 
 const formatPrice = (price) => {
   if (!price) return "—";

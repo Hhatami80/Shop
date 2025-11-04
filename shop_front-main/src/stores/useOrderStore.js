@@ -119,10 +119,10 @@ export const useOrderStore = defineStore('orderStore', {
 
     async cancelUserOrder(orderId) {
       try {
-        await orderService.updateOrder(orderId, { status: 'canceled' })
-        const index = this.orders.findIndex((o) => o.id === orderId)
-        if (index !== -1) this.orders[index].status = 'canceled'
-
+        const response = await orderService.updateOrder(orderId, { status: 'canceled' })
+        if (response.status === 204) {
+          this.orders = await this.fetchOrders()
+        }
         toast.success('سفارش با موفقیت لغو شد')
       } catch (err) {
         console.error('Cancel order error:', err)

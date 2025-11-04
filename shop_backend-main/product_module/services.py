@@ -19,6 +19,4 @@ def create_order(user):
         )
 
     order.calculate_total()
-    cart.items.all().delete()
-
     return order

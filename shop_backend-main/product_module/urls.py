@@ -14,7 +14,7 @@ urlpatterns = [
     path('cart/clear', views.DeleteAllCartItems.as_view(), name='cart'),
     path('cart/<int:cartitem_id>', views.CartView.as_view(), name='cart-delete'),
     path('orders/', views.OrderListView.as_view(), name='order-list-create'),
-    path('orders/<int:pk>', views.OrderDetailView.as_view(), name='order-detail'),
+    path('orders/<int:order_id>', views.OrderDetailView.as_view(), name='order-detail'),
     path('banners', views.CategoryBannerView.as_view()),
     path('category/<int:category_id>', views.SingleCategoryView.as_view()),
     path('checkout/', views.checkout, name='checkout'),

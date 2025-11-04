@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import render, get_object_or_404, redirect
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -191,17 +193,30 @@ class OrderListView(generics.ListAPIView):
 
     def get_queryset(self):
         if self.request.user.role != 'admin':
-            return Order.objects.filter(user=self.request.user)
+            return Order.objects.filter(user=self.request.user).order_by("-created_at")
         return Order.objects.all()
 
 
-class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
+class OrderDetailView(APIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
+    
+    def get(self, request: Request, order_id: int):
+        order = Order.objects.filter(user=request.user, pk=order_id).get()
+        order_serializer = OrderSerializer(order, context={'request': request})
+        return Response(order_serializer.data, status.HTTP_200_OK)
+    def patch(self, request, order_id: int):
+        try:
+            order = Order.objects.filter(user=request.user, pk=order_id).get()
+            order_serializer = OrderSerializer(order, context={'request': request})
+            order.status = request.data.get('status')
+            order.save()
+            return Response({"data": order_serializer.data}, status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': json.dumps(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
 
+    
 
 class CategoryBannerView(APIView):
     def get(self, request: Request):
@@ -272,6 +287,7 @@ class PaymentRequestView(APIView):
             payment.authority = authority
             payment.save()
             payment_url = f"{settings.ZARINPAL_STARTPAY_URL}{authority}"
+            user.cart.items.all().delete()
             return Response({
                 "orderId": order.id,
                 "paymentUrl": payment_url

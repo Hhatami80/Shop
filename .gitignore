@@ -1,2 +1,5 @@
 .venv/
 node_modules/
+.env
+shop_front-main/.env
+__pycache__/

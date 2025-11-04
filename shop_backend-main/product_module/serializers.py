@@ -249,7 +249,7 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    items = OrderItemSerializer(many=True)
+    items = OrderItemSerializer(many=True, required=False)
     created_at_jalali = serializers.SerializerMethodField()
     user = UserAdminSerializer(read_only=True)
     payment = PaymentSerializer(read_only=True)
@@ -266,7 +266,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'created_at',
             'created_at_jalali'
         ]
-        read_only_fields = ["user", "status", "total_price", "created_at"]
+        read_only_fields = ["user", "total_price", "created_at"]
 
     def get_created_at_jalali(self, obj):
         return jdatetime.datetime.fromgregorian(datetime=obj.created_at).strftime("%d %B %Y")

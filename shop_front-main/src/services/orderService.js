@@ -24,8 +24,8 @@ export const orderService = {
 ,
 
 
-  updateOrder(id, data) {
-    return api.patch(`/orders/${id}/`, data)
+  async updateOrder(id, data) {
+    return api.patch(`/orders/${id}`, {'status': data.status})
   },
   requestChangeStatus(orderId, status) {
   return api.patch(`/admin/orders/${orderId}/change_status/`, { status });
@@ -37,7 +37,7 @@ export const orderService = {
     return api.delete(`/admin/orders/${id}/`)
   },
   getOrderById(id) {
-  return api.get(`/orders/${id}/`)
+  return api.get(`/orders/${id}`)
 },
 
 }
