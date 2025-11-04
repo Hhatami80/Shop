@@ -24,7 +24,7 @@ class BannerView(APIView):
 
 class ProductView(APIView):
     def get(self, request: Request):
-        product = Product.objects.prefetch_related('properties')
+        product = Product.objects.prefetch_related('properties').order_by('-id')
         product_serializer = ProductSerializer(product, many=True, context={'request': request})
         discounted_products = Product.objects.exclude(discount=None)
         discounted_serializer = ProductMainPageSerializer(discounted_products, many=True, context={'request': request})

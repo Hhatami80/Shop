@@ -145,7 +145,6 @@ class AddressListCreateView(APIView):
         address = Address.objects.filter(user=request.user).first()
 
         if address:
-
             serializer = AddressSerializer(address, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()

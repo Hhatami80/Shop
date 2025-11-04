@@ -9,5 +9,5 @@ urlpatterns = [
     path('locations/provinces/', views.ProvinceListView.as_view(), name='province-list'),
     path('locations/cities/', views.CityListView.as_view(), name='city-list'),
     path('user/addresses/', views.AddressListCreateView.as_view(), name='address-list'),
-    path('user/addresses/<int:pk>', views.AddressDetailView.as_view(), name='address-detail'),
+    path('user/addresses/<int:pk>/', views.AddressDetailView.as_view(), name='address-detail'),
 ]
