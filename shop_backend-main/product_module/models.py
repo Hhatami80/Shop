@@ -13,7 +13,6 @@ from django.conf import settings
 
 
 # Create your models here.
-
 class ProductCategory(models.Model):
     title = models.CharField(max_length=150, null=True, blank=True)
     parent = models.ForeignKey('ProductCategory', null=True, blank=True, on_delete=models.CASCADE,
@@ -58,7 +57,7 @@ class ProductTag(models.Model):
     def __str__(self):
         return self.tag
 
-
+from django.core.validators import MaxValueValidator, MinValueValidator
 class Product(models.Model):
     title = models.CharField(max_length=150, verbose_name='عنوان محصول')
     image = models.ImageField(verbose_name='عکس محصول', upload_to='images/products', null=True, blank=True)
@@ -66,13 +65,14 @@ class Product(models.Model):
     short_description = models.CharField(verbose_name='توضیحات کوتاه', null=True, blank=True, max_length=100)
     description_title = models.CharField(verbose_name='عنوان توضیحات', null=True, blank=True, max_length=100)
     description = models.TextField(verbose_name='توضیحات تکمیلی', null=True, blank=True)
-    price = models.CharField(verbose_name='قیمت محصولات', max_length=100)
-    discount = models.CharField(verbose_name='تخفیف', null=True, blank=True, max_length=20)
-    discounted_price = models.CharField(verbose_name='قیمت تخفیف خورده', null=True, blank=True, max_length=20)
+    price = models.PositiveBigIntegerField(verbose_name='قیمت محصولات')
+    discount = models.PositiveIntegerField(verbose_name='تخفیف', null=True, blank=True,
+                                           validators=[MaxValueValidator(100), MinValueValidator(0)])
+    discounted_price = models.PositiveBigIntegerField(verbose_name='قیمت تخفیف خورده', null=True, blank=True)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, verbose_name='برند محصول', null=True, blank=True)
     category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE, verbose_name='دسته بندی محصول',
                                  related_name='categories')
-    final_price = models.IntegerField(null=True, blank=True, verbose_name='قیمت نهایی')
+    final_price = models.PositiveBigIntegerField(null=True, blank=True, verbose_name='قیمت نهایی')
     # product_tag = models.ManyToManyField(ProductTag, verbose_name='تگ محصول')
     is_done = models.BooleanField(default=False, verbose_name='تمام شده / نشده')
     created_date = models.DateTimeField(verbose_name='تاریخ ثبت محصول', editable=False, auto_now_add=True)
@@ -84,8 +84,8 @@ class Product(models.Model):
         # Calculate discounted price
         if self.discount:
             try:
-                discount_amount = (int(self.discount) / 100) * float(self.price)
-                self.discounted_price = int(float(self.price) - discount_amount)
+                discount_amount = self.discount / 100 * float(self.price)
+                self.discounted_price = float(self.price) - discount_amount
                 self.final_price = self.discounted_price
             except (ValueError, TypeError):
                 self.discounted_price = None
@@ -246,7 +246,7 @@ class ProductComment(models.Model):
 
 
 class ProductGallery(models.Model):
-    product = models.ForeignKey(Product, verbose_name='گالری محصول', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, verbose_name='گالری محصول', on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(verbose_name='تصویر', upload_to='images/product-gallery')
 
     def __str__(self):

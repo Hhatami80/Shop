@@ -27,7 +27,7 @@ from django.db import transaction
 
 class ProductDetailView(APIView):
     def get(self, request: Request, product_id):
-        product = Product.objects.get(pk=product_id)
+        product = Product.objects.prefetch_related('images').get(pk=product_id)
         comment = ProductComment.objects.filter(product=product, is_approved=True)
         product_serializer = ProductSerializer(product, context={'request': request})
         comment_serializer = ProductCommentSerializer(comment, many=True)

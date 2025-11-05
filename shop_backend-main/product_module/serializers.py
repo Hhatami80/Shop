@@ -33,8 +33,18 @@ class ProductPropertySerializer(serializers.ModelSerializer):
         fields = ['key', 'value']
 
 
+class ProductGallerySerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True)
+
+    class Meta:
+        model = ProductGallery
+        fields = '__all__'
+
+
+
 class ProductSerializer(serializers.ModelSerializer):
-    # image = serializers.ImageField(use_url=True)
+    images = ProductGallerySerializer(many=True, read_only=True)
+    uploaded_images = serializers.ListField(child=serializers.ImageField(), write_only=True, required=False)
     category = CategorySerializer(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(
         queryset=ProductCategory.objects.all(),
@@ -96,6 +106,10 @@ class ProductSerializer(serializers.ModelSerializer):
         properties_data = validated_data.pop('properties', [])
         category = validated_data.pop('category_id')
         product = Product.objects.create(category=category, **validated_data)
+        uploaded_images = validated_data.pop('uploaded_images', [])
+        if uploaded_images:
+            for image in uploaded_images:
+                ProductGallery.objects.create(product=product, image=image)
 
         for prop in properties_data:
             if not isinstance(prop, dict):
@@ -174,13 +188,6 @@ class ProductDescriptionSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['description']
 
-
-class ProductGallerySerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(use_url=True)
-
-    class Meta:
-        model = ProductGallery
-        fields = '__all__'
 
 
 class ProductTagSerializer(serializers.ModelSerializer):
