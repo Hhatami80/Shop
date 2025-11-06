@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { productService } from '@/services/ProductService'
-import Vue3Toastify from 'vue3-toastify'
+import toast from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 
 export const useProductStore = defineStore('product', {
@@ -76,23 +76,38 @@ export const useProductStore = defineStore('product', {
       }
     },
     async toggleProductStatus(productId, newStatus) {
-      this.loading = true
-      this.error = null
-      try {
-        const payload = { is_active: newStatus }
-        const response = await productService.update(productId, payload)
-        const index = this.products.findIndex((p) => p.id === productId)
-        if (index !== -1) {
-          this.products[index].is_active = newStatus
-          Vue3Toastify.toast.success(`محصول ${newStatus ? 'فعال' : 'غیر فعال'} شد.`)
+  this.loading = true
+  this.error = null
+
+  try {
+    const payload = { is_active: newStatus }
+    const res = await productService.update(productId, payload)
+
+    const updatedProduct = res?.data?.products?.[0]
+
+    const index = this.products.findIndex((p) => p.id === productId)
+    if (index !== -1) {
+      if (updatedProduct) {
+        this.products[index] = {
+          ...this.products[index],
+          ...updatedProduct,
         }
-      } catch (error) {
-        this.error = 'خطا در تغییر وضعیت محصول'
-        Vue3Toastify.toast.error(this.error)
-      } finally {
-        this.loading = false
+      } else {
+       
+        this.products[index].is_active = !!newStatus
       }
-    },
+    }
+
+    toast.success(`محصول ${newStatus ? 'فعال' : 'غیرفعال'} شد.`)
+  } catch (error) {
+    console.error('خطا در تغییر وضعیت محصول:', error)
+    this.error = 'خطا در تغییر وضعیت محصول'
+    toast.error(this.error)
+  } finally {
+    this.loading = false
+  }
+}
+,
 
     async getBestSellers() {
       this.loading = true

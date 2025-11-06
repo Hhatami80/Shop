@@ -431,7 +431,7 @@ async function submitForm() {
     payload.append('discount', form.discount)
     payload.append('description', form.description)
     if (form.imageFile) payload.append('image', form.imageFile)
-    form.galleryFiles.forEach((file, idx) => payload.append(`gallery[${idx}]`, file))
+    form.galleryFiles.forEach((file, idx) => payload.append(`uploaded_images[${idx}]`, file))
     payload.append('properties', JSON.stringify(form.properties || []))
     if (isEditing.value) payload.append('_method', 'PUT')
   } else {
