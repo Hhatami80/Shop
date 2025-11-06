@@ -46,7 +46,7 @@ import {
   faMinusCircle,
   faChevronLeft,
   faChevronRight,
-  fawWllet
+  faWallet
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -77,7 +77,7 @@ library.add(
   faMinusCircle,
   faChevronLeft,
   faChevronRight,
-  fawWllet
+  faWallet
 )
 
 const app = createApp(App)

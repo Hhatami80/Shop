@@ -146,7 +146,7 @@ export const useUserStore = defineStore("user", {
       try {
         const res = await userService.addAddress(address);
         if (res.data) this.addresses.push(res.data);
-        toast.success("آدرس ثبت شد ");
+        
       } catch {
         toast.error("خطا در ثبت آدرس");
       }
@@ -175,6 +175,17 @@ export const useUserStore = defineStore("user", {
         toast.error("خطا در ذخیره آدرس‌ها");
       }
     },
+    async updateAddress(id, address) {
+  try {
+    await userService.updateAddress(id, address);
+    toast.success("آدرس با موفقیت به‌روزرسانی شد");
+    await this.fetchAddresses();
+  } catch (err) {
+    console.error("Update address error:", err);
+    toast.error("خطا در ویرایش آدرس");
+  }
+},
+
 
     async fetchBankAccounts() {
       try {
