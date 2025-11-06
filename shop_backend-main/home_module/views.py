@@ -24,11 +24,11 @@ class BannerView(APIView):
 
 class ProductView(APIView):
     def get(self, request: Request):
-        product = Product.objects.prefetch_related('properties').order_by('-id')
+        product = Product.objects.prefetch_related('properties', 'images').filter(is_active=True).order_by('-id')
         product_serializer = ProductSerializer(product, many=True, context={'request': request})
-        discounted_products = Product.objects.exclude(discount=None)
+        discounted_products = Product.objects.filter(is_active=True).exclude(discount=None)
         discounted_serializer = ProductMainPageSerializer(discounted_products, many=True, context={'request': request})
-        new_products = Product.objects.order_by('-id')[:6]
+        new_products = Product.objects.filter(is_active=True).order_by('-created_date')[:6]
         new_product_serializer = ProductMainPageSerializer(new_products, many=True, context={'request': request})
         return Response({
             'products': product_serializer.data,
@@ -57,19 +57,64 @@ class ProductBrandView(APIView):
 
 class SiteSettingView(APIView):
     def get(self, request: Request):
-        site_setting = SiteSetting.objects.first()
+        # --- Contact Section ---
+        site_setting, _ = SiteSetting.objects.get_or_create(
+            defaults={
+                'site_name': 'سرینه',
+                'phone': '۰۲۱-۱۲۳۴۵۶۷۸',
+                'email': 'info@shop.ir',
+                'address': 'تهران، خیابان انقلاب، پلاک ۱۲۳',
+                'text': 'به فروشگاه ما خوش آمدید! بهترین درب‌ها را با بهترین قیمت ارائه می‌دهیم.'
+            }
+        )
         site_serializer = SiteSettingSerializer(site_setting, context={'request': request})
-        footer_linkbox_1 = FooterLinkBox.objects.get(pk=1)
-        footer_linkbox_2 = FooterLinkBox.objects.get(pk=2)
+
+        # --- Footer Link Boxes ---
+        footer_linkbox_1, _ = FooterLinkBox.objects.get_or_create(
+            pk=1,
+            defaults={'title': 'لینک‌های مفید'}
+        )
+        footer_linkbox_2, _ = FooterLinkBox.objects.get_or_create(
+            pk=2,
+            defaults={'title': 'سرویس‌ها'}
+        )
+
+        # --- Footer Links (Box 1) ---
+        if not footer_linkbox_1.footer_link.exists():
+            FooterLink.objects.bulk_create([
+                FooterLink(title='درباره ما', url='/about', footer_link_box=footer_linkbox_1),
+                FooterLink(title='تماس با ما', url='/contact', footer_link_box=footer_linkbox_1),
+                FooterLink(title='سؤالات متداول', url='/faq', footer_link_box=footer_linkbox_1),
+            ])
         links = footer_linkbox_1.footer_link.all()
-        services = footer_linkbox_2.footer_link.all()
         links_serializer = FooterLinkSerializer(links, many=True)
+
+        # --- Services Links (Box 2) ---
+        if not footer_linkbox_2.footer_link.exists():
+            FooterLink.objects.bulk_create([
+                FooterLink(title='سفارش سازی', url='/service/customize', footer_link_box=footer_linkbox_2),
+                FooterLink(title='گارانتی محصولات', url='/service/warranty', footer_link_box=footer_linkbox_2),
+                FooterLink(title='پشتیبانی مشتریان', url='/service/support', footer_link_box=footer_linkbox_2),
+            ])
+        services = footer_linkbox_2.footer_link.all()
         services_serializer = FooterLinkSerializer(services, many=True)
-        badge = TrustSymbols.objects.all()
-        badge_serializer = TrustSymbolSerializer(badge, many=True, context={'request': request})
-        return Response(
-            {'contact': site_serializer.data, 'badges': badge_serializer.data, 'links': links_serializer.data,
-             'services': services_serializer.data}, status.HTTP_200_OK)
+
+        # --- Badges Section ---
+        if not TrustSymbols.objects.exists():
+            TrustSymbols.objects.bulk_create([
+                TrustSymbols(image='badges/enamad.png'),
+                TrustSymbols(image='badges/zarinpal.png'),
+            ])
+        badges = TrustSymbols.objects.all()
+        badge_serializer = TrustSymbolSerializer(badges, many=True, context={'request': request})
+
+        # --- Response ---
+        return Response({
+            'contact': site_serializer.data,
+            'links': links_serializer.data,
+            'services': services_serializer.data,
+            'badges': badge_serializer.data,
+        }, status=status.HTTP_200_OK)
 
 
 class HeaderListView(APIView):
@@ -101,8 +146,8 @@ class AboutUsMainView(APIView):
 
 class BestSellerView(APIView):
     def get(self, request: Request):
-        products = Product.objects.filter(is_done=False)
-        random = Product.objects.get(pk=1)
+        products = Product.objects.filter(is_done=False, is_active=True)
+        random = Product.objects.filter(is_active=True).get(pk=1)
         best_seller = BestSellerSerializer(products, many=True, context={'request': request})
         return Response({'products': best_seller.data,
                          'image': request.build_absolute_uri(random.image.url) if random.image else None},
