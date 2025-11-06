@@ -7,6 +7,7 @@ router.register('admin/orders', views.OrderAdminViewSet, basename='admin-orders'
 
 urlpatterns = [
     # Product CRUD Api
+    path("admin/products", views.AdminProductsView.as_view(), name='list_products'),
     path('product-add', views.AddProductView.as_view(), name='add-product'),
     path('product-delete/<int:product_id>', views.DeleteProductView.as_view(), name='delete-product'),
     path('product-edit/<int:product_id>', views.UpdateProductView.as_view(), name='update-product'),

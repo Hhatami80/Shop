@@ -27,10 +27,19 @@ class IsAdmin(BasePermission):
         return request.user.role == "admin"
 
 
-
 # region Product
+class AdminProductsView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+    
+    def get(self, request: Request):
+        products = Product.objects.prefetch_related('properties', 'images').all()
+        serializer = ProductSerializer(products, many=True, context={'request': request})
+        return Response({
+            'products': serializer.data
+        }, status.HTTP_200_OK)
+
 class AddProductView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def get(self, request: Request):
         category = ProductCategory.objects.all()
