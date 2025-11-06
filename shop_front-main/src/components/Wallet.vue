@@ -53,7 +53,7 @@
         <p>تاکنون تراکنشی ثبت نشده است.</p>
       </div>
 
-      <!-- Pagination -->
+     
       <div v-if="totalPages > 1" class="pagination">
         <button @click="prevPage" :disabled="currentPage === 1">
           <fa-icon :icon="['fas', 'chevron-left']" />

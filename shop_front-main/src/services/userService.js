@@ -2,13 +2,13 @@ import api from './AxiosService'
 
 export const userService = {
 
+
   getUsers() {
     return api.get('/users')
   },
   deleteUser(id) {
     return api.delete(`/users/${id}`)
   },
-
 
   getProfile() {
     return api.get('/user/profile/')
@@ -19,7 +19,6 @@ export const userService = {
     })
   },
 
-
   getAddresses() {
     return api.get('/user/addresses/')
   },
@@ -29,10 +28,12 @@ export const userService = {
   updateAddresses(addresses) {
     return api.put('/user/addresses/', { addresses })
   },
+  updateAddress(id, data) {
+    return api.put(`/user/addresses/${id}/`, data)
+  },
   deleteAddress(id) {
     return api.delete(`/user/addresses/${id}`)
   },
-
 
   getBankInfo() {
     return api.get('/user/bank-accounts/')
@@ -47,7 +48,6 @@ export const userService = {
     return api.delete(`/user/bank-accounts-delete/${id}`)
   },
 
-
   getProvinces() {
     return api.get('/locations/provinces/')
   },
@@ -55,3 +55,5 @@ export const userService = {
     return api.get(`/locations/cities?province=${encodeURIComponent(provinceId)}`)
   },
 }
+
+export default userService

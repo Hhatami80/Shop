@@ -27,7 +27,7 @@ import ForgotPassword from '@/views/ForgotPassword.vue'
 import CategoryPage from '@/views/CategoryPage.vue'
 import ProductDetailPage from '@/views/ProductDetailPage.vue'
 import ContactUs from '@/views/ContactUs.vue'
-
+import AdminTransactions from '@/components/AdminTransactions.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -48,9 +48,9 @@ const router = createRouter({
       meta: { title: 'پرداخت سفارش' },
     },
     {
-      path:'/contactus',
-      name:'contactus',
-      component:ContactUs
+      path: '/contactus',
+      name: 'contactus',
+      component: ContactUs,
     },
     {
       path: '/payment/verify',
@@ -150,6 +150,7 @@ const router = createRouter({
         { path: 'userslist', name: 'userslist', component: UserList },
         { path: 'orderList', name: 'orderList', component: AdminOrders },
         { path: 'comments', name: ' comments', component: CommetsManager },
+        { path: '/admin/transactions', name: 'AdminTransactions',component:AdminTransactions, meta: { requiresAdmin: true },},
       ],
     },
   ],
@@ -168,8 +169,8 @@ router.beforeEach((to) => {
     return { name: 'Login' }
   }
 
-  if (to.path.startsWith("/user") && !isAuthenticated) {
-    return { name: 'Login'}
+  if (to.path.startsWith('/user') && !isAuthenticated) {
+    return { name: 'Login' }
   }
 
   if (to.path.startsWith('/admin') && isAuthenticated && !isAdmin) {

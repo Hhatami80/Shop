@@ -38,31 +38,35 @@
     </div>
 
     <table class="bank-table" v-if="store.bankAccounts.length">
-      <thead>
-        <tr>
-          <th>لوگو</th>
-          <th>نام بانک</th>
-          <th>شماره کارت</th>
-          <th>شماره حساب</th>
-          <th>شماره شبا</th>
-          <th>عملیات</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(account, idx) in store.bankAccounts" :key="account.id">
-          <td>
-            <img :src="account.bankLogo || '/logos/default.png'" class="bank-logo" />
-          </td>
-          <td>{{ account.bankName || "نامشخص" }}</td>
-          <td>{{ maskCard(account.cardNumber) }}</td>
-          <td>{{ account.accountNumber }}</td>
-          <td>{{ account.iban }}</td>
-          <td>
-            <button class="delete-btn" @click="handleDeleteBank(idx)">🗑 حذف</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <thead>
+    <tr>
+      <th>لوگو</th>
+      <th>نام بانک</th>
+      <th>شماره کارت</th>
+      <th>شماره حساب</th>
+      <th>شماره شبا</th>
+      <th>عملیات</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="(account, idx) in store.bankAccounts" :key="account.id">
+      <td>
+        <img
+          :src="getBankFromCard(account.cardNumber)?.bank_logo || '/logos/default.png'"
+          class="bank-logo"
+        />
+      </td>
+      <td>{{ getBankFromCard(account.cardNumber)?.bank_title || "نامشخص" }}</td>
+      <td>{{ maskCard(account.cardNumber) }}</td>
+      <td>{{ account.accountNumber }}</td>
+      <td>{{ account.iban }}</td>
+      <td>
+        <button class="delete-btn" @click="handleDeleteBank(idx)">حذف</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
 
     <p v-else class="empty-message">هنوز حسابی ثبت نکرده‌اید.</p>
   </div>
@@ -79,6 +83,8 @@ import {
   validateIranianIBAN,
   validateAccountNumber,
 } from "@/data/regex/validators";
+
+
 
 const store = useUserStore();
 

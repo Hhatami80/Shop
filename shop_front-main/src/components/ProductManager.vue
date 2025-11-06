@@ -3,7 +3,7 @@
     <h4 class="page-title">مدیریت محصولات کارت اسلایدری</h4>
 
     <h5 class="form-title-section">
-      {{ isEditing ? "ویرایش محصول" : "افزودن محصول جدید" }}
+      {{ isEditing ? 'ویرایش محصول' : 'افزودن محصول جدید' }}
     </h5>
     <form @submit.prevent="submitForm" class="product-form">
       <div class="row">
@@ -23,11 +23,7 @@
           <label for="category" class="label">دسته‌بندی</label>
           <select id="category" v-model="form.category_id" class="input select" required>
             <option value="">انتخاب دسته‌بندی</option>
-            <option
-              v-for="cat in categoryStore.allCategories"
-              :key="cat.id"
-              :value="cat.id"
-            >
+            <option v-for="cat in categoryStore.allCategories" :key="cat.id" :value="cat.id">
               {{ cat.title }}
             </option>
           </select>
@@ -50,7 +46,7 @@
           <input
             id="discount"
             type="number"
-            v-model="form.discount"
+            v-model.number="form.discount"
             class="input"
             placeholder="تخفیف (مثلاً 20)"
           />
@@ -64,33 +60,53 @@
             class="input"
             rows="4"
             placeholder="توضیحات کامل محصول"
+            required
           ></textarea>
         </div>
 
-        <div class="col-half image-upload-area">
-          <label class="label">تصویر محصول</label>
-          <input
-            type="file"
-            accept="image/*"
-            class="input file-input"
-            @change="handleImageUpload"
-            :required="!isEditing && !form.imagePreview"
-          />
-          <img
-            v-if="form.imagePreview"
-            :src="form.imagePreview"
-            class="image-preview"
-            alt="پیش‌نمایش"
-          />
+        <div class="row">
+          <div class="col-half image-upload-area">
+            <label class="label">عکس اصلی محصول</label>
+            <input
+              type="file"
+              accept="image/*"
+              class="input file-input"
+              @change="handleMainImage"
+              :required="!isEditing && !form.imagePreview"
+            />
+            <div v-if="form.imagePreview" class="image-preview-wrapper">
+              <img :src="form.imagePreview" class="image-preview" alt="پیش‌نمایش" />
+              <button type="button" class="remove-image" @click="removeMainImage">×</button>
+            </div>
+          </div>
+
+          <div class="col-half image-upload-area">
+            <label class="label">گالری تصاویر (اختیاری)</label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              class="input file-input"
+              @change="handleGalleryUpload"
+            />
+            <div class="gallery-preview">
+              <div v-for="(img, index) in form.galleryPreviews" :key="index" class="gallery-thumb">
+                <img :src="img" alt="گالری" class="image-preview" />
+                <button
+                  type="button"
+                  class="remove-gallery"
+                  @click="() => removeGalleryImage(index)"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="col-full properties-section">
           <h6 class="section-title">ویژگی‌ها (اختیاری)</h6>
-          <div
-            class="row prop-row"
-            v-for="(property, index) in form.properties"
-            :key="index"
-          >
+          <div class="row prop-row" v-for="(property, index) in form.properties" :key="index">
             <div class="col-5">
               <input
                 type="text"
@@ -110,11 +126,7 @@
               />
             </div>
             <div class="col-2 remove-prop-btn-col">
-              <button
-                type="button"
-                class="btn btn-remove-prop"
-                @click="removeProperty(index)"
-              >
+              <button type="button" class="btn btn-remove-prop" @click="removeProperty(index)">
                 <fa-icon :icon="['fas', 'minus-circle']" />
               </button>
             </div>
@@ -127,7 +139,7 @@
         <div class="col-full form-actions">
           <button type="submit" class="btn btn-submit" :disabled="productStore.loading">
             <fa-icon v-if="productStore.loading" :icon="['fas', 'spinner']" pulse />
-            {{ isEditing ? "ذخیره تغییرات" : "افزودن محصول" }}
+            {{ isEditing ? 'ذخیره تغییرات' : 'افزودن محصول' }}
           </button>
           <button type="button" class="btn btn-cancel" @click="resetForm">انصراف</button>
         </div>
@@ -153,6 +165,7 @@
             <th>تخفیف</th>
             <th>توضیحات</th>
             <th>ویژگی‌ها</th>
+            <th>وضعیت</th>
             <th>عملیات</th>
           </tr>
         </thead>
@@ -163,9 +176,7 @@
             <td>{{ product.category?.title }}</td>
             <td class="price-cell">{{ product.final_price }}</td>
             <td class="discount-cell">{{ product.discount }}%</td>
-            <td class="description-cell">
-              {{ truncateDescription(product.description) }}
-            </td>
+            <td class="description-cell">{{ truncateDescription(product.description) }}</td>
             <td>
               <ul class="prop-list">
                 <li
@@ -174,10 +185,19 @@
                     : product.properties) || []"
                   :key="pIndex"
                 >
-                  <strong>{{ prop.key }}:</strong>
-                  {{ truncateDescription(prop.value) }}
+                  <strong>{{ prop.key }}:</strong> {{ truncateDescription(prop.value) }}
                 </li>
               </ul>
+            </td>
+            <td>
+              <label class="toggle-switch">
+                <input
+                  type="checkbox"
+                  :checked="product.is_active"
+                  @change="productStore.toggleProductStatus(product.id, $event.target.checked)"
+                />
+                <span class="slider"></span>
+              </label>
             </td>
             <td class="actions-cell">
               <button class="btn btn-view" @click="showProductDetails(product)">
@@ -194,17 +214,10 @@
         </tbody>
       </table>
 
-      <!-- ✅ Pagination -->
       <div v-if="totalPages > 1" class="pagination">
-        <button class="pagination-btn" :disabled="currentPage === 1" @click="prevPage">
-          قبلی
-        </button>
+        <button class="pagination-btn" :disabled="currentPage === 1" @click="prevPage">قبلی</button>
         <span>صفحه {{ currentPage }} از {{ totalPages }}</span>
-        <button
-          class="pagination-btn"
-          :disabled="currentPage === totalPages"
-          @click="nextPage"
-        >
+        <button class="pagination-btn" :disabled="currentPage === totalPages" @click="nextPage">
           بعدی
         </button>
       </div>
@@ -214,7 +227,6 @@
       </div>
     </div>
 
-    <!-- Modal -->
     <Teleport to="body">
       <div v-if="isModalOpen" class="modal-overlay" @click="closeModal">
         <div class="modal-content" @click.stop>
@@ -222,33 +234,37 @@
           <div v-if="selectedProduct" class="product-details">
             <h3 class="product-modal-title">مشخصات: {{ selectedProduct.title }}</h3>
             <hr class="modal-divider" />
-
             <div class="modal-main-info">
-              <img
-                :src="selectedProduct.image"
-                alt="تصویر محصول"
-                class="modal-product-image"
-              />
+              <div class="modal-images">
+                <div class="main-image-wrapper">
+                  <img :src="selectedProduct.image" alt="تصویر اصلی" class="main-image" />
+                </div>
+                <div v-if="selectedProduct.galleryPreviews?.length" class="gallery-images">
+                  <img
+                    v-for="(img, idx) in selectedProduct.galleryPreviews"
+                    :key="idx"
+                    :src="img"
+                    class="gallery-thumb"
+                  />
+                </div>
+              </div>
+
               <div class="modal-text-info">
                 <p class="modal-price">
                   قیمت نهایی:
                   <span
                     >{{
-                      (
-                        selectedProduct.final_price || selectedProduct.price
-                      ).toLocaleString()
+                      (selectedProduct.final_price || selectedProduct.price).toLocaleString()
                     }}
                     تومان</span
                   >
                 </p>
                 <p class="modal-category">
-                  قیمت اصلی:
-                  <span>{{ selectedProduct.price.toLocaleString() }} تومان</span>
+                  قیمت اصلی: <span>{{ selectedProduct.price.toLocaleString() }} تومان</span>
                 </p>
                 <p class="modal-category">
                   دسته‌بندی: <span>{{ selectedProduct.category?.title }}</span>
                 </p>
-
                 <div v-if="selectedProduct.discount > 0" class="modal-discount-tag">
                   {{ selectedProduct.discount }}% تخفیف!
                 </div>
@@ -279,8 +295,8 @@
               class="modal-edit-btn"
               @click="
                 () => {
-                  editProduct(selectedProduct);
-                  closeModal();
+                  editProduct(selectedProduct)
+                  closeModal()
                 }
               "
             >
@@ -294,110 +310,130 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from "vue";
-import { useProductStore } from "@/stores/useProductStore";
-import { useCategoryStore } from "@/stores/useCategoryStore";
-import { toast } from "vue3-toastify";
-import "vue3-toastify/dist/index.css";
+import { ref, reactive, onMounted, computed } from 'vue'
+import { useProductStore } from '@/stores/useProductStore'
+import { useCategoryStore } from '@/stores/useCategoryStore'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
-const productStore = useProductStore();
-const categoryStore = useCategoryStore();
+const productStore = useProductStore()
+const categoryStore = useCategoryStore()
 
-const isEditing = ref(false);
-const editingIndex = ref(-1);
-
-const isModalOpen = ref(false);
-const selectedProduct = ref(null);
+const isEditing = ref(false)
+const editingIndex = ref(-1)
+const isModalOpen = ref(false)
+const selectedProduct = ref(null)
 
 const form = reactive({
   id: null,
-  title: "",
-  category_id: "",
+  title: '',
+  category_id: '',
   price: null,
-  discount: "",
-  description: "",
+  discount: '',
+  description: '',
   imageFile: null,
   imagePreview: null,
+  galleryFiles: [],
+  galleryPreviews: [],
   properties: [],
-});
+})
 
-const submitSuccess = ref(false);
-const submitError = ref(null);
+const submitSuccess = ref(false)
+const submitError = ref(null)
 
-const currentPage = ref(1);
-const pageSize = 5;
+const currentPage = ref(1)
+const pageSize = 5
+
 const paginatedProducts = computed(() => {
-  const start = (currentPage.value - 1) * pageSize;
-  return productStore.products.slice(start, start + pageSize);
-});
-const totalPages = computed(() => Math.ceil(productStore.products.length / pageSize));
+  const start = (currentPage.value - 1) * pageSize
+  return productStore.products.slice(start, start + pageSize)
+})
+
+const totalPages = computed(() => Math.ceil(productStore.products.length / pageSize))
+
 function nextPage() {
-  if (currentPage.value < totalPages.value) currentPage.value++;
+  if (currentPage.value < totalPages.value) currentPage.value++
 }
+
 function prevPage() {
-  if (currentPage.value > 1) currentPage.value--;
+  if (currentPage.value > 1) currentPage.value--
 }
 
 function resetForm() {
-  form.id = null;
-  form.title = "";
-  form.category_id = "";
-  form.price = null;
-  form.discount = "";
-  form.description = "";
-  form.imageFile = null;
-  form.imagePreview = null;
-  form.properties = [];
-  isEditing.value = false;
-  editingIndex.value = -1;
-  submitSuccess.value = false;
-  submitError.value = null;
+  form.id = null
+  form.title = ''
+  form.category_id = ''
+  form.price = null
+  form.discount = ''
+  form.description = ''
+  form.imageFile = null
+  form.imagePreview = null
+  form.galleryFiles = []
+  form.galleryPreviews = []
+  form.properties = []
+  isEditing.value = false
+  editingIndex.value = -1
+  submitSuccess.value = false
+  submitError.value = null
 }
 
 function addProperty() {
-  form.properties.push({ key: "", value: "" });
+  form.properties.push({ key: '', value: '' })
 }
-function truncateDescription(text, maxLength = 60) {
-  if (!text) return "";
-  return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
-}
+
 function removeProperty(index) {
-  form.properties.splice(index, 1);
+  form.properties.splice(index, 1)
 }
-function handleImageUpload(event) {
-  const file = event.target.files[0];
+
+function truncateDescription(text, maxLength = 60) {
+  if (!text) return ''
+  return text.length > maxLength ? text.slice(0, maxLength) + '...' : text
+}
+
+function handleMainImage(event) {
+  const file = event.target.files[0]
   if (file) {
-    form.imageFile = file;
-    form.imagePreview = URL.createObjectURL(file);
+    form.imageFile = file
+    form.imagePreview = URL.createObjectURL(file)
   }
+}
+
+function handleGalleryUpload(event) {
+  const files = Array.from(event.target.files)
+  form.galleryFiles.push(...files)
+  form.galleryPreviews.push(...files.map((f) => URL.createObjectURL(f)))
+}
+
+function removeGalleryImage(index) {
+  form.galleryFiles.splice(index, 1)
+  form.galleryPreviews.splice(index, 1)
 }
 
 async function submitForm() {
-  submitSuccess.value = false;
-  submitError.value = null;
+  submitSuccess.value = false
+  submitError.value = null
 
   if (!form.title || !form.category_id || form.price === null || !form.description) {
-    toast.warning("لطفاً همه فیلدهای ضروری را پر کنید.");
-    return;
+    toast.warning('لطفاً همه فیلدهای ضروری را پر کنید.')
+    return
   }
   if (!isEditing.value && !form.imageFile) {
-    toast.warning("لطفاً یک تصویر برای محصول انتخاب کنید.");
-    return;
+    toast.warning('لطفاً یک تصویر برای محصول انتخاب کنید.')
+    return
   }
 
-  let payload;
-  if (form.imageFile) {
-    payload = new FormData();
-    payload.append("title", form.title);
-    payload.append("category_id", form.category_id);
-    payload.append("price", form.price);
-    payload.append("discount", form.discount);
-    payload.append("description", form.description);
-    payload.append("image", form.imageFile);
-    payload.append("properties", JSON.stringify(form.properties || []));
-    if (isEditing.value) {
-      payload.append("_method", "PUT");
-    }
+  let payload
+  if (form.imageFile || form.galleryFiles.length) {
+    payload = new FormData()
+    payload.append('title', form.title)
+    payload.append('category_id', form.category_id)
+    payload.append('price', form.price)
+    payload.append('discount', form.discount)
+    payload.append('description', form.description)
+    if (form.imageFile) payload.append('image', form.imageFile)
+    form.galleryFiles.forEach((file, idx) => payload.append(`gallery[${idx}]`, file))
+    payload.append('properties', JSON.stringify(form.properties || []))
+    if (isEditing.value) payload.append('_method', 'PUT')
   } else {
     payload = {
       title: form.title,
@@ -406,110 +442,105 @@ async function submitForm() {
       discount: form.discount,
       description: form.description,
       properties: JSON.stringify(form.properties || []),
-    };
+    }
   }
 
   try {
     if (isEditing.value && form.id) {
-      await productStore.updateProduct(form.id, payload);
+      await productStore.updateProduct(form.id, payload)
       productStore.products[editingIndex.value] = {
         ...productStore.products[editingIndex.value],
         title: form.title,
-        category:
-          categoryStore.allCategories.find((cat) => cat.id === form.category_id) || null,
+        category: categoryStore.allCategories.find((c) => c.id === form.category_id) || null,
         price: form.price,
         final_price: form.price * (1 - (form.discount || 0) / 100),
         discount: form.discount,
         description: form.description,
         properties: [...form.properties],
         image: form.imagePreview,
-      };
-      toast.success("محصول با موفقیت ویرایش شد.");
+      }
+      toast.success('محصول با موفقیت ویرایش شد.')
     } else {
-      const newProduct = await productStore.addProduct(payload);
-      const category =
-        categoryStore.allCategories.find((cat) => cat.id === form.category_id) || null;
+      const newProduct = await productStore.addProduct(payload)
+      const category = categoryStore.allCategories.find((c) => c.id === form.category_id) || null
       productStore.products.unshift({
         ...newProduct,
         title: form.title,
-        category: category,
+        category,
         price: form.price,
         final_price: form.price * (1 - (form.discount || 0) / 100),
         discount: form.discount,
         description: form.description,
         properties: [...form.properties],
         image: form.imagePreview,
-      });
-      toast.success("محصول با موفقیت اضافه شد.");
+      })
+      toast.success('محصول با موفقیت اضافه شد.')
     }
 
-    resetForm();
+    resetForm()
   } catch (error) {
-    const message =
-      productStore.error || "خطا در ذخیره محصول. لطفاً اتصال و داده‌ها را بررسی کنید.";
-    submitError.value = message;
-    toast.error(message);
+    const message = productStore.error || 'خطا در ذخیره محصول. لطفاً اتصال و داده‌ها را بررسی کنید.'
+    submitError.value = message
+    toast.error(message)
   }
 }
 
 async function removeProduct(productId, index) {
-  if (!confirm("آیا از حذف این محصول مطمئن هستید؟")) return;
+  if (!confirm('آیا از حذف این محصول مطمئن هستید؟')) return
   try {
-    await productStore.deleteProduct(productId);
-    productStore.products.splice(index, 1);
-    toast.success("محصول با موفقیت حذف شد.");
-  } catch (error) {
-    const message = productStore.error || "خطا در حذف محصول";
-    toast.error(message);
+    await productStore.deleteProduct(productId)
+    productStore.products.splice(index, 1)
+    toast.success('محصول با موفقیت حذف شد.')
+  } catch {
+    toast.error(productStore.error || 'خطا در حذف محصول')
   }
 }
 
 function editProduct(product, index) {
-  isEditing.value = true;
-  editingIndex.value = index;
+  isEditing.value = true
+  editingIndex.value = index
+  form.id = product.id || null
+  form.title = product.title || ''
+  form.category_id = product.category?.id || product.category_id || ''
+  form.price = product.price || null
+  form.discount = product.discount || ''
+  form.description = product.description || ''
+  form.imageFile = null
+  form.imagePreview = product.image || null
+  form.galleryFiles = []
+  form.galleryPreviews = []
 
-  form.id = product.id || null;
-  form.title = product.title || "";
-  form.category_id = product.category?.id || product.category_id || "";
-  form.price = product.price || null;
-  form.discount = product.discount || "";
-  form.description = product.description || "";
-  form.imageFile = null;
-  form.imagePreview = product.image || null;
-
-  if (typeof product.properties === "string") {
+  if (typeof product.properties === 'string') {
     try {
-      form.properties = JSON.parse(product.properties);
+      form.properties = JSON.parse(product.properties)
     } catch {
-      form.properties = [];
+      form.properties = []
     }
-  } else if (Array.isArray(product.properties)) {
-    form.properties = [...product.properties];
-  } else {
-    form.properties = [];
-  }
+  } else if (Array.isArray(product.properties)) form.properties = [...product.properties]
+  else form.properties = []
 }
 
 function showProductDetails(product) {
-  selectedProduct.value = product;
-  isModalOpen.value = true;
+  selectedProduct.value = product
+  isModalOpen.value = true
 }
+
 function closeModal() {
-  isModalOpen.value = false;
-  selectedProduct.value = null;
+  isModalOpen.value = false
+  selectedProduct.value = null
 }
 
 onMounted(() => {
-  productStore.getAllProducts();
-  categoryStore.getAllCategories();
-});
+  productStore.getAllProducts()
+  categoryStore.getAllCategories()
+})
 </script>
 
 <style scoped>
 .product-container {
   padding: 30px;
   direction: rtl;
-  font-family: "Yekan", sans-serif;
+  font-family: 'Yekan', sans-serif;
   background-color: #f9f9f9;
 }
 
@@ -587,13 +618,13 @@ onMounted(() => {
 }
 
 .input,
-.input[type="text"],
-.input[type="number"],
+.input[type='text'],
+.input[type='number'],
 .input.select,
 textarea.input {
   width: 100%;
   padding: 12px 14px;
-  font-family: "Vazirmatn";
+  font-family: 'Vazirmatn';
   font-size: 15px;
   border: 1px solid #ddd;
   border-radius: 10px;
@@ -623,7 +654,7 @@ textarea.input {
   resize: vertical;
 }
 
-.image-preview {
+/* .image-preview {
   max-width: 120px;
   max-height: 120px;
   border: 2px solid #ffd700;
@@ -633,7 +664,7 @@ textarea.input {
   background: #f8f9fa;
   display: block;
   object-fit: cover;
-}
+} */
 
 .properties-section {
   box-sizing: border-box;
@@ -888,6 +919,142 @@ textarea.input {
   animation: slide-in 0.3s ease-out;
   direction: rtl;
 }
+.image-upload-area {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 15px;
+  border: 2px dashed #ffd700;
+  border-radius: 12px;
+  background-color: #fcfcfc;
+  transition: 0.3s;
+}
+
+.image-upload-area:hover {
+  border-color: #ffc107;
+  background-color: #fffbea;
+}
+
+.image-upload-area .label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.file-input {
+  border: none;
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 8px;
+  background-color: #fff;
+  transition: 0.2s;
+}
+
+.file-input:hover {
+  background-color: #f9f9f9;
+}
+
+.image-preview-wrapper,
+.gallery-thumb {
+  position: relative;
+  display: inline-block;
+}
+
+.image-preview {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 2px solid #ffd700;
+  padding: 4px;
+  background: #f8f9fa;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
+}
+
+.image-preview:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.gallery-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.remove-gallery,
+.remove-image {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+
+.image-preview-wrapper:hover .remove-image,
+.gallery-thumb:hover .remove-gallery {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.toggle-switch {
+  position: relative;
+  width: 50px;
+  height: 24px;
+  display: inline-block;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  border-radius: 24px;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: '';
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #28a745; /* سبز برای فعال */
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
 
 @keyframes slide-in {
   from {
@@ -898,6 +1065,56 @@ textarea.input {
     transform: translateY(0);
     opacity: 1;
   }
+}
+.modal-images {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.main-image-wrapper {
+  width: 250px;
+  height: 250px;
+  border: 3px solid #ffd700;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.main-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.main-image:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+}
+
+.gallery-images {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.gallery-thumb {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.gallery-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .modal-close-btn {

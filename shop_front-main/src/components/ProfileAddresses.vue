@@ -1,107 +1,102 @@
 <template>
   <div class="addresses-section">
-    <h3>آدرس‌ها</h3>
+    <h3>مدیریت آدرس‌ها</h3>
 
+  
     <div class="address-form">
       <div class="form-group">
         <label>استان:</label>
-        <select v-model="newAddress.province_id" @change="updateCities">
+        <select v-model="form.province_id" @change="updateCities">
           <option disabled value="">انتخاب کنید</option>
-          <option
-            v-for="province in store.provinces"
-            :key="province.id"
-            :value="province.id"
-          >
-            {{ province.name }}
-          </option>
+          <option v-for="p in store.provinces" :key="p.id" :value="p.id">{{ p.name }}</option>
         </select>
       </div>
 
       <div class="form-group">
         <label>شهر:</label>
-        <select v-model="newAddress.city_id" :disabled="!newAddress.province_id">
+        <select v-model="form.city_id" :disabled="!form.province_id">
           <option disabled value="">انتخاب کنید</option>
-          <option v-for="city in store.cities" :key="city.id" :value="city.id">
-            {{ city.name }}
-          </option>
+          <option v-for="c in store.cities" :key="c.id" :value="c.id">{{ c.name }}</option>
         </select>
       </div>
 
       <div class="form-group">
         <label>محله:</label>
-        <input v-model="newAddress.neighborhood" type="text" placeholder="مثال نیاوران" />
+        <input v-model="form.neighborhood" type="text" placeholder="مثلاً نیاوران" />
       </div>
 
       <div class="form-group">
         <label>کوچه:</label>
-        <input v-model="newAddress.street" type="text" placeholder="مثلاً کوچه گلستان" />
+        <input v-model="form.street" type="text" placeholder="مثلاً کوچه گلستان" />
       </div>
 
       <div class="form-group">
         <label>پلاک:</label>
-        <input v-model="newAddress.plate" type="text" placeholder="مثال ۲۳" />
+        <input v-model="form.plate" type="text" placeholder="مثلاً ۱۲۳" />
       </div>
 
       <div class="form-group">
         <label>کد پستی:</label>
-        <input
-          v-model="newAddress.postal_code"
-          type="text"
-          placeholder="مثال 1234567890"
-        />
+        <input v-model="form.postal_code" type="text" placeholder="مثلاً 1234567890" />
       </div>
 
       <div class="form-group full">
         <label>آدرس کامل:</label>
-        <textarea
-          v-model="newAddress.full_address"
-          rows="2"
-          placeholder="مثال تهران، نیاوران، کوچه گلستان، پلاک ۲۳..."
-        ></textarea>
+        <textarea v-model="form.full_address" placeholder="مثلاً تهران، نیاوران، کوچه گلستان، پلاک ۱۲۳"></textarea>
       </div>
 
-      <button class="btn gold-btn" @click="addAddress">افزودن آدرس</button>
+      <button class="btn gold-btn" @click="saveAddress">
+        {{ editMode ? "ویرایش آدرس" : "افزودن آدرس" }}
+      </button>
     </div>
 
+    
     <table class="addresses-table" v-if="store.addresses.length">
-      <thead>
-        <tr>
-          <th>استان</th>
-          <th>شهر</th>
-          <th>محله</th>
-          <th>کوچه</th>
-          <th>پلاک</th>
-          <th>کد پستی</th>
-          <th>آدرس کامل</th>
-          <th>عملیات</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(addr, idx) in store.addresses" :key="idx">
-          <td>{{ addr.province.name }}</td>
-          <td>{{ addr.city.name }}</td>
-          <td>{{ addr.neighborhood }}</td>
-          <td>{{ addr.street }}</td>
-          <td>{{ addr.plate }}</td>
-          <td>{{ addr.postal_code }}</td>
-          <td>{{ addr.full_address }}</td>
-          <td>
-            <button class="delete-btn" @click="deleteAddress(idx)">🗑</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <thead>
+    <tr>
+      <th>استان</th>
+      <th>شهر</th>
+      <th>محله</th>
+      <th>کوچه</th>
+      <th>پلاک</th>
+      <th>کد پستی</th>
+      <th>آدرس کامل</th>
+      <th>عملیات</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="(addr, idx) in store.addresses" :key="addr.id">
+      <td>{{ addr.province.name }}</td>
+      <td>{{ addr.city.name }}</td>
+      <td>{{ addr.neighborhood }}</td>
+      <td>{{ addr.street }}</td>
+      <td>{{ addr.plate }}</td>
+      <td>{{ addr.postal_code }}</td>
+      <td>{{ addr.full_address }}</td>
+      <td>
+        <div class="action-buttons">
+          <button class="btn edit-btn" @click="editAddress(addr)"> ویرایش</button>
+          <button class="btn delete-btn" @click="deleteAddress(addr.id, idx)"> حذف</button>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
   </div>
 </template>
 
 <script setup>
-import { reactive, onMounted, watch } from "vue";
+import { reactive, ref, onMounted } from "vue";
 import { useUserStore } from "@/stores/useUserStore";
 import { toast } from "vue3-toastify";
 
 const store = useUserStore();
 
-const newAddress = reactive({
+const editMode = ref(false);
+const editingId = ref(null);
+
+const form = reactive({
   province_id: "",
   city_id: "",
   neighborhood: "",
@@ -111,83 +106,105 @@ const newAddress = reactive({
   full_address: "",
 });
 
-onMounted(async () => {
-  await store.fetchProvinces();
-  await store.fetchAddresses();
-});
+const resetForm = () => {
+  Object.assign(form, {
+    province_id: "",
+    city_id: "",
+    neighborhood: "",
+    street: "",
+    plate: "",
+    postal_code: "",
+    full_address: "",
+  });
+  editMode.value = false;
+  editingId.value = null;
+};
 
-watch(
-  () => newAddress.province_id,
-  async (val) => {
-    newAddress.city_id = "";
-    if (val) await store.fetchCities(val);
-  }
-);
-
-const addAddress = async () => {
+const validateForm = () => {
   if (
-    !newAddress.province_id ||
-    !newAddress.city_id ||
-    !newAddress.neighborhood ||
-    !newAddress.street ||
-    !newAddress.plate ||
-    !newAddress.postal_code ||
-    !newAddress.full_address
+    !form.province_id ||
+    !form.city_id ||
+    !form.neighborhood ||
+    !form.street ||
+    !form.plate ||
+    !form.postal_code ||
+    !form.full_address
   ) {
-    return toast.error("لطفاً همه فیلدها را تکمیل کنید");
+    toast.error("لطفاً همه فیلدها را پر کنید");
+    return false;
   }
-
-  if (!/^\d+$/.test(newAddress.plate)) {
-    return toast.error("پلاک باید فقط شامل عدد باشد");
+  if (!/^\d+$/.test(form.plate)) {
+    toast.error("پلاک باید فقط عدد باشد");
+    return false;
   }
-
-  if (!/^\d{10}$/.test(newAddress.postal_code)) {
-    return toast.error("کد پستی باید ۱۰ رقم عدد باشد");
+  if (!/^\d{10}$/.test(form.postal_code)) {
+    toast.error("کد پستی باید ۱۰ رقم باشد");
+    return false;
   }
+  return true;
+};
 
-  const addressToAdd = {
-    province_id: newAddress.province_id,
-    city_id: newAddress.city_id,
-    neighborhood: newAddress.neighborhood,
-    street: newAddress.street,
-    plate: newAddress.plate,
-    postal_code: newAddress.postal_code,
-    full_address: newAddress.full_address,
-  };
+const saveAddress = async () => {
+  if (!validateForm()) return;
 
   try {
-    await store.addAddress(addressToAdd);
+    if (editMode.value) {
+      await store.updateAddress(editingId.value, { ...form });
 
-    newAddress.province_id = "";
-    newAddress.city_id = "";
-    newAddress.neighborhood = "";
-    newAddress.street = "";
-    newAddress.plate = "";
-    newAddress.postal_code = "";
-    newAddress.full_address = "";
-
-    toast.success("آدرس با موفقیت افزوده شد ");
-  } catch (error) {
-    console.error(error.response?.data);
-    toast.error("خطا در افزودن آدرس");
+    } else {
+      await store.addAddress({ ...form });
+      toast.success("آدرس جدید افزوده شد");
+    }
+    resetForm();
+    await store.fetchAddresses();
+  } catch (err) {
+    toast.error("خطا در ذخیره آدرس");
   }
 };
 
-const deleteAddress = async (idx) => {
+const editAddress = (addr) => {
+  editMode.value = true;
+  editingId.value = addr.id;
+  Object.assign(form, {
+    province_id: addr.province.id,
+    city_id: addr.city.id,
+    neighborhood: addr.neighborhood,
+    street: addr.street,
+    plate: addr.plate,
+    postal_code: addr.postal_code,
+    full_address: addr.full_address,
+  });
+};
+
+const deleteAddress = async (id, idx) => {
   try {
     await store.deleteAddress(idx);
+    toast.success("آدرس حذف شد");
   } catch {
     toast.error("خطا در حذف آدرس");
   }
 };
+
+const updateCities = async () => {
+  if (form.province_id) {
+    await store.fetchCities(form.province_id);
+  }
+};
+
+onMounted(async () => {
+  await store.fetchProvinces();
+  await store.fetchAddresses();
+});
 </script>
 
 <style scoped>
+@import url("https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap");
+
 .addresses-section {
+  font-family: "Vazirmatn", sans-serif;
   display: flex;
   flex-direction: column;
   gap: 25px;
-  font-family: IRANSans, sans-serif;
 }
 
 .address-form {
@@ -204,6 +221,7 @@ const deleteAddress = async (idx) => {
   display: flex;
   flex-direction: column;
 }
+
 .form-group.full {
   grid-column: 1 / -1;
 }
@@ -216,103 +234,112 @@ label {
 }
 
 input,
-select {
-  padding: 10px 12px;
-  font-family: "Yekan";
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  font-size: 0.9rem;
-  height: 42px;
-  box-sizing: border-box;
-}
-
+select,
 textarea {
-  resize: vertical;
-  min-height: 60px;
-  max-height: 180px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 1px solid #ddd;
-  font-family: "Yekan", sans-serif;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
   font-size: 0.9rem;
-  line-height: 1.6;
-  background: #fff;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: all 0.25s ease;
-}
-
-textarea:focus {
-  border-color: #f8b900;
-  box-shadow: 0 0 0 4px rgba(249, 199, 16, 0.2), inset 0 1px 5px rgba(249, 199, 16, 0.15);
-  background: #fffdfa;
-  outline: none;
-}
-
-textarea::placeholder {
-  color: #aaa;
-  font-size: 0.9rem;
-}
-
-input:focus,
-select:focus {
-  border-color: #f8b900;
-  box-shadow: 0 0 0 3px rgba(249, 199, 16, 0.2);
-  outline: none;
 }
 
 .btn {
+  padding: 8px 16px; 
   border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: 10px;
+  font-weight: bold;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: 0.3s;
+  grid-column: auto;
+  justify-self: start; 
 }
+
 
 .gold-btn {
-  background: linear-gradient(135deg, #f9c710, #f8b900);
+  background: #f9c710;
   color: white;
-  padding: 10px 0;
-  box-shadow: 0 4px 10px rgba(191, 162, 52, 0.4);
+  
 }
 
+
 .gold-btn:hover {
-  background: linear-gradient(135deg, #ffd740, #f9c710);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(191, 162, 52, 0.5);
+  background: #ffd740;
 }
+
 
 .addresses-table {
   width: 100%;
-  font-family: "Yekan";
   border-collapse: collapse;
-  margin-top: 20px;
+  margin-top: 25px;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
 }
 
-.addresses-table th,
-.addresses-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: center;
-  font-size: 0.9rem;
+.addresses-table thead {
+  background: #f9c710;
+  color: #fff;
 }
 
 .addresses-table th {
-  background: linear-gradient(135deg, #f9c710, #f8b900);
-  color: white;
-  border-radius: 6px;
+  padding: 14px 10px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-bottom: 2px solid #f1f1f1;
 }
 
-.delete-btn {
-  background: transparent;
+.addresses-table td {
+  padding: 12px 10px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #444;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+  transition: background 0.25s;
+}
+
+.addresses-table tbody tr:hover td {
+  background: #fff8e1;
+}
+
+.addresses-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.action-buttons .btn {
   border: none;
-  color: #d33;
-  font-size: 18px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: 0.3s;
+  transition: all 0.25s ease;
 }
 
-.delete-btn:hover {
-  transform: scale(1.2);
+.action-buttons .edit-btn {
+  background: #f9c710;
+  color: white;
+}
+
+.action-buttons .edit-btn:hover {
+  background: #ffd740;
+}
+
+.action-buttons .delete-btn {
+  background: #e53935;
+  color: white;
+}
+
+.action-buttons .delete-btn:hover {
+  background: #c62828;
 }
 </style>
+

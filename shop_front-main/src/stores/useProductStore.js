@@ -61,6 +61,7 @@ export const useProductStore = defineStore('product', {
           short_description: p.short_description || '',
           properties: p.properties || [],
           category: p.category || {},
+          is_active: p.is_active !== undefined ? p.is_active : true,
           average_rating: Number(p.average_rating) || 0,
           is_done: !!p.is_done,
           is_favorited: !!p.is_favorited,
@@ -70,6 +71,24 @@ export const useProductStore = defineStore('product', {
         }))
       } catch (error) {
         this.error = 'خطا در دریافت محصولات'
+      } finally {
+        this.loading = false
+      }
+    },
+    async toggleProductStatus(productId, newStatus) {
+      this.loading = true
+      this.error = null
+      try {
+        const payload = { is_active: newStatus }
+        const response = await productService.update(productId, payload)
+        const index = this.products.findIndex((p) => p.id === productId)
+        if (index !== -1) {
+          this.products[index].is_active = newStatus
+          Vue3Toastify.toast.success(`محصول ${newStatus ? 'فعال' : 'غیر فعال'} شد.`)
+        }
+      } catch (error) {
+        this.error = 'خطا در تغییر وضعیت محصول'
+        Vue3Toastify.toast.error(this.error)
       } finally {
         this.loading = false
       }

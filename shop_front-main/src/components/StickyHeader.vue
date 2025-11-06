@@ -5,17 +5,22 @@
         <router-link to="/">
           <i class="fas fa-home"></i>
         </router-link>
-        <router-link to="/shop-cart">
+        <router-link to="/shop-cart" class="cart-icon">
           <i class="fas fa-shopping-cart"></i>
+          <transition name="badge-pop" mode="out-in">
+            <span
+              v-if="cartStore.totalQuantity > 0"
+              class="cart-badge"
+              :key="cartStore.totalQuantity"
+            >
+              {{ cartStore.totalQuantity }}
+            </span>
+          </transition>
         </router-link>
+
         <i class="fas fa-heart"></i>
         <template v-if="loginStore.isAuthenticated">
-          <router-link
-            v-if="loginStore.isAdmin"
-            to="/admin"
-            class="user-icon"
-            title="پنل ادمین"
-          >
+          <router-link v-if="loginStore.isAdmin" to="/admin" class="user-icon" title="پنل ادمین">
             <i class="fas fa-crown"></i>
           </router-link>
 
@@ -51,40 +56,44 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
-import { useHeaderStore } from "@/stores/useHeaderStore";
-import { useLoginStore } from "@/stores/useLoginStore";
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useHeaderStore } from '@/stores/useHeaderStore'
+import { useLoginStore } from '@/stores/useLoginStore'
+import { useCartStore } from '@/stores/useCartStore'
+
+const cartStore = useCartStore()
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
-});
+})
 
-const drawerOpen = ref(false);
-const headerStore = useHeaderStore();
-const loginStore = useLoginStore();
-const isBlurred = ref(false);
+const drawerOpen = ref(false)
+const headerStore = useHeaderStore()
+const loginStore = useLoginStore()
+const isBlurred = ref(false)
 
 function toggleMenu() {
-  drawerOpen.value = !drawerOpen.value;
+  drawerOpen.value = !drawerOpen.value
 }
 
 function scrollToSection(selector) {
-  const el = document.querySelector(selector);
+  const el = document.querySelector(selector)
   if (el) {
-    el.scrollIntoView({ behavior: "smooth" });
-    drawerOpen.value = false;
+    el.scrollIntoView({ behavior: 'smooth' })
+    drawerOpen.value = false
   }
 }
 
 const handleScroll = () => {
-  isBlurred.value = window.scrollY > 50;
-};
+  isBlurred.value = window.scrollY > 50
+}
 
 onMounted(() => {
-  window.addEventListener("scroll", handleScroll);
-  loginStore.loadFromCookies();
-});
-onUnmounted(() => window.removeEventListener("scroll", handleScroll));
+  window.addEventListener('scroll', handleScroll)
+  loginStore.loadFromCookies()
+  cartStore.fetchCart()
+})
+onUnmounted(() => window.removeEventListener('scroll', handleScroll))
 </script>
 
 <style scoped>
@@ -122,7 +131,9 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll));
   color: #222;
   font-size: 1.2rem;
   cursor: pointer;
-  transition: color 0.2s ease, transform 0.15s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.15s ease;
 }
 
 .icons a:hover,
@@ -209,7 +220,9 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll));
 
 .sticky-slide-fade-enter-active,
 .sticky-slide-fade-leave-active {
-  transition: transform 0.25s ease, opacity 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
 }
 .sticky-slide-fade-enter-from {
   transform: translateY(-8px);
@@ -217,6 +230,50 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll));
 }
 .sticky-slide-fade-leave-to {
   transform: translateY(-8px);
+  opacity: 0;
+}
+.cart-icon {
+  position: relative;
+  display: inline-block;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  background-color: #dc3545;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform-origin: center;
+}
+
+
+.badge-pop-enter-active,
+.badge-pop-leave-active {
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+.badge-pop-enter-from {
+  transform: scale(0.5);
+  opacity: 0;
+}
+.badge-pop-enter-to {
+  transform: scale(1);
+  opacity: 1;
+}
+.badge-pop-leave-from {
+  transform: scale(1);
+  opacity: 1;
+}
+.badge-pop-leave-to {
+  transform: scale(0.5);
   opacity: 0;
 }
 

@@ -144,7 +144,11 @@ input[type='text'] {
   font-size: 15px;
   transition: border-color 0.3s, box-shadow 0.3s;
 }
-
+input:focus {
+  outline: none;
+  border-color: var(--primary-gold);
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.4);
+}
 input[type='text']:focus {
   border-color: var(--primary-gold);
   box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
