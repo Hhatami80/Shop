@@ -32,11 +32,7 @@ export const productService = {
   },
 
   create(productFormData) {
-    return api.post('/product-add', productFormData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    })
+    return api.post('/product-add', productFormData)
   },
 
   update(productId, productFormData) {

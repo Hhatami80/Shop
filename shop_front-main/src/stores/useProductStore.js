@@ -215,24 +215,7 @@ export const useProductStore = defineStore('product', {
         const response = await productService.create(newProduct)
         const p = response.data
         this.getAllProducts()
-        // this.products.push({
-        //   ...p
-        //   // brand: p.brand || 'ناشناخته',
-        //   // price: Number(p.price) || 0,
-        //   // discounted_price: Number(p.discounted_price) || 0,
-        //   // discount: Number(p.discount) || 0,
-        //   // description: p.description || '',
-        //   // image: p.image || '',
-        //   // short_description: p.short_description || '',
-        //   // properties: p.properties || [],
-        //   // category: p.category || {},
-        //   // average_rating: Number(p.average_rating) || 0,
-        //   // is_done: !!p.is_done,
-        //   // is_favorited: !!p.is_favorited,
-        //   // slug: p.slug || '',
-        //   // created_date: p.created_date || '',
-        //   // jalali_created_date: p.jalali_created_date || '',
-        // })
+        
       } catch (error) {
         this.error = 'خطا در افزودن محصول'
         throw error
