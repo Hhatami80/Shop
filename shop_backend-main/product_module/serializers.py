@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.parsers import MultiPartParser, FormParser
+
 from .models import Product, ProductCategory, Brand, ProductProperty, ProductComment, ProductGallery, ProductTag, Cart, \
     CartItem, ProductRating, OrderItem, Order, CategoryBanner, Wallet, Transaction, Payment
 from mixins.dedup_image_serializer import DedupImageMixin
@@ -43,8 +45,8 @@ class ProductGallerySerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    parser_classes = [MultiPartParser, FormParser]
     images = ProductGallerySerializer(many=True, read_only=True)
-    uploaded_images = serializers.ListField(child=serializers.ImageField(), write_only=True, required=False)
     category = CategorySerializer(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(
         queryset=ProductCategory.objects.all(),
@@ -103,10 +105,11 @@ class ProductSerializer(serializers.ModelSerializer):
         return 0
 
     def create(self, validated_data):
+        request = self.context.get('request')
         properties_data = validated_data.pop('properties', [])
         category = validated_data.pop('category_id')
         product = Product.objects.create(category=category, **validated_data)
-        uploaded_images = validated_data.pop('uploaded_images', [])
+        uploaded_images = request.FILES.getlist('uploaded_images')
         if uploaded_images:
             for image in uploaded_images:
                 ProductGallery.objects.create(product=product, image=image)

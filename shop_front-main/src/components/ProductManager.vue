@@ -137,8 +137,8 @@
         </div>
 
         <div class="col-full form-actions">
-          <button type="submit" class="btn btn-submit" :disabled="productStore.loading">
-            <fa-icon v-if="productStore.loading" :icon="['fas', 'spinner']" pulse />
+          <button type="submit" class="btn btn-submit" :disabled="adminStore.loading">
+            <fa-icon v-if="adminStore.loading" :icon="['fas', 'spinner']" pulse />
             {{ isEditing ? 'ذخیره تغییرات' : 'افزودن محصول' }}
           </button>
           <button type="button" class="btn btn-cancel" @click="resetForm">انصراف</button>
@@ -152,10 +152,10 @@
     <hr class="divider" />
 
     <div class="table-wrapper">
-      <div v-if="productStore.loading" class="loading-state">
+      <div v-if="adminStore.loading" class="loading-state">
         <fa-icon :icon="['fas', 'spinner']" pulse /> در حال بارگذاری محصولات...
       </div>
-      <table class="custom-table" v-else-if="productStore.products.length">
+      <table class="custom-table" v-else-if="adminStore.products.length">
         <thead>
           <tr>
             <th>تصویر</th>
@@ -194,7 +194,7 @@
                 <input
                   type="checkbox"
                   :checked="product.is_active"
-                  @change="productStore.toggleProductStatus(product.id, $event.target.checked)"
+                  @change="adminStore.toggleProductStatus(product.id, $event.target.checked)"
                 />
                 <span class="slider"></span>
               </label>
@@ -222,7 +222,7 @@
         </button>
       </div>
 
-      <div v-else-if="!productStore.products.length" class="empty-state">
+      <div v-else-if="!adminStore.products.length" class="empty-state">
         محصولی برای نمایش وجود ندارد.
       </div>
     </div>
@@ -315,8 +315,10 @@ import { useProductStore } from '@/stores/useProductStore'
 import { useCategoryStore } from '@/stores/useCategoryStore'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
+import { useAdminStore } from '@/stores/useAdminStore'
 
 const productStore = useProductStore()
+const adminStore = useAdminStore()
 const categoryStore = useCategoryStore()
 
 const isEditing = ref(false)
@@ -346,10 +348,10 @@ const pageSize = 5
 
 const paginatedProducts = computed(() => {
   const start = (currentPage.value - 1) * pageSize
-  return productStore.products.slice(start, start + pageSize)
+  return adminStore.products.slice(start, start + pageSize)
 })
 
-const totalPages = computed(() => Math.ceil(productStore.products.length / pageSize))
+const totalPages = computed(() => Math.ceil(adminStore.products.length / pageSize))
 
 function nextPage() {
   if (currentPage.value < totalPages.value) currentPage.value++
@@ -431,7 +433,7 @@ async function submitForm() {
     payload.append('discount', form.discount)
     payload.append('description', form.description)
     if (form.imageFile) payload.append('image', form.imageFile)
-    form.galleryFiles.forEach((file, idx) => payload.append(`uploaded_images[${idx}]`, file))
+    if (form.galleryFiles) form.galleryFiles.forEach((file, idx) => payload.append(`uploaded_images`, file))
     payload.append('properties', JSON.stringify(form.properties || []))
     if (isEditing.value) payload.append('_method', 'PUT')
   } else {
@@ -461,6 +463,7 @@ async function submitForm() {
       }
       toast.success('محصول با موفقیت ویرایش شد.')
     } else {
+     
       const newProduct = await productStore.addProduct(payload)
       const category = categoryStore.allCategories.find((c) => c.id === form.category_id) || null
       productStore.products.unshift({
@@ -531,8 +534,9 @@ function closeModal() {
 }
 
 onMounted(() => {
-  productStore.getAllProducts()
+  adminStore.getAllProducts()
   categoryStore.getAllCategories()
+  console.log(adminStore.products)
 })
 </script>
 
@@ -1087,12 +1091,14 @@ input:checked + .slider:before {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
 }
 
 .main-image:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
 .gallery-images {
@@ -1108,13 +1114,15 @@ input:checked + .slider:before {
   object-fit: cover;
   border: 2px solid #ddd;
   border-radius: 8px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   cursor: pointer;
 }
 
 .gallery-thumb:hover {
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .modal-close-btn {

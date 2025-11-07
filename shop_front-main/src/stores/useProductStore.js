@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { productService } from '@/services/ProductService'
 import toast from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
+import { adminService } from '@/services/adminService'
 
 export const useProductStore = defineStore('product', {
   state: () => ({
@@ -41,7 +42,7 @@ export const useProductStore = defineStore('product', {
       this.loading = true
       this.error = null
       try {
-        const response = await productService.get()
+        const response = await adminService.getAdminPageProducts()
         this.new_products = response.data.new_products.map((p) => ({
           ...p,
           price: Number(p.price) || 0,
@@ -76,39 +77,36 @@ export const useProductStore = defineStore('product', {
       }
     },
     async toggleProductStatus(productId, newStatus) {
-  this.loading = true
-  this.error = null
+      this.loading = true
+      this.error = null
 
-  try {
-    const payload = { is_active: newStatus }
-    const res = await productService.update(productId, payload)
+      try {
+        const payload = { is_active: newStatus }
+        const res = await productService.update(productId, payload)
 
-    const updatedProduct = res?.data?.products?.[0]
+        const updatedProduct = res?.data?.products?.[0]
 
-    const index = this.products.findIndex((p) => p.id === productId)
-    if (index !== -1) {
-      if (updatedProduct) {
-        this.products[index] = {
-          ...this.products[index],
-          ...updatedProduct,
+        const index = this.products.findIndex((p) => p.id === productId)
+        if (index !== -1) {
+          if (updatedProduct) {
+            this.products[index] = {
+              ...this.products[index],
+              ...updatedProduct,
+            }
+          } else {
+            this.products[index].is_active = !!newStatus
+          }
         }
-      } else {
-       
-        this.products[index].is_active = !!newStatus
+
+        toast.success(`محصول ${newStatus ? 'فعال' : 'غیرفعال'} شد.`)
+      } catch (error) {
+        console.error('خطا در تغییر وضعیت محصول:', error)
+        this.error = 'خطا در تغییر وضعیت محصول'
+        toast.error(this.error)
+      } finally {
+        this.loading = false
       }
-    }
-
-    toast.success(`محصول ${newStatus ? 'فعال' : 'غیرفعال'} شد.`)
-  } catch (error) {
-    console.error('خطا در تغییر وضعیت محصول:', error)
-    this.error = 'خطا در تغییر وضعیت محصول'
-    toast.error(this.error)
-  } finally {
-    this.loading = false
-  }
-}
-,
-
+    },
     async getBestSellers() {
       this.loading = true
       this.error = null
@@ -215,24 +213,6 @@ export const useProductStore = defineStore('product', {
         const response = await productService.create(newProduct)
         const p = response.data
         this.getAllProducts()
-        // this.products.push({
-        //   ...p
-        //   // brand: p.brand || 'ناشناخته',
-        //   // price: Number(p.price) || 0,
-        //   // discounted_price: Number(p.discounted_price) || 0,
-        //   // discount: Number(p.discount) || 0,
-        //   // description: p.description || '',
-        //   // image: p.image || '',
-        //   // short_description: p.short_description || '',
-        //   // properties: p.properties || [],
-        //   // category: p.category || {},
-        //   // average_rating: Number(p.average_rating) || 0,
-        //   // is_done: !!p.is_done,
-        //   // is_favorited: !!p.is_favorited,
-        //   // slug: p.slug || '',
-        //   // created_date: p.created_date || '',
-        //   // jalali_created_date: p.jalali_created_date || '',
-        // })
       } catch (error) {
         this.error = 'خطا در افزودن محصول'
         throw error
