@@ -3,7 +3,7 @@
     <h2>مدیریت تراکنش‌ها</h2>
 
     <div v-if="loading">در حال بارگذاری...</div>
-    <div v-else-if="!transactions.length">تراکنشی یافت نشد</div>
+    <div class="empty-state " v-else-if="!transactions.length">تراکنشی یافت نشد</div>
 
     <table v-else class="transactions-table">
       <thead>
@@ -50,6 +50,16 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.admin-transactions{
+  max-width: 1200px;
+  margin: 40px auto;
+  font-family: "Yekan", sans-serif;
+  background: #fff;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+  direction: rtl;
+}
 .transactions-table {
   width: 100%;
   border-collapse: collapse;
@@ -66,5 +76,10 @@ onMounted(async () => {
 .transactions-table th {
   background-color: #f9c710;
   color: white;
+}
+.empty-state {
+  text-align: center;
+  padding: 30px;
+  color: #777;
 }
 </style>
