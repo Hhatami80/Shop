@@ -377,7 +377,7 @@ th {
   transform: translateY(-1px);
 }
 
- .my-swal-popup {
+ /* .my-swal-popup {
   font-family: 'Vazirmatn', sans-serif;
   border-radius: 12px;
   direction: rtl;
@@ -408,5 +408,5 @@ th {
   border-radius: 8px;
   box-shadow: none !important;
   margin: 0 5px;
-} 
+}  */
 </style>

@@ -64,8 +64,9 @@
           ></textarea>
         </div>
 
-        <div class="row">
-          <div class="col-half image-upload-area">
+        <div class="row image-section">
+          
+          <div class="image-upload-area main-image-area">
             <label class="label">عکس اصلی محصول</label>
             <input
               type="file"
@@ -74,14 +75,15 @@
               @change="handleMainImage"
               :required="!isEditing && !form.imagePreview"
             />
-            <div v-if="form.imagePreview" class="image-preview-wrapper">
+            <div v-if="form.imagePreview" class="image-preview-wrapper large">
               <img :src="form.imagePreview" class="image-preview" alt="پیش‌نمایش" />
-              <button type="button" class="remove-image" @click="removeMainImage">×</button>
+              <button type="button" class="remove-image">×</button>
             </div>
           </div>
 
-          <div class="col-half image-upload-area">
-            <label class="label">گالری تصاویر (اختیاری)</label>
+        
+          <div class="image-upload-area gallery-area">
+            <label class="label">گالری تصاویر</label>
             <input
               type="file"
               accept="image/*"
@@ -89,8 +91,12 @@
               class="input file-input"
               @change="handleGalleryUpload"
             />
-            <div class="gallery-preview">
-              <div v-for="(img, index) in form.galleryPreviews" :key="index" class="gallery-thumb">
+            <div class="gallery-preview large">
+              <div
+                v-for="(img, index) in form.galleryPreviews"
+                :key="index"
+                class="gallery-thumb large"
+              >
                 <img :src="img" alt="گالری" class="image-preview" />
                 <button
                   type="button"
@@ -231,36 +237,45 @@
       <div v-if="isModalOpen" class="modal-overlay" @click="closeModal">
         <div class="modal-content" @click.stop>
           <button class="modal-close-btn" @click="closeModal">&times;</button>
+
           <div v-if="selectedProduct" class="product-details">
             <h3 class="product-modal-title">مشخصات: {{ selectedProduct.title }}</h3>
             <hr class="modal-divider" />
-            <div class="modal-main-info">
-              <div class="modal-images">
-                <div class="main-image-wrapper">
-                  <img :src="selectedProduct.image" alt="تصویر اصلی" class="main-image" />
-                </div>
-                <div v-if="selectedProduct.galleryPreviews?.length" class="gallery-images">
-                  <img
-                    v-for="(img, idx) in selectedProduct.galleryPreviews"
-                    :key="idx"
-                    :src="img"
-                    class="gallery-thumb"
-                  />
-                </div>
+
+            <div class="modal-images">
+              <div class="main-image-wrapper">
+                <img
+                  :src="activeImage || selectedProduct.image"
+                  alt="تصویر محصول"
+                  class="main-image"
+                />
               </div>
 
+              <div v-if="selectedProduct.galleryPreviews?.length" class="gallery-thumbnails">
+                <img
+                  v-for="(img, idx) in selectedProduct.galleryPreviews"
+                  :key="idx"
+                  :src="img"
+                  :alt="`گالری ${idx + 1}`"
+                  class="gallery-thumb"
+                  :class="{ active: activeImage === img }"
+                  @click="activeImage = img"
+                />
+              </div>
+            </div>
+
+            <div class="modal-main-info">
               <div class="modal-text-info">
                 <p class="modal-price">
                   قیمت نهایی:
-                  <span
-                    >{{
-                      (selectedProduct.final_price || selectedProduct.price).toLocaleString()
-                    }}
-                    تومان</span
-                  >
+                  <span>
+                    {{ (selectedProduct.final_price || selectedProduct.price).toLocaleString() }}
+                    تومان
+                  </span>
                 </p>
                 <p class="modal-category">
-                  قیمت اصلی: <span>{{ selectedProduct.price.toLocaleString() }} تومان</span>
+                  قیمت اصلی:
+                  <span>{{ selectedProduct.price.toLocaleString() }} تومان</span>
                 </p>
                 <p class="modal-category">
                   دسته‌بندی: <span>{{ selectedProduct.category?.title }}</span>
@@ -342,6 +357,7 @@ const form = reactive({
 
 const submitSuccess = ref(false)
 const submitError = ref(null)
+const activeImage = ref(null)
 
 const currentPage = ref(1)
 const pageSize = 5
@@ -433,7 +449,8 @@ async function submitForm() {
     payload.append('discount', form.discount)
     payload.append('description', form.description)
     if (form.imageFile) payload.append('image', form.imageFile)
-    if (form.galleryFiles) form.galleryFiles.forEach((file, idx) => payload.append(`uploaded_images`, file))
+    if (form.galleryFiles)
+      form.galleryFiles.forEach((file, idx) => payload.append(`uploaded_images`, file))
     payload.append('properties', JSON.stringify(form.properties || []))
     if (isEditing.value) payload.append('_method', 'PUT')
   } else {
@@ -463,7 +480,6 @@ async function submitForm() {
       }
       toast.success('محصول با موفقیت ویرایش شد.')
     } else {
-     
       const newProduct = await productStore.addProduct(payload)
       const category = categoryStore.allCategories.find((c) => c.id === form.category_id) || null
       productStore.products.unshift({
@@ -524,6 +540,7 @@ function editProduct(product, index) {
 
 function showProductDetails(product) {
   selectedProduct.value = product
+  activeImage.value = product.image || null
   isModalOpen.value = true
 }
 
@@ -922,96 +939,125 @@ textarea.input {
   animation: slide-in 0.3s ease-out;
   direction: rtl;
 }
-.image-upload-area {
+
+.image-section {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-top: 15px;
+}
+
+.main-image-area,
+.gallery-area {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 15px;
-  border: 2px dashed #ffd700;
+}
+
+.image-upload-area {
+  border: 2px dashed #f9c710;
   border-radius: 12px;
-  background-color: #fcfcfc;
-  transition: 0.3s;
+  padding: 15px;
+  background: #fffdf6;
+  transition: all 0.3s ease;
 }
 
 .image-upload-area:hover {
-  border-color: #ffc107;
-  background-color: #fffbea;
+  background: #fffbea;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
 }
 
-.image-upload-area .label {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.file-input {
-  border: none;
-  padding: 6px 10px;
-  cursor: pointer;
-  border-radius: 8px;
-  background-color: #fff;
-  transition: 0.2s;
-}
-
-.file-input:hover {
-  background-color: #f9f9f9;
-}
-
-.image-preview-wrapper,
-.gallery-thumb {
+.image-preview-wrapper.large {
+  width: 220px;
+  height: 220px;
+  border-radius: 12px;
+  overflow: hidden;
   position: relative;
-  display: inline-block;
+  border: 3px solid #f9c710;
+  background: #fff;
+  box-shadow: 0 4px 15px rgba(249, 199, 16, 0.25);
 }
 
 .image-preview {
-  width: 140px;
-  height: 140px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border-radius: 10px;
-  border: 2px solid #ffd700;
-  padding: 4px;
-  background: #f8f9fa;
   transition:
-    transform 0.3s,
-    box-shadow 0.3s;
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
-.image-preview:hover {
+.image-preview-wrapper.large:hover img,
+.gallery-thumb.large:hover img {
   transform: scale(1.05);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
-.gallery-preview {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.remove-gallery,
-.remove-image {
+.remove-image,
+.remove-gallery {
   position: absolute;
-  top: -8px;
-  right: -8px;
+  top: 4px;
+  right: 4px;
   background-color: #dc3545;
   color: #fff;
   border: none;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   font-size: 16px;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   opacity: 0;
-  transition:
-    opacity 0.2s,
-    transform 0.2s;
+  transition: all 0.2s ease;
 }
 
 .image-preview-wrapper:hover .remove-image,
 .gallery-thumb:hover .remove-gallery {
   opacity: 1;
   transform: scale(1.1);
+}
+
+.gallery-preview.large {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.gallery-thumb.large {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  border: 3px solid #f9c710;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(249, 199, 16, 0.25);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.gallery-thumb.large:hover {
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .image-section {
+    flex-direction: column;
+  }
+
+  .image-preview-wrapper.large {
+    width: 180px;
+    height: 180px;
+  }
+
+  .gallery-thumb.large {
+    width: 100px;
+    height: 100px;
+  }
 }
 
 .toggle-switch {
@@ -1052,7 +1098,7 @@ textarea.input {
 }
 
 input:checked + .slider {
-  background-color: #28a745; /* سبز برای فعال */
+  background-color: #28a745;
 }
 
 input:checked + .slider:before {
@@ -1260,6 +1306,33 @@ input:checked + .slider:before {
 }
 .modal-edit-btn:hover {
   background-color: #1a1a1a;
+}
+.gallery-thumbnails {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.gallery-thumbnails .gallery-thumb {
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.gallery-thumbnails .gallery-thumb:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.gallery-thumbnails .gallery-thumb.active {
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
 @media (max-width: 768px) {
