@@ -16,6 +16,20 @@ export const useAdminStore = defineStore('admin', {
       this.products = response.data.products
       this.loading = false
     },
+    async deleteProduct(productId) {
+          this.loading = true
+          this.error = null
+          try {
+            const response = await adminService.removeProduct(productId)
+            this.getAllProducts()
+            return response.data
+          } catch (error) {
+            this.error = 'خطا در حذف محصول'
+            throw error
+          } finally {
+            this.loading = false
+          }
+        },
     async toggleProductStatus(productId, newStatus) {
       this.loading = true
       this.error = null

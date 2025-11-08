@@ -491,11 +491,10 @@ async function submitForm() {
 async function removeProduct(productId, index) {
   if (!confirm('آیا از حذف این محصول مطمئن هستید؟')) return
   try {
-    await productStore.deleteProduct(productId)
-    productStore.products.splice(index, 1)
-    toast.success('محصول با موفقیت حذف شد.')
+    await adminStore.deleteProduct(productId).data
+    toast.success("محصول با موفقیت حذف شد")
   } catch {
-    toast.error(productStore.error || 'خطا در حذف محصول')
+    toast.error(adminStore.error || 'خطا در حذف محصول')
   }
 }
 
