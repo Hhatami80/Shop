@@ -13,15 +13,17 @@
           <th>کاربر</th>
           <th>مبلغ</th>
           <th>نوع تراکنش</th>
+          <th>کد رهگیری</th>
           <th>وضعیت</th>
           <th>تاریخ</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="t in store.transactions" :key="t.id">
-          <td>{{ t.user?.name || t.user_id || "—" }}</td>
+          <td>{{ t.user?.fullname || t.user_id || "—" }}</td>
           <td>{{ t.amount?.toLocaleString("fa-IR") }} تومان</td>
           <td>{{ t.type }}</td>
+          <td>{{ t.internal_tracking_id }}</td>
           <td>
             <span
               :class="[

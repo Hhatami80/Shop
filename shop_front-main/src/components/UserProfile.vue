@@ -34,6 +34,8 @@ import ProfileInfo from "@/components/ProfileInfo.vue";
 import { useUserStore } from "@/stores/useUserStore";
 import ProfileAddresses from "@/components/ProfileAddresses.vue";
 import BankAccounts from "@/components/BankAccounts.vue";
+import { useRoute } from "vue-router";
+const route = useRoute();
 
 const store = useUserStore();
 const tab = ref("info");
@@ -47,6 +49,9 @@ onMounted(async () => {
     store.fetchAddresses(),
     store.fetchBankAccounts(),
   ]);
+  if (route.query.tab === "bank") {
+    tab.value = "bank";
+  }
   const module = await import("vue3-persian-datetime-picker");
   DatePicker.value = module.default;
   datePickerLoaded.value = true;

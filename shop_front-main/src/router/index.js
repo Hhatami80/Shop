@@ -106,6 +106,12 @@ const router = createRouter({
           component: () => import('@/views/WalletVerify.vue'),
           meta: { title: 'تأیید پرداخت کیف پول' },
         },
+        {
+          path: 'profile',
+          name: 'UserProfile',
+          component: () => import('@/components/UserProfile.vue'),
+          meta: { title: 'پروفایل کاربری' },
+        },
 
         {
           path: 'order-success',
@@ -150,7 +156,12 @@ const router = createRouter({
         { path: 'userslist', name: 'userslist', component: UserList },
         { path: 'orderList', name: 'orderList', component: AdminOrders },
         { path: 'comments', name: ' comments', component: CommetsManager },
-        { path: '/admin/transactions', name: 'AdminTransactions',component:AdminTransactions, meta: { requiresAdmin: true },},
+        {
+          path: '/admin/transactions',
+          name: 'AdminTransactions',
+          component: AdminTransactions,
+          meta: { requiresAdmin: true },
+        },
       ],
     },
   ],

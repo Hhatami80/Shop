@@ -130,7 +130,7 @@ const formatPrice = (price) => (price ? Number(price).toLocaleString("fa-IR") : 
 const changeStatus = async (order) => {
   try {
     await orderStore.updateOrderStatus(order.id, order.status);
-    toast.success("وضعیت سفارش به‌روزرسانی شد");
+    
   } catch (error) {
     toast.error("خطا در تغییر وضعیت سفارش");
   }

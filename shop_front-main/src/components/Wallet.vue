@@ -1,5 +1,12 @@
 <template>
   <div class="wallet-page">
+    <div v-if="!hasBankAccount" class="bank-warning">
+      ⚠️ برای استفاده از کیف پول، لطفاً حساب بانکی خود را در بخش حساب بانکی وارد کنید.
+      <button class="go-bank-btn" @click="goToBankSection">
+        رفتن به حساب بانکی
+      </button>
+    </div>
+
     <div class="wallet-top-row">
       <div class="wallet-card-wrapper" v-if="bank">
         <BankCard
@@ -23,7 +30,6 @@
         </div>
       </div>
     </div>
-
     <div class="wallet-transactions">
       <h3>تراکنش‌ها</h3>
 
@@ -53,14 +59,11 @@
         <p>تاکنون تراکنشی ثبت نشده است.</p>
       </div>
 
-     
       <div v-if="totalPages > 1" class="pagination">
         <button @click="prevPage" :disabled="currentPage === 1">
           <fa-icon :icon="['fas', 'chevron-left']" />
         </button>
-
         <span>صفحه {{ currentPage }} از {{ totalPages }}</span>
-
         <button @click="nextPage" :disabled="currentPage === totalPages">
           <fa-icon :icon="['fas', 'chevron-right']" />
         </button>
@@ -83,9 +86,11 @@ const router = useRouter();
 
 const amount = ref(0);
 
+
 const bank = computed(() =>
   userStore.bankAccounts.length > 0 ? userStore.bankAccounts[0] : null
 );
+const showBankMessage = computed(() => !bank.value); 
 
 onMounted(async () => {
   await Promise.all([
@@ -97,7 +102,6 @@ onMounted(async () => {
 
 const currentPage = ref(1);
 const pageSize = ref(5);
-
 const totalPages = computed(() => Math.ceil(wallet.transactions.length / pageSize.value));
 
 const paginatedTransactions = computed(() => {
@@ -108,7 +112,6 @@ const paginatedTransactions = computed(() => {
 const nextPage = () => {
   if (currentPage.value < totalPages.value) currentPage.value++;
 };
-
 const prevPage = () => {
   if (currentPage.value > 1) currentPage.value--;
 };
@@ -120,6 +123,7 @@ const goToPayment = async () => {
 };
 
 const withdraw = async () => {
+  if (!bank.value) return toast.error("برای برداشت وجه ابتدا حساب بانکی ثبت کنید.");
   if (amount.value <= 0) return toast.error("مبلغ وارد شده صحیح نیست");
   await wallet.withdraw({ amount: amount.value, method: "card" });
   amount.value = 0;
@@ -133,8 +137,10 @@ const formatDate = (dateStr) => {
     day: "2-digit",
   }).format(new Date(dateStr));
 };
-
 const formatPrice = (amount) => Number(amount)?.toLocaleString("fa-IR") || "0";
+const goToBankSection = () => {
+  router.push({ name: "UserProfile", query: { tab: "bank" } });
+};
 </script>
 
 <style scoped>
@@ -326,6 +332,35 @@ const formatPrice = (amount) => Number(amount)?.toLocaleString("fa-IR") || "0";
 }
 .pagination span {
   font-weight: bold;
+}
+.bank-warning {
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  color: #795548;
+  padding: 16px 20px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.go-bank-btn {
+  background: linear-gradient(135deg, #f9c710, #f8b900);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.go-bank-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
 @media (max-width: 1000px) {

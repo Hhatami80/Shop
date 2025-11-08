@@ -169,9 +169,9 @@ const cancelOrder = async (order) => {
   await orderStore.cancelUserOrder(order.id);
 };
 
-const formatPaymentMethod = (method) =>
-  ({ online: "پرداخت آنلاین", cod: "پرداخت در محل", wallet: "کیف پول" }[method] ||
-  "نامشخص");
+// const formatPaymentMethod = (method) =>
+//   ({ online: "پرداخت آنلاین", cod: "پرداخت در محل", wallet: "کیف پول" }[method] ||
+//   "نامشخص");
 </script>
 
 <style scoped>

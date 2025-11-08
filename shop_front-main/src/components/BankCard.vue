@@ -92,9 +92,9 @@
         }"
       >
         <p class="card-amount" v-if="!hideAmount && amount">
-          {{ rialToToman(Number(amount))?.toLocaleString() ?? 0 }} ریال
+          {{ rialToToman(Number(amount))?.toLocaleString() ?? 0 }} تومان
         </p>
-        <p class="card-amount mask" v-else>•••••••••• ریال</p>
+        <p class="card-amount mask" v-else>•••••••••• تومان</p>
       </div>
     </div>
   </div>

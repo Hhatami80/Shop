@@ -143,7 +143,7 @@ async function save() {
 h2 {
   text-align: right;
   margin-bottom: 25px;
-  color: var(--gold-primary);
+  color: var(--text-dark);
   font-weight: 800;
   font-size: 2rem;
   border-bottom: 2px solid var(--gold-primary);

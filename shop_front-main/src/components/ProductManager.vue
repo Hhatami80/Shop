@@ -728,8 +728,7 @@ textarea.input {
 }
 
 .btn-add-prop:hover {
-  background-color: #1a1a1a;
-  color: #ffd700;
+  
   box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
 }
 .btn {

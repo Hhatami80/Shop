@@ -15,11 +15,27 @@
       </div>
 
       <div class="form-group">
-        <label>نام:</label>
+        <label> نام کاربری:</label>
         <input
           v-model="store.profile.username"
           type="text"
-          placeholder="مثلاً رضا رضایی"
+          
+        />
+      </div>
+      <div class="form-group">
+        <label> نام:</label>
+        <input
+          v-model="store.profile.first_name"
+          type="text"
+          placeholder="مثال رضا "
+        />
+      </div>
+      <div class="form-group">
+        <label> نام خانوادگی:</label>
+        <input
+          v-model="store.profile.last_name"
+          type="text"
+          placeholder="مثال رضایی"
         />
       </div>
 
@@ -61,7 +77,9 @@
     <table class="preview-table">
       <thead>
         <tr>
+          <th>نام کاربری</th>
           <th>نام</th>
+          <th>نام خانوادگی</th>
           <th>ایمیل</th>
           <th>شماره تماس</th>
           <th>تاریخ تولد</th>
@@ -72,6 +90,8 @@
       <tbody>
         <tr>
           <td>{{ store.profile.username }}</td>
+          <td>{{ store.profile.first_name }}</td>
+          <td>{{ store.profile.last_name }}</td>
           <td>{{ store.profile.email }}</td>
           <td>{{ store.profile.phone }}</td>
           <td>{{ birthdateShamsi }}</td>
@@ -136,7 +156,8 @@ const onFileChange = (e) => {
 
 const saveProfile = async () => {
   const formData = new FormData();
-  formData.append("username", store.profile.username);
+  formData.append("first_name", store.profile.first_name);
+  formData.append("last_name", store.profile.last_name);
   formData.append("email", store.profile.email);
   formData.append("phone", store.profile.phone);
 
