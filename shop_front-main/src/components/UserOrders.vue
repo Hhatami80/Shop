@@ -85,7 +85,7 @@
                 <td>{{ item.quantity }}</td>
                 <td>{{ formatPrice(item.price) }} تومان</td>
                 <td>{{ formatPrice(item.price * item.quantity) }} تومان</td>
-                <td>{{ formatPaymentMethod(selectedOrder.payment_method) }}</td>
+                <td>{{ selectedOrder.payment.payment_method}}</td>
               </tr>
               <tr v-if="!selectedOrder.items.length">
                 <td colspan="5" class="empty-items">این سفارش محصولی ندارد.</td>
