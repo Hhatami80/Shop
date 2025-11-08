@@ -14,7 +14,7 @@
         />
         <div class="bank-detect">
           <img :src="detectedBank.bank_logo || '/logos/default.png'" class="bank-logo" />
-          <span>{{ detectedBank.bank_title || "---" }}</span>
+          <span>{{ detectedBank.bank_title || '---' }}</span>
         </div>
       </div>
 
@@ -25,11 +25,7 @@
 
       <div class="input-card">
         <label>شماره شبا</label>
-        <input
-          type="text"
-          v-model="newBank.iban"
-          placeholder="IR820540102680020817909002"
-        />
+        <input type="text" v-model="newBank.iban" placeholder="IR820540102680020817909002" />
       </div>
     </div>
 
@@ -38,118 +34,120 @@
     </div>
 
     <table class="bank-table" v-if="store.bankAccounts.length">
-  <thead>
-    <tr>
-      <th>لوگو</th>
-      <th>نام بانک</th>
-      <th>شماره کارت</th>
-      <th>شماره حساب</th>
-      <th>شماره شبا</th>
-      <th>عملیات</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr v-for="(account, idx) in store.bankAccounts" :key="account.id">
-      <td>
-        <img
-          :src="getBankFromCard(account.cardNumber)?.bank_logo || '/logos/default.png'"
-          class="bank-logo"
-        />
-      </td>
-      <td>{{ getBankFromCard(account.cardNumber)?.bank_title || "نامشخص" }}</td>
-      <td>{{ maskCard(account.cardNumber) }}</td>
-      <td>{{ account.accountNumber }}</td>
-      <td>{{ account.iban }}</td>
-      <td>
-        <button class="delete-btn" @click="handleDeleteBank(idx)">حذف</button>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
+      <thead>
+        <tr>
+          <th>لوگو</th>
+          <th>نام بانک</th>
+          <th>شماره کارت</th>
+          <th>شماره حساب</th>
+          <th>شماره شبا</th>
+          <th>عملیات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(account, idx) in store.bankAccounts" :key="account.id">
+          <td>
+            <img
+              :src="getBankFromCard(account.cardNumber)?.bank_logo || '/logos/default.png'"
+              class="bank-logo"
+            />
+          </td>
+          <td>{{ getBankFromCard(account.cardNumber)?.bank_title || 'نامشخص' }}</td>
+          <td>{{ maskCard(account.cardNumber) }}</td>
+          <td>{{ account.accountNumber }}</td>
+          <td>{{ account.iban }}</td>
+          <td>
+            <button class="delete-btn" @click="handleDeleteBank(idx)">حذف</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
     <p v-else class="empty-message">هنوز حسابی ثبت نکرده‌اید.</p>
   </div>
 </template>
 
 <script setup>
-import { reactive, computed, onMounted } from "vue";
-import { useUserStore } from "@/stores/useUserStore";
-import { toast } from "vue3-toastify";
-import "vue3-toastify/dist/index.css";
+import { reactive, computed, onMounted } from 'vue'
+import { useUserStore } from '@/stores/useUserStore'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 import {
   getBankFromCard,
   validateBankCardNumber,
   validateIranianIBAN,
   validateAccountNumber,
-} from "@/data/regex/validators";
+} from '@/data/regex/validators'
 
-
-
-const store = useUserStore();
+const store = useUserStore()
 
 const newBank = reactive({
-  cardNumber: "",
-  accountNumber: "",
-  iban: "",
-});
+  cardNumber: '',
+  accountNumber: '',
+  iban: '',
+})
 
 const detectedBank = computed(() => {
-  const cardClean = newBank.cardNumber.replace(/\s+/g, "");
-  return getBankFromCard(cardClean) || {};
-});
+  const cardClean = newBank.cardNumber.replace(/\s+/g, '')
+  return getBankFromCard(cardClean) || {}
+})
 
 onMounted(async () => {
-  await store.fetchProfile();
-  await store.fetchBankAccounts();
-});
+  await store.fetchProfile()
+  await store.fetchBankAccounts()
+})
 
 function maskCard(cardNumber) {
-  if (!cardNumber) return "";
-  return "**** **** **** " + cardNumber.slice(-4);
+  if (!cardNumber) return ''
+  return '**** **** **** ' + cardNumber.slice(-4)
 }
 
 function onCardInput(e) {
-  let digits = e.target.value.replace(/\D/g, "").slice(0, 16);
-  newBank.cardNumber = digits.replace(/(.{4})/g, "$1 ").trim();
+  let digits = e.target.value.replace(/\D/g, '').slice(0, 16)
+  newBank.cardNumber = digits.replace(/(.{4})/g, '$1 ').trim()
 }
 
 const handleAddBank = async () => {
-  const card = newBank.cardNumber.replace(/\s+/g, "");
-  const accountNum = newBank.accountNumber.trim();
-  const iban = newBank.iban.trim();
+  const card = newBank.cardNumber.replace(/\s+/g, '')
+  const accountNum = newBank.accountNumber.trim()
+  const iban = newBank.iban.trim()
 
-  if (!card || !accountNum || !iban) return toast.error("لطفاً همه فیلدها را پر کنید");
+  if (!card || !accountNum || !iban) return toast.error('لطفاً همه فیلدها را پر کنید')
 
-  if (!validateBankCardNumber(card)) return toast.error("شماره کارت معتبر نیست");
+  if (!validateBankCardNumber(card)) return toast.error('شماره کارت معتبر نیست')
   if (!validateAccountNumber(accountNum))
-    return toast.error("شماره حساب معتبر نیست (حداکثر 12 رقم)");
-  let ibanIsValid = validateIranianIBAN(iban);
-  if (!ibanIsValid) return toast.error("شماره شبا معتبر نیست");
+    return toast.error('شماره حساب معتبر نیست (حداکثر 12 رقم)')
+  if (!validateIranianIBAN(iban)) return toast.error('شماره شبا معتبر نیست')
 
   const bankInfo = {
     cardNumber: card,
     accountNumber: accountNum,
     iban,
-  };
+  }
 
   try {
-    const added = await store.addBankAccount(bankInfo);
-    added.bankName = detectedBank.value.bank_title || "نامشخص";
-    added.bankLogo = detectedBank.value.bank_logo || "/logos/default.png";
+    const added = await store.addBankAccount(bankInfo)
+    await store.fetchBankAccounts();
+    store.bankAccounts.push({
+      ...added,
+      bankName: detectedBank.value.bank_title || 'نامشخص',
+      bankLogo: detectedBank.value.bank_logo || '/logos/default.png',
+    })
 
-    newBank.cardNumber = "";
-    newBank.accountNumber = "";
-    newBank.iban = "";
+    newBank.cardNumber = ''
+    newBank.accountNumber = ''
+    newBank.iban = ''
+
+    toast.success('حساب بانکی با موفقیت اضافه شد!')
   } catch (err) {
-    console.error(err.response?.data || err);
-    toast.error("خطا در افزودن حساب بانکی");
+    console.error(err.response?.data || err)
+    toast.error('خطا در افزودن حساب بانکی')
   }
-};
+}
 
 const handleDeleteBank = async (index) => {
-  await store.deleteBankAccount(index);
-};
+  await store.deleteBankAccount(index)
+}
 </script>
 
 <style scoped>
