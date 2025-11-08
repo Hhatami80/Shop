@@ -83,6 +83,8 @@ export const useUserStore = defineStore("user", {
           birthdate,
           image: data.image || null,
           previewImage: null,
+          first_name: data.first_name || "",
+          last_name: data.last_name || "",
         };
       } catch (error) {
         console.error("Fetch profile error:", error);
