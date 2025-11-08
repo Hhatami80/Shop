@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'admin_panel',
     'article_module',
     'user_panel_module',
+    'payments',
     # INSTALLED PACKAGES
     'rest_framework',
     'corsheaders',

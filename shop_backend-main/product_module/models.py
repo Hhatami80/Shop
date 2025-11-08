@@ -117,7 +117,7 @@ class Order(models.Model):
         choices=[('pending', 'Pending'), ('paid', 'Paid'), ('completed', 'Completed'), ('canceled', 'Canceled')],
         default='pending'
     )
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_price = models.DecimalField(max_digits=20, decimal_places=0,default=0)
 
     def calculate_total(self):
         total = sum(item.quantity * item.price for item in self.items.all())
@@ -292,7 +292,7 @@ class Wallet(models.Model):
         return f"{self.user} - {self.balance} تومان"
 
 
-class Transaction(models.Model):
+class WalletTransaction(models.Model):
     TYPE_CHOICES = [
         ("credit", "واریز"),
         ("debit", "برداشت"),

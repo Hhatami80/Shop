@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.parsers import MultiPartParser, FormParser
 
 from .models import Product, ProductCategory, Brand, ProductProperty, ProductComment, ProductGallery, ProductTag, Cart, \
-    CartItem, ProductRating, OrderItem, Order, CategoryBanner, Wallet, Transaction, Payment
+    CartItem, ProductRating, OrderItem, Order, CategoryBanner, Wallet, WalletTransaction, Payment
 from mixins.dedup_image_serializer import DedupImageMixin
 from django.utils import timezone
 import json
@@ -306,7 +306,7 @@ class TransactionSerializer(serializers.ModelSerializer):
     date = serializers.SerializerMethodField()
 
     class Meta:
-        model = Transaction
+        model = WalletTransaction
         fields = ['id', 'type', 'method', 'amount', 'description', 'date']
 
     def get_date(self, obj):
