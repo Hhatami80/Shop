@@ -238,6 +238,10 @@ class SingleCategoryView(APIView):
 def checkout(request: Request):
     user: User = request.user
     payment_method = request.data.get("payment_method")
+    if payment_method == "wallet":
+        payment_method = Payment.PaymentMethod.Wallet
+    elif payment_method == "cod":
+        payment_method = Payment.PaymentMethod.COD
     cart = Cart.objects.get(user=user)
     total_cart_value = 0
     for item in cart.items.all():
@@ -249,25 +253,34 @@ def checkout(request: Request):
     try:
         order = create_order(user)
         order_serializer = OrderSerializer(order)
-        user.wallet.balance -= total_cart_value
-        order.status = "paid"
-        order.save()
-        user.wallet.save()
-        Payment.objects.create(
-            payment_method=Payment.PaymentMethod.Wallet,
-            gateway=None,
+        if payment_method == Payment.PaymentMethod.Wallet:
+            user.wallet.balance -= total_cart_value
+            order.status = "paid"
+            order.save()
+            user.wallet.save()
+        elif payment_method == Payment.PaymentMethod.COD:
+            order.status = "pending"
+            order.save()
+        payment = Payment.objects.create(
+            payment_method=payment_method,
+            gateway='',
             order_id=order.id,
             is_successful=True,
-            authority=None,
+            authority='',
         )
-        Transaction.objects.create(
+        payment.save()
+        transaction = Transaction.objects.create(
+            user=request.user,
+            amount=total_cart_value,
+            gateway='',
             status=Transaction.Status.SUCCESS,
             type=Transaction.Type.Order,
             description="پرداخت سفارش از کیف پول"
         )
+        transaction.save()
         return Response({'data': order_serializer.data}, status.HTTP_200_OK)
     except Exception as err:
-        return Response({"error": err}, status.HTTP_403_FORBIDDEN)
+        return Response(err, status.HTTP_403_FORBIDDEN)
 
 
 class PaymentRequestView(APIView):

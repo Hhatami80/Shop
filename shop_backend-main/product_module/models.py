@@ -276,10 +276,11 @@ class Payment(models.Model):
     class PaymentMethod(models.TextChoices):
         Wallet = "کیف پول", "Wallet"
         PaymentGateway =  "درگاه پرداخت", "PaymentGateway"
+        COD = "پرداخت در محل", "COD"
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment')
     authority = models.CharField(max_length=64, blank=True, null=True)
     ref_id = models.CharField(max_length=64, blank=True, null=True)
-    gateway = models.CharField(max_length=20, default='zarinpal')
+    gateway = models.CharField(max_length=20, default='zarinpal', null=True, blank=True)
     is_successful = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     payment_method = models.CharField(choices=PaymentMethod.choices, max_length=20, default=PaymentMethod.Wallet)
