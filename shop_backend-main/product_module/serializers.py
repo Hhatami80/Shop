@@ -252,6 +252,7 @@ class PaymentSerializer(serializers.ModelSerializer):
             'id',
             'gateway',
             'is_successful',
+            'payment_method',
             'authority',
             'ref_id',
             'created_at'

@@ -273,12 +273,16 @@ class CategoryBanner(models.Model):
 
 # models.py
 class Payment(models.Model):
+    class PaymentMethod(models.TextChoices):
+        Wallet = "کیف پول", "Wallet"
+        PaymentGateway =  "درگاه پرداخت", "PaymentGateway"
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment')
     authority = models.CharField(max_length=64, blank=True, null=True)
     ref_id = models.CharField(max_length=64, blank=True, null=True)
     gateway = models.CharField(max_length=20, default='zarinpal')
     is_successful = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    payment_method = models.CharField(choices=PaymentMethod.choices, max_length=20, default=PaymentMethod.Wallet)
 
     def __str__(self):
         return f"Payment for Order #{self.order.id}"

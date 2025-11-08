@@ -253,6 +253,18 @@ def checkout(request: Request):
         order.status = "paid"
         order.save()
         user.wallet.save()
+        Payment.objects.create(
+            payment_method=Payment.PaymentMethod.Wallet,
+            gateway=None,
+            order_id=order.id,
+            is_successful=True,
+            authority=None,
+        )
+        Transaction.objects.create(
+            status=Transaction.Status.SUCCESS,
+            type=Transaction.Type.Order,
+            description="پرداخت سفارش از کیف پول"
+        )
         return Response({'data': order_serializer.data}, status.HTTP_200_OK)
     except Exception as err:
         return Response({"error": err}, status.HTTP_403_FORBIDDEN)
@@ -269,7 +281,8 @@ class PaymentRequestView(APIView):
         except ValueError as e:
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        payment = Payment.objects.create(order=order, gateway='zarinpal')
+        payment = Payment.objects.create(order=order, gateway='zarinpal',
+                                         payment_method=Payment.PaymentMethod.PaymentGateway)
 
         data = {
             "merchant_id": settings.ZARINPAL_MERCHANT_ID,
