@@ -117,7 +117,7 @@ class Order(models.Model):
         choices=[('pending', 'Pending'), ('paid', 'Paid'), ('completed', 'Completed'), ('canceled', 'Canceled')],
         default='pending'
     )
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_price = models.DecimalField(max_digits=20, decimal_places=0,default=0)
 
     def calculate_total(self):
         total = sum(item.quantity * item.price for item in self.items.all())
@@ -273,12 +273,16 @@ class CategoryBanner(models.Model):
 
 # models.py
 class Payment(models.Model):
+    class PaymentMethod(models.TextChoices):
+        Wallet = "کیف پول", "Wallet"
+        PaymentGateway =  "درگاه پرداخت", "PaymentGateway"
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment')
     authority = models.CharField(max_length=64, blank=True, null=True)
     ref_id = models.CharField(max_length=64, blank=True, null=True)
     gateway = models.CharField(max_length=20, default='zarinpal')
     is_successful = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    payment_method = models.CharField(choices=PaymentMethod.choices, max_length=20, default=PaymentMethod.Wallet)
 
     def __str__(self):
         return f"Payment for Order #{self.order.id}"
@@ -292,7 +296,7 @@ class Wallet(models.Model):
         return f"{self.user} - {self.balance} تومان"
 
 
-class Transaction(models.Model):
+class WalletTransaction(models.Model):
     TYPE_CHOICES = [
         ("credit", "واریز"),
         ("debit", "برداشت"),

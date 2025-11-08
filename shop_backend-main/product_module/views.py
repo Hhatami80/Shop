@@ -8,8 +8,9 @@ from rest_framework import status
 from rest_framework.views import APIView
 
 from account_module.models import User
+from payments.models import Transaction
 from .models import Product, ProductGallery, ProductComment, Cart, CartItem, ProductRating, OrderItem, Order, \
-    CategoryBanner, ProductCategory, Payment, Wallet, Transaction, WalletPayment
+    CategoryBanner, ProductCategory, Payment, Wallet, WalletTransaction, WalletPayment
 from .serializers import ProductSerializer, ProductGallerySerializer, ProductCommentSerializer, \
     ProductDescriptionSerializer, ProductPropertySerializer, CartItemSerializer, CartSerializer, \
     ProductRatingSerializer, OrderSerializer, CategoryBannerSerializer, CategorySerializer, WalletSerializer, \
@@ -252,6 +253,18 @@ def checkout(request: Request):
         order.status = "paid"
         order.save()
         user.wallet.save()
+        Payment.objects.create(
+            payment_method=Payment.PaymentMethod.Wallet,
+            gateway=None,
+            order_id=order.id,
+            is_successful=True,
+            authority=None,
+        )
+        Transaction.objects.create(
+            status=Transaction.Status.SUCCESS,
+            type=Transaction.Type.Order,
+            description="پرداخت سفارش از کیف پول"
+        )
         return Response({'data': order_serializer.data}, status.HTTP_200_OK)
     except Exception as err:
         return Response({"error": err}, status.HTTP_403_FORBIDDEN)
@@ -268,7 +281,8 @@ class PaymentRequestView(APIView):
         except ValueError as e:
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        payment = Payment.objects.create(order=order, gateway='zarinpal')
+        payment = Payment.objects.create(order=order, gateway='zarinpal',
+                                         payment_method=Payment.PaymentMethod.PaymentGateway)
 
         data = {
             "merchant_id": settings.ZARINPAL_MERCHANT_ID,
@@ -330,6 +344,16 @@ class PaymentVerifyView(APIView):
             order.status = 'paid'
             order.save()
 
+            Transaction.objects.create(
+                user=request.user,
+                status=Transaction.Status.SUCCESS,
+                type=Transaction.Type.Order,
+                description="پرداخت مستقیم سفارش",
+                reference_id=payment.ref_id,
+                gateway="زرین پال",
+                amount=order.total_price
+            )
+
             return Response({
                 "success": True,
                 "detail": "Payment successful",
@@ -372,7 +396,7 @@ class WalletDepositView(APIView):
         with transaction.atomic():
             wallet.balance += float(amount)
             wallet.save()
-            Transaction.objects.create(
+            WalletTransaction.objects.create(
                 wallet=wallet,
                 type="credit",
                 method=method,
@@ -400,7 +424,7 @@ class WalletWithdrawView(APIView):
         with transaction.atomic():
             wallet.balance -= float(amount)
             wallet.save()
-            Transaction.objects.create(
+            WalletTransaction.objects.create(
                 wallet=wallet,
                 type="debit",
                 method=method,
@@ -481,6 +505,8 @@ class WalletPaymentVerifyView(APIView):
             return Response({"detail": "Invalid payment"}, status=status.HTTP_404_NOT_FOUND)
 
         if zarinpal_status != 'OK':
+            if payment:
+                payment.is_successful = False
             return Response({"detail": "Payment canceled by user"}, status=status.HTTP_400_BAD_REQUEST)
 
         data = {
@@ -501,12 +527,21 @@ class WalletPaymentVerifyView(APIView):
 
             wallet.balance += payment.amount
             wallet.save()
-            Transaction.objects.create(
+            WalletTransaction.objects.create(
                 wallet=wallet,
                 type="credit",
                 method="card",
                 amount=payment.amount,
                 description=f"شارژ موفق کیف پول (رسید {payment.ref_id})"
+            )
+            Transaction.objects.create(
+                user=request.user,
+                amount=payment.amount,
+                gateway='زرین پال',
+                description="شارژ کیف پول",
+                status=Transaction.Status.SUCCESS,
+                type=Transaction.Type.WalletCharge,
+                reference_id=payment.ref_id,
             )
 
             # Redirect to frontend success page

@@ -28,5 +28,6 @@ urlpatterns = [
     path('api/', include('user_panel_module.urls')),
     path('api/', include('article_module.urls')),
     path('api/', include('site_module.urls')),
+    path('api/', include('payments.urls')),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
