@@ -361,7 +361,6 @@ const activeImage = ref(null)
 
 const currentPage = ref(1)
 const pageSize = 5
-
 const paginatedProducts = computed(() => {
   const start = (currentPage.value - 1) * pageSize
   return adminStore.products.slice(start, start + pageSize)
@@ -481,6 +480,7 @@ async function submitForm() {
       toast.success('محصول با موفقیت ویرایش شد.')
     } else {
       const newProduct = await productStore.addProduct(payload)
+      await adminStore.getAllProducts();
       const category = categoryStore.allCategories.find((c) => c.id === form.category_id) || null
       productStore.products.unshift({
         ...newProduct,

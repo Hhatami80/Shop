@@ -1,5 +1,6 @@
 import { adminService } from '@/services/adminService'
 import { defineStore } from 'pinia'
+import { productService } from '@/services/ProductService'
 
 export const useAdminStore = defineStore('admin', {
   state: () => ({
@@ -37,22 +38,9 @@ export const useAdminStore = defineStore('admin', {
       try {
         const payload = { is_active: newStatus }
         const res = await productService.update(productId, payload)
+        this.getAllProducts()  
+        toast.success(`محصول ${newStatus ? 'فعال' : 'غیرفعال'} شد.`) 
 
-        const updatedProduct = res?.data?.products?.[0]
-
-        const index = this.products.findIndex((p) => p.id === productId)
-        if (index !== -1) {
-          if (updatedProduct) {
-            this.products[index] = {
-              ...this.products[index],
-              ...updatedProduct,
-            }
-          } else {
-            this.products[index].is_active = !!newStatus
-          }
-        }
-
-        toast.success(`محصول ${newStatus ? 'فعال' : 'غیرفعال'} شد.`)
       } catch (error) {
         console.error('خطا در تغییر وضعیت محصول:', error)
         this.error = 'خطا در تغییر وضعیت محصول'

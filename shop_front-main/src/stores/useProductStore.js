@@ -210,10 +210,10 @@ export const useProductStore = defineStore('product', {
       this.loading = true
       this.error = null
       try {
-        const response = await productService.create(newProduct)
-        const p = response.data
-        this.getAllProducts()
+        await productService.create(newProduct)
+        await this.getAllProducts();
       } catch (error) {
+        console.log(error)
         this.error = 'خطا در افزودن محصول'
         throw error
       } finally {
