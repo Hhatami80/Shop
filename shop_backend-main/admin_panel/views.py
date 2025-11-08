@@ -32,7 +32,7 @@ class AdminProductsView(APIView):
     permission_classes = [IsAuthenticated, IsAdmin]
     
     def get(self, request: Request):
-        products = Product.objects.prefetch_related('properties', 'images').all()
+        products = Product.objects.prefetch_related('properties', 'images').all().order_by('-created_date')
         serializer = ProductSerializer(products, many=True, context={'request': request})
         return Response({
             'products': serializer.data
