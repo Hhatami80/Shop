@@ -72,7 +72,7 @@ const onFileChange = async (event, index) => {
   try {
     await footerStore.uploadBadgeFile(file, index)
   } catch {
-    toast.error('خطا در آپلود تصویر')
+    
   }
 }
 

@@ -18,12 +18,7 @@ const isProductRoute = computed(() => route.path.startsWith('/product'))
 
 </script>
 <style>
-/* @font-face {
-  font-family: 'Yekan';
-  src: url('@/assets/fonts/Yekan.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-} */
+
 
 html,
 body {

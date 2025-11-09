@@ -12,12 +12,12 @@
 
     <div class="content">
       <div class="product-gallery">
-        <!-- تصویر اصلی محصول -->
+        
         <div class="main-image">
           <img :src="product.image" :alt="product.title" />
         </div>
 
-        <!-- گالری تصاویر محصول -->
+        
         <div class="gallery-images" v-if="product.images?.length">
           <img v-for="(img, i) in product.images" :key="i" :src="img.image" :alt="product.title" />
         </div>
@@ -373,6 +373,10 @@ watch(
 .buy-section {
   margin-top: 25px;
   text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 12px; 
+  align-items: flex-start;
 }
 
 .add-to-cart.golden-button {
@@ -381,21 +385,28 @@ watch(
   border: none;
   border-radius: 6px;
   padding: 14px;
-  width: 200px;
+  width: 220px;
   cursor: pointer;
   font-size: 16px;
-  margin-left: 10px;
 }
 
 .wishlist.golden-button {
-  background: #f9c710;
+  background: #fff;
   color: #1a1a1a;
-  border: none;
+  border: 1px solid #f9c710;
   border-radius: 6px;
-  padding: 8px 16px;
+  padding: 12px;
+  width: 220px;
   cursor: pointer;
   font-size: 15px;
+  transition: all 0.3s ease;
 }
+
+.wishlist.golden-button:hover {
+  background: #f9c710;
+  color: #000;
+}
+
 
 .product-gallery {
   display: flex;

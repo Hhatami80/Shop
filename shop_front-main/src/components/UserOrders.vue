@@ -167,6 +167,7 @@ const cancelOrder = async (order) => {
   if (!confirm("آیا مطمئن هستید می‌خواهید این سفارش را لغو کنید؟")) return;
 
   await orderStore.cancelUserOrder(order.id);
+  await orderStore.fetchOrders()
 };
 
 // const formatPaymentMethod = (method) =>
@@ -313,7 +314,7 @@ h2 {
   text-align: center;
 }
 .modal-table th {
-  background: #f0f0f0;
+  background-color: #ffd700;
 }
 .empty-items {
   text-align: center;

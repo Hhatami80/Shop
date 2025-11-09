@@ -198,10 +198,10 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap");
+
 
 .addresses-section {
-  font-family: "Vazirmatn", sans-serif;
+  
   display: flex;
   flex-direction: column;
   gap: 25px;

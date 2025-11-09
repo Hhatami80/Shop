@@ -139,7 +139,7 @@ const logout = () => {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap');
+
 
 .admin-container {
   direction: rtl;
