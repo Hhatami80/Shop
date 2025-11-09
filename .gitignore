@@ -4,3 +4,4 @@ node_modules/
 shop_front-main/.env
 __pycache__/
 shop_backend-main/db.sqlite3
+shop_backend-main/*/__pycache__/*.*
