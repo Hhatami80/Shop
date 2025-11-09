@@ -236,7 +236,7 @@ class SingleCategoryView(APIView):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def checkout(request: Request):
-    user: User = request.user
+    user = request.user
     payment_method = request.data.get("payment_method")
     if payment_method == "wallet":
         payment_method = Payment.PaymentMethod.Wallet
@@ -246,7 +246,7 @@ def checkout(request: Request):
     total_cart_value = 0
     for item in cart.items.all():
         total_cart_value += int(item.product.price) * item.quantity
-    if payment_method == "wallet" and user.wallet.balance < total_cart_value:
+    if payment_method == Payment.PaymentMethod.Wallet and user.wallet.balance < total_cart_value:
         return Response({
             "error": "Wallet Balance Low!"
         })
@@ -254,10 +254,13 @@ def checkout(request: Request):
         order = create_order(user)
         order_serializer = OrderSerializer(order)
         if payment_method == Payment.PaymentMethod.Wallet:
-            user.wallet.balance -= total_cart_value
-            order.status = "paid"
-            order.save()
-            user.wallet.save()
+            balance = user.wallet.balance
+            isInteger = (balance - total_cart_value) >= 0
+            if isInteger:
+                user.wallet.balance -= total_cart_value
+                user.wallet.save()
+                order.status = "paid"
+                order.save()
         elif payment_method == Payment.PaymentMethod.COD:
             order.status = "pending"
             order.save()
@@ -275,12 +278,13 @@ def checkout(request: Request):
             gateway='',
             status=Transaction.Status.SUCCESS,
             type=Transaction.Type.Order,
-            description="پرداخت سفارش از کیف پول"
+            description=payment_method
         )
         transaction.save()
         return Response({'data': order_serializer.data}, status.HTTP_200_OK)
     except Exception as err:
-        return Response(err, status.HTTP_403_FORBIDDEN)
+        return Response({"msg": "some error occured",
+                          "error": str(err)}, status.HTTP_403_FORBIDDEN)
 
 
 class PaymentRequestView(APIView):
