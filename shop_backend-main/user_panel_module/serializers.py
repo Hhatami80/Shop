@@ -48,24 +48,28 @@ class BankInfoSerializer(serializers.ModelSerializer):
         model = BankInformation
         fields = '__all__'
 
+import jdatetime
+from rest_framework import serializers
 
-class UpdateProfileSerializer(serializers.ModelSerializer):
-    birthdate = serializers.DateField(required=False, allow_null=True)
-
-    def validate_birthdate(self, value):
-        # If frontend sends a string in Jalali format jYYYY/jMM/jDD
+class JalaliDateField(serializers.DateField):
+    def to_internal_value(self, value):
         if isinstance(value, str) and "/" in value:
             try:
                 jy, jm, jd = map(int, value.split("/"))
-                g_date = jdatetime.date(jy, jm, jd).togregorian()
-                return g_date
-            except Exception as e:
-                raise serializers.ValidationError("Invalid Jalali date format.")
-        return value
+                return jdatetime.date(jy, jm, jd).togregorian()
+            except Exception:
+                raise serializers.ValidationError(
+                    "Invalid Jalali date format. Expected jYYYY/jMM/jDD."
+                )
+        return super().to_internal_value(value)
+
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    birthdate = JalaliDateField(required=False, allow_null=True)
 
     class Meta:
         model = User
-        fields = ['username', 'phone', 'email', 'image', 'birthdate']
+        fields = ['username', 'phone', 'email', 'image', 'birthdate', 'first_name', 'last_name']
 
 # class UpdateProfileImageSerializer(serializers.ModelSerializer):
 #     class Meta:

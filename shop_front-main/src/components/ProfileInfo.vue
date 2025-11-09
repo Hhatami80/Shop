@@ -156,6 +156,7 @@ const onFileChange = (e) => {
 
 const saveProfile = async () => {
   const formData = new FormData();
+  formData.append("username", store.profile.username);
   formData.append("first_name", store.profile.first_name);
   formData.append("last_name", store.profile.last_name);
   formData.append("email", store.profile.email);
