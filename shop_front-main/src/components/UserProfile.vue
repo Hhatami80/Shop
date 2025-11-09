@@ -3,13 +3,13 @@
     <h3>پروفایل کاربری</h3>
 
     <div class="profile-tabs">
-      <button :class="{ active: tab === 'info' }" @click="tab = 'info'">
+      <button :class="{ active: tab === 'info' }" @click="changeTab('info')">
         مشخصات فردی
       </button>
-      <button :class="{ active: tab === 'addresses' }" @click="tab = 'addresses'">
+      <button :class="{ active: tab === 'addresses' }" @click="changeTab('addresses')">
         آدرس‌ها
       </button>
-      <button :class="{ active: tab === 'bank' }" @click="tab = 'bank'">
+      <button :class="{ active: tab === 'bank' }" @click="changeTab('bank')">
         حساب بانکی
       </button>
     </div>
@@ -29,19 +29,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import ProfileInfo from "@/components/ProfileInfo.vue";
-import { useUserStore } from "@/stores/useUserStore";
 import ProfileAddresses from "@/components/ProfileAddresses.vue";
 import BankAccounts from "@/components/BankAccounts.vue";
-import { useRoute } from "vue-router";
-const route = useRoute();
+import { useUserStore } from "@/stores/useUserStore";
 
 const store = useUserStore();
-const tab = ref("info");
-const defaultAvatar = "/logos/default.png";
-const DatePicker = ref(null);
-const datePickerLoaded = ref(false);
+const route = useRoute();
+const router = useRouter();
+
+const tab = ref(route.query.tab || "info");
 
 onMounted(async () => {
   await Promise.all([
@@ -49,33 +48,21 @@ onMounted(async () => {
     store.fetchAddresses(),
     store.fetchBankAccounts(),
   ]);
-  if (route.query.tab === "bank") {
-    tab.value = "bank";
-  }
-  const module = await import("vue3-persian-datetime-picker");
-  DatePicker.value = module.default;
-  datePickerLoaded.value = true;
+
+  if (route.query.tab) tab.value = route.query.tab;
 });
 
-const onFileChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    store.updateProfileImage(file);
+watch(
+  () => route.query.tab,
+  (newTab) => {
+    if (newTab) tab.value = newTab;
   }
-};
-
-const saveProfile = async () => {
-  const formData = new FormData();
-  formData.append("username", store.profile.username);
-  formData.append("email", store.profile.email);
-  formData.append("phone", store.profile.phone);
-  formData.append("birthdate", store.profile.birthdate);
-  if (store.profile.image instanceof File) formData.append("image", store.profile.image);
-
-  await store.updateProfile(formData);
+);
+const changeTab = (newTab) => {
+  tab.value = newTab;
+  router.replace({ query: { ...route.query, tab: newTab } });
 };
 </script>
-
 <style scoped>
 .profile-card {
   background: linear-gradient(180deg, #ffffff 0%, #fdfaf3 100%);

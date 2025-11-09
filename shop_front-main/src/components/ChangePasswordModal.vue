@@ -72,7 +72,7 @@ const submit = async () => {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  font-family: 'Yekan', sans-serif;
+  
 }
 
 .close-icon {
@@ -148,7 +148,7 @@ const submit = async () => {
 }
 
 .modal-box input {
-  font-family: 'Yekan';
+  
   width: 90%;
   padding: 12px 16px;
   font-size: 14px;

@@ -124,7 +124,7 @@ async function handleSubmit() {
   border-radius: 12px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   direction: rtl;
-  font-family: 'Vazirmatn', 'Yekan', sans-serif;
+  
 }
 
 h2 {

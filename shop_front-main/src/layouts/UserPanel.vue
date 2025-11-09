@@ -120,7 +120,7 @@ const logout = () => {
 
 <style scoped>
 .admin-panel {
-  font-family: "Yekan";
+  
   display: flex;
   min-height: 100vh;
   direction: rtl;
@@ -128,7 +128,7 @@ const logout = () => {
 }
 
 .sidebar {
-  font-family: "Yekan";
+  
   width: 220px;
   background: #111;
   color: white;

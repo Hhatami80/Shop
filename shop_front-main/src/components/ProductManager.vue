@@ -560,7 +560,7 @@ onMounted(() => {
 .product-container {
   padding: 30px;
   direction: rtl;
-  font-family: 'Yekan', sans-serif;
+  ;
   background-color: #f9f9f9;
 }
 

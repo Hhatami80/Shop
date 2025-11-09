@@ -114,7 +114,7 @@ function removeItem(id) {
   grid-template-columns: 2.5fr 1fr;
   gap: 30px;
   direction: rtl;
-  font-family: "Yekan", sans-serif;
+  
   max-width: 1200px;
   margin: 40px auto;
   padding: 20px;

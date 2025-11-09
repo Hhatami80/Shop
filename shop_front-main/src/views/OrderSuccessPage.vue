@@ -59,7 +59,7 @@ const goToHome = () => router.push("/");
   justify-content: center;
   align-items: center;
   height: 80vh;
-  font-family: "Yekan", sans-serif;
+  
   background: #f9f9f9;
 }
 

@@ -25,7 +25,7 @@ function submitSearch() {
 <style scoped>
 .search-box {
   direction: rtl;
-  font-family: 'Yekan';
+  
   display: flex;
   align-items: center;
   background: white;
@@ -43,7 +43,7 @@ function submitSearch() {
 }
 .search-box input {
   flex: 1;
-  font-family: 'Yekan';
+  
   padding: 10px 16px;
   border: none;
   outline: none;

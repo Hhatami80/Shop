@@ -18,16 +18,15 @@ const isProductRoute = computed(() => route.path.startsWith('/product'))
 
 </script>
 <style>
-@font-face {
+/* @font-face {
   font-family: 'Yekan';
   src: url('@/assets/fonts/Yekan.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
-}
+} */
 
 html,
 body {
-  font-family: 'Yekan', Tahoma, sans-serif;
   margin: 0;
   padding: 0;
   width: 100%;
@@ -42,7 +41,6 @@ body {
 .my-swal-popup {
   border-radius: 20px !important;
   padding: 35px 40px !important;
-  font-family: 'Yekan', sans-serif;
   background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
   box-shadow: 0 15px 40px rgba(50, 130, 184, 0.3);
   color: #1a1a1a;

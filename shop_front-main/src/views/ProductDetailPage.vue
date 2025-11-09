@@ -12,12 +12,15 @@
 
     <div class="content">
       <div class="product-gallery">
-        <img
-          v-for="(img, i) in product.images"
-          :key="i"
-          :src="img"
-          :alt="product.title"
-        />
+        <!-- تصویر اصلی محصول -->
+        <div class="main-image">
+          <img :src="product.image" :alt="product.title" />
+        </div>
+
+        <!-- گالری تصاویر محصول -->
+        <div class="gallery-images" v-if="product.images?.length">
+          <img v-for="(img, i) in product.images" :key="i" :src="img.image" :alt="product.title" />
+        </div>
       </div>
 
       <div class="product-info">
@@ -42,7 +45,7 @@
               {{ size }}
             </button>
           </div>
-          <button class="size-guide">راهنمای سایز</button>
+          <button class="size-guide golden-button">راهنمای سایز</button>
         </div>
 
         <div class="price">{{ toPersianNumber(product.price) }} ریال</div>
@@ -57,30 +60,33 @@
         </div>
 
         <div class="buy-section">
-          <button class="add-to-cart" @click="addToCart(product.id)">
+          <button class="add-to-cart golden-button" @click="addToCart(product.id)">
             افزودن به سبد خرید
           </button>
           <p class="stock" v-if="product.stock <= 2">
             تنها {{ toPersianNumber(product.stock) }} عدد در انبار موجود است
           </p>
-          <button class="wishlist">
+          <button class="wishlist golden-button">
             <i class="far fa-heart"></i> افزودن به علاقه‌مندی‌ها
           </button>
         </div>
 
         <div class="tabs">
-          <button
-            :class="{ active: activeTab === 'details' }"
-            @click="activeTab = 'details'"
-          >
+          <button :class="{ active: activeTab === 'details' }" @click="activeTab = 'details'">
             جزئیات
           </button>
-          <button
-            :class="{ active: activeTab === 'comments' }"
-            @click="activeTab = 'comments'"
-          >
+          <button :class="{ active: activeTab === 'comments' }" @click="activeTab = 'comments'">
             نظرات
           </button>
+        </div>
+        <div v-if="product.properties?.length" class="product-properties-list">
+          <h4>ویژگی‌های محصول</h4>
+          <ul>
+            <li v-for="(prop, index) in product.properties" :key="index">
+              <span class="prop-key">{{ prop.key }}:</span>
+              <span class="prop-value">{{ prop.value }}</span>
+            </li>
+          </ul>
         </div>
 
         <div v-if="activeTab === 'details'" class="details">
@@ -90,7 +96,7 @@
 
         <div v-else class="comments">
           <p>هنوز نظری برای این محصول ثبت نشده است.</p>
-          <button class="submit-comment" @click="openCommentModal">ثبت نظر</button>
+          <button class="submit-comment golden-button" @click="openCommentModal">ثبت نظر</button>
         </div>
       </div>
     </div>
@@ -112,11 +118,7 @@
         <div class="modal-form">
           <div class="row">
             <input v-model="commentForm.firstName" type="text" placeholder="نام" />
-            <input
-              v-model="commentForm.lastName"
-              type="text"
-              placeholder="نام خانوادگی"
-            />
+            <input v-model="commentForm.lastName" type="text" placeholder="نام خانوادگی" />
           </div>
 
           <div class="row">
@@ -124,20 +126,11 @@
             <input v-model="commentForm.phone" type="text" placeholder="تلفن همراه" />
           </div>
 
-          <input
-            class="title1"
-            v-model="commentForm.title"
-            type="text"
-            placeholder="عنوان"
-          />
-
-          <textarea
-            v-model="commentForm.comment"
-            placeholder="نظر خود را وارد کنید..."
-          ></textarea>
+          <input class="title1" v-model="commentForm.title" type="text" placeholder="عنوان" />
+          <textarea v-model="commentForm.comment" placeholder="نظر خود را وارد کنید..."></textarea>
         </div>
         <div class="modal-actions">
-          <button @click="submitComment">ثبت</button>
+          <button class="golden-button" @click="submitComment">ثبت</button>
           <button @click="closeCommentModal">انصراف</button>
         </div>
       </div>
@@ -148,72 +141,69 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
-import { useRoute } from "vue-router";
-import { useProductStore } from "@/stores/useProductStore";
-import { useCategoryStore } from "@/stores/useCategoryStore";
-import { useCartStore } from "@/stores/useCartStore";
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { useProductStore } from '@/stores/useProductStore'
+import { useCategoryStore } from '@/stores/useCategoryStore'
+import { useCartStore } from '@/stores/useCartStore'
 
-const route = useRoute();
-const productStore = useProductStore();
-const categoryStore = useCategoryStore();
-const cartStore = useCartStore();
+const route = useRoute()
+const productStore = useProductStore()
+const categoryStore = useCategoryStore()
+const cartStore = useCartStore()
 
-const selectedSize = ref(null);
-const quantity = ref(1);
-const activeTab = ref("details");
+const selectedSize = ref(null)
+const quantity = ref(1)
+const activeTab = ref('details')
 
-const productId = computed(() => Number(route.params.id));
-const product = computed(() => productStore.selectedProduct);
+const productId = computed(() => Number(route.params.id))
+const product = computed(() => productStore.selectedProduct)
 
 const categoryTitle = computed(() => {
-  const category = categoryStore.allCategories.find(
-    (c) => c.id === product.value?.category?.id
-  );
-  return category ? category.title : "";
-});
+  const category = categoryStore.allCategories.find((c) => c.id === product.value?.category?.id)
+  return category ? category.title : ''
+})
 
 const relatedProducts = computed(() => {
-  if (!product.value?.category?.id) return [];
+  if (!product.value?.category?.id) return []
   return productStore.products
-    .filter(
-      (p) => p.category?.id === product.value.category.id && p.id !== product.value.id
-    )
-    .slice(0, 4);
-});
+    .filter((p) => p.category?.id === product.value.category.id && p.id !== product.value.id)
+    .slice(0, 4)
+})
 
 function increase() {
-  quantity.value++;
+  quantity.value++
 }
 function decrease() {
-  if (quantity.value > 1) quantity.value--;
+  if (quantity.value > 1) quantity.value--
 }
 function toPersianNumber(number) {
-  return number?.toLocaleString("fa-IR");
+  return number?.toLocaleString('fa-IR')
 }
 
 async function loadProduct() {
-  await productStore.getProductById(productId.value);
+  await productStore.getProductById(productId.value)
 }
 
 async function addToCart(productId) {
-  await cartStore.addItem(productId, quantity.value);
+  await cartStore.addItem(productId, quantity.value)
 }
-const isCommentModalOpen = ref(false);
+
+const isCommentModalOpen = ref(false)
 const commentForm = ref({
-  firstName: "",
-  lastName: "",
-  email: "",
-  phone: "",
-  title: "",
-  comment: "",
-});
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  title: '',
+  comment: '',
+})
 
 function openCommentModal() {
-  isCommentModalOpen.value = true;
+  isCommentModalOpen.value = true
 }
 function closeCommentModal() {
-  isCommentModalOpen.value = false;
+  isCommentModalOpen.value = false
 }
 
 function submitComment() {
@@ -223,38 +213,38 @@ function submitComment() {
     !commentForm.value.email.trim() ||
     !commentForm.value.comment.trim()
   ) {
-    alert("لطفاً فیلدهای ضروری را پر کنید.");
-    return;
+    alert('لطفاً فیلدهای ضروری را پر کنید.')
+    return
   }
 
-  console.log("نظر ثبت شد:", commentForm.value);
-  alert("نظر شما با موفقیت ثبت شد!");
+  console.log('نظر ثبت شد:', commentForm.value)
+  alert('نظر شما با موفقیت ثبت شد!')
 
   commentForm.value = {
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    title: "",
-    comment: "",
-  };
-  closeCommentModal();
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    title: '',
+    comment: '',
+  }
+  closeCommentModal()
 }
 
 onMounted(async () => {
-  await categoryStore.getAllCategories();
-  await productStore.getAllProducts();
-  await loadProduct();
-});
+  await categoryStore.getAllCategories()
+  await productStore.getAllProducts()
+  await loadProduct()
+})
 
 watch(
   () => route.params.id,
   async () => {
-    quantity.value = 1;
-    selectedSize.value = null;
-    await loadProduct();
-  }
-);
+    quantity.value = 1
+    selectedSize.value = null
+    await loadProduct()
+  },
+)
 </script>
 
 <style scoped>
@@ -262,19 +252,22 @@ watch(
   background-color: white;
   padding: 30px 60px;
   direction: rtl;
-  font-family: "Yekan", sans-serif;
+  
   color: #2f3e34;
 }
+
 .breadcrumb {
   font-size: 14px;
   margin-bottom: 20px;
   color: #666;
   text-align: right;
 }
+
 .breadcrumb a {
   text-decoration: none;
   color: #666;
 }
+
 .breadcrumb span {
   margin: 0 6px;
 }
@@ -285,38 +278,46 @@ watch(
   gap: 40px;
   align-items: flex-start;
 }
+
 .product-info {
   flex: 1;
   text-align: right;
 }
+
 .title {
   font-size: 22px;
   font-weight: bold;
   margin-bottom: 8px;
 }
+
 .code {
   color: #777;
   margin-bottom: 16px;
 }
+
 .color-section {
   display: flex;
   align-items: center;
   gap: 6px;
   margin-bottom: 15px;
 }
+
 .color-box {
   width: 25px;
   height: 25px;
   border: 1px solid #ccc;
 }
+
 .size-section {
   margin-bottom: 20px;
 }
+
 .sizes {
   display: flex;
   gap: 10px;
   margin-top: 10px;
 }
+
 .sizes button {
   padding: 6px 12px;
   border: 1px solid #999;
@@ -325,36 +326,41 @@ watch(
   cursor: pointer;
   font-size: 14px;
 }
+
 .sizes button.active {
-  background: #a7b5ac;
-  color: white;
-  border-color: #a7b5ac;
+  background: #f9c710;
+  color: #1a1a1a;
+  border-color: #f9c710;
 }
-.size-guide {
-  display: block;
-  margin: 15px 0 0 0;
-  border: 1px solid #999;
-  padding: 10px 30px;
-  background: #fff;
+
+.size-guide.golden-button {
+  background: #f9c710;
+  color: #1a1a1a;
+  border: none;
   border-radius: 6px;
+  padding: 8px 20px;
   cursor: pointer;
 }
+
 .price {
   font-size: 20px;
   color: #333;
   font-weight: bold;
   margin: 20px 0;
 }
+
 .quantity {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
+
 .controls {
   display: flex;
   align-items: center;
   gap: 10px;
 }
+
 .controls button {
   width: 28px;
   height: 28px;
@@ -363,99 +369,74 @@ watch(
   background: #fff;
   cursor: pointer;
 }
+
 .buy-section {
   margin-top: 25px;
   text-align: right;
 }
-.add-to-cart {
-  width: 60%;
-  padding: 10px;
-  background: white;
-  border: 1px solid #444;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-}
-.add-to-cart:hover {
-  background: #f9f9f9;
-}
-.wishlist {
-  background: none;
+
+.add-to-cart.golden-button {
+  background: #f9c710;
+  color: #1a1a1a;
   border: none;
-  color: #2f3e34;
+  border-radius: 6px;
+  padding: 14px;
+  width: 200px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 10px;
+}
+
+.wishlist.golden-button {
+  background: #f9c710;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
   font-size: 15px;
-  cursor: pointer;
-  margin-top: 10px;
 }
-.tabs {
-  display: flex;
-  gap: 10px;
-  margin-top: 25px;
-}
-.title1 {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-sizing: border-box;
-  outline: none;
-  font-size: 12px;
-  width: 500px;
-  margin-bottom: 10px;
-}
-.tabs button {
-  border: 1px solid #777;
-  background: white;
-  padding: 8px 30px;
-  cursor: pointer;
-  border-radius: 4px;
-}
-.tabs button.active {
-  background: #333;
-  color: white;
-  border-color: #333;
-}
-.details,
-.comments {
-  margin-top: 20px;
-  line-height: 1.9;
-  text-align: right;
-}
-.submit-comment {
-  display: block;
-  margin: 25px 0 0 0;
-  padding: 10px 40px;
-  border: 1px solid #444;
-  background: white;
-  cursor: pointer;
-  border-radius: 4px;
-}
+
 .product-gallery {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  width: 500px;
+  flex-direction: column;
   gap: 12px;
 }
-.product-gallery img {
+
+.product-gallery .main-image img {
   width: 100%;
-  height: 100%;
+  height: 400px;
   object-fit: cover;
   border-radius: 6px;
   border: 1px solid #eee;
 }
+
+.product-gallery .gallery-images {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.product-gallery .gallery-images img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
 .related-products {
   margin-top: 60px;
   text-align: right;
 }
-.related-products h3 {
-  font-size: 20px;
-  margin-bottom: 25px;
-  color: #333;
-}
+
 .related-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 25px;
 }
+
 .product-card {
   border: 1px solid #ddd;
   height: 500px;
@@ -464,21 +445,25 @@ watch(
   transition: all 0.3s ease;
   background: #fff;
 }
+
 .product-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
+
 .product-card img {
   width: 100%;
   border-radius: 8px;
   height: 60%;
   object-fit: fill;
 }
+
 .product-card .name {
   font-size: 18px;
   margin-top: 10px;
   color: #333;
 }
+
 .product-card .price {
   color: #333;
   font-weight: bold;
@@ -497,6 +482,7 @@ watch(
   align-items: center;
   z-index: 999;
 }
+
 .modal {
   background: #fff;
   padding: 20px;
@@ -504,15 +490,18 @@ watch(
   width: 500px;
   max-width: 90%;
 }
+
 .modal h3 {
   margin-bottom: 15px;
   text-align: center;
 }
+
 .modal-form .row {
   display: flex;
   gap: 10px;
   margin-bottom: 12px;
 }
+
 .modal-form input,
 .modal-form textarea {
   flex: 1;
@@ -522,25 +511,30 @@ watch(
   box-sizing: border-box;
   outline: none;
 }
+
 .modal-form textarea {
   width: 100%;
   height: 100px;
   resize: none;
 }
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 10px;
 }
-.modal-actions button:first-child {
-  background: #333;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 5px;
-  cursor: pointer;
+
+.modal-actions .golden-button {
+  background: #f9c710;
+  color: #1a1a1a;
   border: none;
+  border-radius: 6px;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-weight: 600;
 }
+
 .modal-actions button:last-child {
   background: #ccc;
   padding: 8px 16px;
@@ -549,11 +543,85 @@ watch(
   border: none;
 }
 
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.tabs button {
+  background: #f9c710;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tabs button.active {
+  background: #e6b800;
+}
+
+.details,
+.comments {
+  margin-top: 20px;
+  line-height: 1.9;
+  text-align: right;
+}
+
+.submit-comment.golden-button {
+  background: #f9c710;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.title1 {
+  margin-bottom: 10px;
+  width: 246px;
+}
+.product-properties-list {
+  margin-top: 20px;
+}
+
+.product-properties-list h4 {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.product-properties-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.product-properties-list li {
+  padding: 6px 0;
+  font-size: 15px;
+  display: flex;
+  gap: 6px;
+}
+
+.product-properties-list .prop-key {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.product-properties-list .prop-value {
+  color: #555;
+}
+
 @media (max-width: 900px) {
   .content {
     flex-direction: column-reverse;
   }
-  .product-gallery {
+  .product-gallery .gallery-images {
     grid-template-columns: 1fr;
   }
   .sizes,

@@ -161,7 +161,7 @@ const deleteOrder = async (orderId) => {
 .admin-orders-page {
   max-width: 1200px;
   margin: 40px auto;
-  font-family: "Yekan", sans-serif;
+  
   background: #fff;
   padding: 25px;
   border-radius: 16px;

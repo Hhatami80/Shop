@@ -48,7 +48,7 @@ const showOriginalPrice = computed(
 
 <style scoped>
 * {
-  font-family: 'Yekan';
+  font-family: 'IRANSansX';
 }
 
 .product-card {

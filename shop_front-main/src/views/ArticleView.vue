@@ -38,7 +38,7 @@ onMounted(() => {
   background: #ffffff;
   max-width: 900px;
   margin: 2rem auto;
-  font-family: 'Yekan', sans-serif;
+  
   line-height: 1.9;
   padding: 2.5rem;
   border-radius: 20px;

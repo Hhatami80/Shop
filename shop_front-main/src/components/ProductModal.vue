@@ -183,7 +183,7 @@ async function submitComment() {
 
 <style scoped>
 .modal-overlay {
-  font-family: "Yekan";
+  
   position: fixed;
   top: 0;
   left: 0;
@@ -196,7 +196,7 @@ async function submitComment() {
   z-index: 2000;
 }
 .modal-content {
-  font-family: "Yekan";
+  
   background: white;
   border-radius: 16px;
   max-width: 900px;
@@ -272,7 +272,7 @@ async function submitComment() {
 }
 .tab-content {
   display: flex;
-  font-family: "Yekan";
+  
   flex-direction: column;
   gap: 20px;
 }
@@ -284,7 +284,7 @@ async function submitComment() {
   padding: 25px;
   border-radius: 16px;
   direction: rtl;
-  font-family: "Yekan";
+  
 }
 .product-image img {
   width: 100%;
@@ -462,7 +462,5 @@ async function submitComment() {
 .new-price {
   color: #e11d48;
 }
-textarea {
-  font-family: "Yekan";
-}
+
 </style>

@@ -42,7 +42,6 @@ const formatPrice = (price) => (price ? price.toLocaleString('fa-IR').replace(/Ù
   display: flex;
   height: 460px;
   min-height: 460px;
-  font-family: 'Yekan';
   flex-direction: column;
   background: white;
   border-radius: 16px;
@@ -107,7 +106,6 @@ const formatPrice = (price) => (price ? price.toLocaleString('fa-IR').replace(/Ù
 .add-to-cart {
   font-weight: bold;
   background: #f9c710;
-  font-family: 'Yekan';
   color: #222;
   border: none;
   border-radius: 10px;

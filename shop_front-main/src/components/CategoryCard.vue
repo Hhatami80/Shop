@@ -33,7 +33,6 @@ const goToCategory = () =>{
   padding: 20px 15px;
   text-align: center;
   color: #111;
-  font-family: 'Yekan', sans-serif;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;

@@ -100,7 +100,7 @@ const processPayment = async () => {
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  font-family: "Yekan", sans-serif;
+  
   direction: rtl;
   text-align: right;
 }

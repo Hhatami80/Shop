@@ -81,7 +81,7 @@ onMounted(async () => {
   border-radius: 16px;
   text-align: center;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-  font-family: "Yekan", sans-serif;
+  
 }
 
 h2 {

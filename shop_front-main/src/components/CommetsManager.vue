@@ -268,7 +268,7 @@ button,
 .container,
 h4,
 .table {
-  font-family: 'Vazirmatn', 'Yekan', sans-serif !important;
+  font-family: 'IRANSansX', sans-serif !important;
   direction: rtl;
 }
 

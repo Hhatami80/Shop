@@ -120,7 +120,7 @@ const resetPassword = async () => {
   background-color: #f9f9f9;
   min-height: 100vh;
   padding: 60px 20px;
-  font-family: 'Yekan', sans-serif;
+  
   color: #333;
   display: flex;
   justify-content: center;

@@ -128,7 +128,7 @@ const confirmCOD = async () => {
 
 <style scoped>
 .payment-page {
-  font-family: "Yekan";
+  
   max-width: 100vw;
   margin: 50px auto;
   background: #fff;
@@ -152,7 +152,7 @@ h2 {
 
 p {
   margin: 10px 0;
-  font-family: "Yekan";
+  
 
   font-size: 1rem;
 }

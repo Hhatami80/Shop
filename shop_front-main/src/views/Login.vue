@@ -102,7 +102,7 @@ async function loginUser() {
 
 .login-wrapper {
   direction: rtl;
-  font-family: "Yekan", sans-serif;
+  
   background-color: #f9f9f9;
   min-height: 100vh;
   display: flex;
@@ -162,7 +162,7 @@ async function loginUser() {
 
 input {
   width: 100%;
-  font-family: "Yekan", Arial, sans-serif;
+  
   padding: 12px 14px;
   font-family: inherit;
   border: 1.5px solid #e0e0e0;

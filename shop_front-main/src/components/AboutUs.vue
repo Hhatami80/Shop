@@ -29,7 +29,6 @@ onMounted(() => {
 
 <style scoped>
 .about-us {
-  font-family: "Yekan";
   display: flex;
   justify-content: center;
   align-items: center;
@@ -77,6 +76,7 @@ onMounted(() => {
   line-height: 1.6;
   color: #222222;
   margin-bottom: 1.5rem;
+  text-align: justify;
 }
 .content button {
   background-color: #f9c710;

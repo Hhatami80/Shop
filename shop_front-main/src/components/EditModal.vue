@@ -88,7 +88,7 @@ const submitEdit = () => {
   width: 90%;
   max-width: 400px;
   box-shadow: 0 0 20px rgba(249, 199, 16, 0.2);
-  font-family: 'Yekan', sans-serif;
+  
   direction: rtl;
 }
 

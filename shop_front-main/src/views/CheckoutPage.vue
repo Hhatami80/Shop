@@ -137,7 +137,7 @@ const proceedToPayment = async () => {
   max-width: 100vw;
   margin: 50px auto;
   padding: 30px 25px;
-  font-family: "Yekan", sans-serif;
+  
   background: #f6f7f9;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
 }
@@ -202,7 +202,7 @@ f h2 {
 
 .item-details {
   flex: 1;
-  font-family: "Yekan", sans-serif;
+  
 
   display: flex;
   flex-direction: column;
@@ -244,7 +244,7 @@ f h2 {
 }
 
 .payment-method {
-  font-family: "Yekan";
+  
   direction: rtl;
   display: flex;
   flex-direction: column;
@@ -259,7 +259,7 @@ f h2 {
 
 .payment-method label {
   display: flex;
-  font-family: "Yekan";
+  
 
   align-items: center;
   gap: 10px;

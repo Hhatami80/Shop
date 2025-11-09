@@ -1,10 +1,10 @@
 *{
-  font-family: 'Yekan', sans-serif;
+  font-family: 'IRANSansX', sans-serif;
 
 }
 html, body {
   /* direction: rtl; */
-  font-family: 'Yekan', sans-serif;
+  font-family: 'IRANSansX', sans-serif;
   margin: 0;
   padding: 0;
   width: 100%;
@@ -12,11 +12,11 @@ html, body {
   background-color: #000 !important; 
 }
 button{
-  font-family: 'Yekan';
+  font-family: 'IRANSansX', sans-serif;
 }
 
 .Toastify__toast,
 .Toastify__toast-body,
 .Toastify__toast-container {
-  font-family: "Yekan", sans-serif !important;
+  font-family: 'IRANSansX', sans-serif !important;
 }

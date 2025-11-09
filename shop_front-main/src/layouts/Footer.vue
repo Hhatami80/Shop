@@ -84,7 +84,7 @@ onMounted(() => {
   justify-content: space-between;
   padding: 50px 40px;
   border-radius: 8px;
-  font-family: 'Yekan', sans-serif;
+  
   direction: rtl;
   gap: 40px;
   position: relative;

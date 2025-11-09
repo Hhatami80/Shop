@@ -1,10 +1,8 @@
 <template>
   <div class="wallet-page">
-    <div v-if="!hasBankAccount" class="bank-warning">
+    <div v-if="!bank" class="bank-warning">
       ⚠️ برای استفاده از کیف پول، لطفاً حساب بانکی خود را در بخش حساب بانکی وارد کنید.
-      <button class="go-bank-btn" @click="goToBankSection">
-        رفتن به حساب بانکی
-      </button>
+      <button class="go-bank-btn" @click="goToBankSection">رفتن به حساب بانکی</button>
     </div>
 
     <div class="wallet-top-row">
@@ -46,9 +44,9 @@
         <tbody>
           <tr v-for="tx in paginatedTransactions" :key="tx.id">
             <td>{{ formatDate(tx.date) }}</td>
-            <td :class="tx.type">{{ tx.type === "credit" ? "واریز" : "برداشت" }}</td>
+            <td :class="tx.type">{{ tx.type === 'credit' ? 'واریز' : 'برداشت' }}</td>
             <td>{{ formatPrice(tx.amount) }} تومان</td>
-            <td>{{ tx.method === "card" ? "کارت" : "شبا" }}</td>
+            <td>{{ tx.method === 'card' ? 'کارت' : 'شبا' }}</td>
             <td>{{ tx.description }}</td>
           </tr>
         </tbody>
@@ -73,74 +71,71 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
-import { useWalletStore } from "@/stores/useWalletStore";
-import { useUserStore } from "@/stores/useUserStore";
-import { toast } from "vue3-toastify";
-import { useRouter } from "vue-router";
-import BankCard from "@/components/BankCard.vue";
+import { ref, onMounted, computed } from 'vue'
+import { useWalletStore } from '@/stores/useWalletStore'
+import { useUserStore } from '@/stores/useUserStore'
+import { toast } from 'vue3-toastify'
+import { useRouter } from 'vue-router'
+import BankCard from '@/components/BankCard.vue'
 
-const wallet = useWalletStore();
-const userStore = useUserStore();
-const router = useRouter();
+const wallet = useWalletStore()
+const userStore = useUserStore()
+const router = useRouter()
 
-const amount = ref(0);
+const amount = ref(0)
 
-
-const bank = computed(() =>
-  userStore.bankAccounts.length > 0 ? userStore.bankAccounts[0] : null
-);
-const showBankMessage = computed(() => !bank.value); 
+const bank = computed(() => (userStore.bankAccounts.length > 0 ? userStore.bankAccounts[0] : null))
+const showBankMessage = computed(() => !bank.value)
 
 onMounted(async () => {
   await Promise.all([
     wallet.fetchBalance(),
     wallet.fetchTransactions(),
     userStore.fetchBankAccounts(),
-  ]);
-});
+  ])
+})
 
-const currentPage = ref(1);
-const pageSize = ref(5);
-const totalPages = computed(() => Math.ceil(wallet.transactions.length / pageSize.value));
+const currentPage = ref(1)
+const pageSize = ref(5)
+const totalPages = computed(() => Math.ceil(wallet.transactions.length / pageSize.value))
 
 const paginatedTransactions = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value;
-  return wallet.transactions.slice(start, start + pageSize.value);
-});
+  const start = (currentPage.value - 1) * pageSize.value
+  return wallet.transactions.slice(start, start + pageSize.value)
+})
 
 const nextPage = () => {
-  if (currentPage.value < totalPages.value) currentPage.value++;
-};
+  if (currentPage.value < totalPages.value) currentPage.value++
+}
 const prevPage = () => {
-  if (currentPage.value > 1) currentPage.value--;
-};
+  if (currentPage.value > 1) currentPage.value--
+}
 
 const goToPayment = async () => {
-  if (amount.value <= 0) return toast.error("مبلغ وارد شده صحیح نیست");
-  wallet.pendingAmount = amount.value;
-  router.push({ name: "WalletPayment" });
-};
+  if (amount.value <= 0) return toast.error('مبلغ وارد شده صحیح نیست')
+  wallet.pendingAmount = amount.value
+  router.push({ name: 'WalletPayment' })
+}
 
 const withdraw = async () => {
-  if (!bank.value) return toast.error("برای برداشت وجه ابتدا حساب بانکی ثبت کنید.");
-  if (amount.value <= 0) return toast.error("مبلغ وارد شده صحیح نیست");
-  await wallet.withdraw({ amount: amount.value, method: "card" });
-  amount.value = 0;
-};
+  if (!bank.value) return toast.error('برای برداشت وجه ابتدا حساب بانکی ثبت کنید.')
+  if (amount.value <= 0) return toast.error('مبلغ وارد شده صحیح نیست')
+  await wallet.withdraw({ amount: amount.value, method: 'card' })
+  amount.value = 0
+}
 
 const formatDate = (dateStr) => {
-  if (!dateStr) return "";
-  return new Intl.DateTimeFormat("fa-IR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(dateStr));
-};
-const formatPrice = (amount) => Number(amount)?.toLocaleString("fa-IR") || "0";
+  if (!dateStr) return ''
+  return new Intl.DateTimeFormat('fa-IR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date(dateStr))
+}
+const formatPrice = (amount) => Number(amount)?.toLocaleString('fa-IR') || '0'
 const goToBankSection = () => {
-  router.push({ name: "UserProfile", query: { tab: "bank" } });
-};
+  router.push({ name: 'UserProfile', query: { tab: 'bank' } })
+}
 </script>
 
 <style scoped>
@@ -151,7 +146,7 @@ const goToBankSection = () => {
   display: flex;
   flex-direction: column;
   gap: 60px;
-  font-family: "Yekan", sans-serif;
+  
   background: linear-gradient(165deg, #f6f7fc, #e6ebf5);
   border-radius: 32px;
   box-shadow: inset 0 0 50px rgba(255, 255, 255, 0.25);

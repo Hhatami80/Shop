@@ -145,7 +145,7 @@ const logout = () => {
   direction: rtl;
   display: flex;
   height: 100vh;
-  font-family: 'Vazirmatn', 'Yekan', sans-serif;
+  font-family: 'IRANSansX',sans-serif;
 }
 
 .admin-main {

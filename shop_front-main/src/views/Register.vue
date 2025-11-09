@@ -153,7 +153,7 @@ const verifyOtp = async () => {
   background-color: #f9f9f9;
   min-height: 100vh;
   padding: 60px 20px;
-  font-family: "Yekan", sans-serif;
+  
   color: #333;
   display: flex;
   justify-content: center;
@@ -220,7 +220,7 @@ const verifyOtp = async () => {
 }
 
 .input_second.input_all {
-  font-family: "Yekan";
+  
   width: 100%;
   padding: 12px 14px;
   font-size: 15px;
@@ -233,7 +233,7 @@ const verifyOtp = async () => {
 }
 
 .input_second.input_all:focus {
-  font-family: "Yekan";
+  
   border-color: #ffd700;
   background-color: #fff;
   box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
@@ -292,7 +292,7 @@ const verifyOtp = async () => {
 
 .footer_login_reg {
   margin-top: 20px;
-  font-family: "Yekan";
+  
   font-size: 14px;
   color: #666;
 }

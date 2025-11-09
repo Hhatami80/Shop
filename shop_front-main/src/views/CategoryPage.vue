@@ -36,7 +36,7 @@ onMounted(() => categoryStore.getAllCategories())
   direction: rtl;
   background: #fcfcfc;
   min-height: 100vh;
-  font-family: 'Vazirmatn', 'Yekan', sans-serif;
+  font-family: 'IRANSansX', sans-serif;
 }
 
 .categories-container {

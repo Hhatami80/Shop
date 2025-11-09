@@ -184,7 +184,7 @@ h3 {
   position: relative;
 }
 input {
-  width: 100%;
+  width: 90%;
   direction: ltr;
   padding: 10px 12px;
   border-radius: 10px;

@@ -67,7 +67,6 @@ onMounted(async () => {
   margin: 20px auto;
   padding: 40px 20px;
   text-align: center;
-  font-family: 'Yekan', sans-serif;
   background: linear-gradient(to bottom, #000 50%, #fff 50%);
   
 }

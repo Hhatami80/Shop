@@ -92,7 +92,7 @@ function submitForm() {
 <style scoped>
 .contact-page {
   direction: rtl;
-  font-family: "Yekan", sans-serif;
+  
   color: #2b2b2b;
   background-color: #fff;
 }
@@ -122,7 +122,7 @@ function submitForm() {
 
 .contact-form,
 .contact-info {
-  font-family: "Yekan", sans-serif;
+  
   background: #fafafa;
   padding: 30px;
   border-radius: 20px;
