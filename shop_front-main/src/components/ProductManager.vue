@@ -346,7 +346,7 @@ const form = reactive({
   title: '',
   category_id: '',
   price: null,
-  discount: '',
+  discount: 0,
   description: '',
   imageFile: null,
   imagePreview: null,

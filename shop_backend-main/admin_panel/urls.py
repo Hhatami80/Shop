@@ -39,7 +39,7 @@ urlpatterns = [
     path('header/', views.UpdateDeleteHeaderView.as_view(), name='update-delete-header'),
     path('upload-logo/', views.SetLogoView.as_view(), name='site-logo'),
     # Footer Items CRUD Api
-    path('footer/', views.FooterUpdateView.as_view(), name='add-link'),
+    path('admin/footer/', views.FooterUpdateView.as_view(), name='add-link'),
     # About Us Main Page API
     path('aboutus/', views.UpdateAboutUsMainView.as_view(), name='about-us-main'),
     # User API
