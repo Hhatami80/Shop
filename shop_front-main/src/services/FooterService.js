@@ -8,7 +8,7 @@ export const footerService = {
 
 
   updateFooter(payload) {
-    return api.put('/footer/', payload, {
+    return api.put('admin/footer/', payload, {
       headers: {
         Accept: 'application/json',
       },
