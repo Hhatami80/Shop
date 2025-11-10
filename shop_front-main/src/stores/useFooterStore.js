@@ -50,7 +50,6 @@ export const useFooterStore = defineStore('footer', {
         }
 
         await footerService.updateFooter(payload)
-        
         return true
       } catch (err) {
         toast.error(`خطا در ذخیره‌سازی: ${err?.message || 'خطایی هنگام ذخیره اطلاعات رخ داد'}`)
@@ -64,9 +63,7 @@ export const useFooterStore = defineStore('footer', {
         const formData = new FormData()
         formData.append('file', file)
 
-        const response = await axios.post('/api/upload', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        })
+        const response = await footerService.updateFooter()
 
         const imageUrl = response.data.url
         this.badges[index] = { image: imageUrl }
