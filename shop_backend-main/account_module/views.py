@@ -4,6 +4,8 @@ from rest_framework.request import Request
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework import status
+
+import sms_manager
 from .models import User, PhoneOTP, ExpiringToken, Address
 from .serializers import UserSerializer, LoginSerializer, SendOTPSerializer, VerifyOTPSerializer, UserAdminSerializer, \
     ForgetPasswordSerializer, ResetPasswordSerializer, AddressSerializer
@@ -27,12 +29,11 @@ class RegisterView(APIView):
 
             user: User = User.objects.filter(username=username).first()
             if user is not None:
-                return Response({'errors': 'این نام کاربری قابل استفاده نیست'}, status.HTTP_400_BAD_REQUEST)
+                return Response({'errors': 'این نام کاربری قابل استفاده نیست.'}, status.HTTP_400_BAD_REQUEST)
             otp_obj, _ = PhoneOTP.objects.update_or_create(phone=user_phone, username=username, password=user_pass)
-
-            # Todo: Send SMS
-            print(f'OTP for this user: {otp_obj.code}')
-            return Response({'detail': 'کد تایید ارسال شد', 'code': otp_obj.code}, status.HTTP_200_OK)
+            sms = sms_manager.OTPService()
+            sms.send_otp(user_phone, otp_obj.code)
+            return Response({'detail': 'کد تایید ارسال شد.'}, status.HTTP_200_OK)
 
         return Response({'errors': user_serializer.errors}, status.HTTP_422_UNPROCESSABLE_ENTITY)
 
