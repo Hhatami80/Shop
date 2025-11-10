@@ -70,7 +70,7 @@ const onFileChange = async (event, index) => {
   const file = event.target.files[0]
   if (!file) return
   try {
-    await footerStore.uploadBadgeFile(file, index)
+    footerStore.addBadge({'image': file})
   } catch {
     
   }

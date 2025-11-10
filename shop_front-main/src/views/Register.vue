@@ -1,4 +1,5 @@
 <template>
+  <StickyHeader :visible="true" :use-scroll-blur="false" />
   <main class="wrapper default">
     <div class="container">
       <div class="main-content login_content">
@@ -118,6 +119,7 @@ import { useRouter } from "vue-router";
 import { useRegisterStore } from "@/stores/useRegisterStore";
 import { ref } from "vue";
 import { storeToRefs } from "pinia";
+import StickyHeader from "@/components/StickyHeader.vue";
 
 const router = useRouter();
 const registers = useRegisterStore();
@@ -153,7 +155,7 @@ const verifyOtp = async () => {
   background-color: #f9f9f9;
   min-height: 100vh;
   padding: 60px 20px;
-  
+  margin-top: 10px;
   color: #333;
   display: flex;
   justify-content: center;

@@ -1,7 +1,11 @@
 <template>
   <div class="cart-grid">
     <div v-if="cartStore.items.length === 0" class="empty-cart">
-      سبد خرید شما خالی است
+      <div class="empty-icon">
+        <i class="fas fa-shopping-cart"></i>
+      </div>
+      <p>سبد خرید شما خالی است</p>
+      <small>برای شروع خرید، محصولات مورد علاقه خود را اضافه کنید!</small>
     </div>
 
     <div v-else class="cart-items">
@@ -31,21 +35,13 @@
                 تومان تخفیف
               </p>
               <p class="item-price">
-                {{
-                  Number(
-                    item.product.discounted_price || item.product.price
-                  ).toLocaleString()
-                }}
+                {{ Number(item.product.discounted_price || item.product.price).toLocaleString() }}
                 تومان / واحد
               </p>
             </div>
 
             <div class="qty-section">
-              <button
-                v-if="item.quantity > 1"
-                @click="decrease(item)"
-                class="qty-btn increase-btn"
-              >
+              <button v-if="item.quantity > 1" @click="decrease(item)" class="qty-btn increase-btn">
                 <i class="fas fa-minus"></i>
               </button>
               <button v-else @click="removeItem(item.id)" class="qty-btn delete-btn">
@@ -75,26 +71,26 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
-import { useCartStore } from "@/stores/useCartStore";
-import { useRouter } from "vue-router";
-const router = useRouter();
+import { onMounted } from 'vue'
+import { useCartStore } from '@/stores/useCartStore'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 function goToCheckout() {
-  router.push({ name: "checkout" });
+  router.push({ name: 'checkout' })
 }
 
-const cartStore = useCartStore();
-onMounted(() => cartStore.fetchCart());
+const cartStore = useCartStore()
+onMounted(() => cartStore.fetchCart())
 
 function increase(item) {
-  cartStore.updateItem(item.id, item.quantity + 1);
+  cartStore.updateItem(item.id, item.quantity + 1)
 }
 function decrease(item) {
-  if (item.quantity > 1) cartStore.updateItem(item.id, item.quantity - 1);
+  if (item.quantity > 1) cartStore.updateItem(item.id, item.quantity - 1)
 }
 function removeItem(id) {
-  cartStore.removeItem(id);
+  cartStore.removeItem(id)
 }
 </script>
 
@@ -114,7 +110,7 @@ function removeItem(id) {
   grid-template-columns: 2.5fr 1fr;
   gap: 30px;
   direction: rtl;
-  
+
   max-width: 1200px;
   margin: 40px auto;
   padding: 20px;
@@ -127,11 +123,52 @@ function removeItem(id) {
   text-align: center;
   font-size: 1.2rem;
   color: var(--text-dark);
-  padding: 60px;
+  padding: 60px 30px;
   border-radius: 16px;
   background: var(--card-bg);
   border: 2px dashed var(--primary-gold);
   font-weight: 600;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+
+  animation: fadeScaleIn 0.5s ease forwards;
+}
+
+.empty-cart .empty-icon {
+  font-size: 50px;
+  color: var(--primary-gold);
+  animation: bounce 1.2s infinite;
+}
+
+
+.empty-cart small {
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+@keyframes fadeScaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .cart-items {
@@ -148,7 +185,9 @@ function removeItem(id) {
   border-radius: 12px;
   box-shadow: 0 4px 15px var(--shadow-subtle);
   border: 1px solid var(--border-light);
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
 }
 .cart-item:hover {
   transform: translateY(-3px);

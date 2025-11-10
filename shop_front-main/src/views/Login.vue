@@ -1,5 +1,7 @@
 <template>
+  <StickyHeader :visible="true" :use-scroll-blur="false" />
   <main class="login-wrapper">
+
     <div class="login-container">
       <h2 class="login-title">ورود به حساب کاربری</h2>
       <form class="login-form" @submit.prevent="loginUser">
@@ -61,6 +63,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useLoginStore } from "@/stores/useLoginStore";
 import { toast } from "vue3-toastify";
+import StickyHeader from "@/components/StickyHeader.vue";
 
 const login = useLoginStore();
 const router = useRouter();
@@ -102,7 +105,7 @@ async function loginUser() {
 
 .login-wrapper {
   direction: rtl;
-  
+  margin-top: 10px;
   background-color: #f9f9f9;
   min-height: 100vh;
   display: flex;
@@ -190,8 +193,8 @@ input:focus {
 
 .toggle-password {
   position: absolute;
-  top: 50%;
-  left: 12px;
+  top: 55%;
+  left: 10px;
   transform: translateY(-50%);
   cursor: pointer;
   color: #aaa;

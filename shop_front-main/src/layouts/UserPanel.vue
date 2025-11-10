@@ -8,9 +8,7 @@
         </button>
       </div>
 
-      <button class="home-btn" @click="goHome">
-        <i class="fas fa-home"></i> صفحه اصلی
-      </button>
+      <button class="home-btn" @click="goHome"><i class="fas fa-home"></i> صفحه اصلی</button>
 
       <nav>
         <ul>
@@ -67,81 +65,87 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { toast } from "vue3-toastify";
-import { useWalletStore } from "@/stores/useWalletStore";
-import { useUserStore } from "@/stores/useUserStore";
+import { ref, computed, onMounted } from 'vue'
+import { toast } from 'vue3-toastify'
+import { useWalletStore } from '@/stores/useWalletStore'
+import { useUserStore } from '@/stores/useUserStore'
 
-import ShoppingCart from "@/components/ShoppingCart.vue";
-import UserProfile from "@/components/UserProfile.vue";
-import Wallet from "@/components/Wallet.vue";
-import UserOrders from "@/components/UserOrders.vue";
-import { useLoginStore } from "@/stores/useLoginStore";
+import ShoppingCart from '@/components/ShoppingCart.vue'
+import UserProfile from '@/components/UserProfile.vue'
+import Wallet from '@/components/Wallet.vue'
+import UserOrders from '@/components/UserOrders.vue'
+import { useLoginStore } from '@/stores/useLoginStore'
 
-import { useRouter } from "vue-router";
-const loginStore = useLoginStore();
+import { useRouter } from 'vue-router'
+const loginStore = useLoginStore()
 
-const isCollapsed = ref(false);
-const activeTab = ref("profile");
-const walletStore = useWalletStore();
-const userStore = useUserStore();
-const router = useRouter();
+const isCollapsed = ref(false)
+const activeTab = ref('profile')
+const walletStore = useWalletStore()
+const userStore = useUserStore()
+const router = useRouter()
 
 onMounted(async () => {
-  await walletStore.fetchBalance();
-  await walletStore.fetchTransactions();
-  await userStore.fetchBankAccounts();
-});
+  await walletStore.fetchBalance()
+  await walletStore.fetchTransactions()
+  await userStore.fetchBankAccounts()
+})
 
 const goHome = () => {
-  router.push("/");
-};
+  router.push('/')
+}
 
 const pageTitle = computed(() => {
   switch (activeTab.value) {
-    case "profile":
-      return "پروفایل کاربر";
-    case "cart":
-      return "سبد خرید";
-    case "wallet":
-      return "کیف پول من";
-    case "orders":
-      return "سفارش‌های من";
+    case 'profile':
+      return 'پروفایل کاربر'
+    case 'cart':
+      return 'سبد خرید'
+    case 'wallet':
+      return 'کیف پول من'
+    case 'orders':
+      return 'سفارش‌های من'
     default:
-      return "";
+      return ''
   }
-});
+})
 const logout = () => {
-  loginStore.logout();
-  toast.info("شما از حساب خارج شدید!");
-  router.push("/login");
-};
+  loginStore.logout()
+  toast.info('شما از حساب خارج شدید!')
+  router.push('/login')
+}
 </script>
 
 <style scoped>
 .admin-panel {
-  
   display: flex;
   min-height: 100vh;
   direction: rtl;
   background: #f5f5f5;
+  overflow: hidden;
 }
 
 .sidebar {
-  
   width: 220px;
   background: #111;
   color: white;
   display: flex;
   flex-direction: column;
   padding: 20px;
+  position: fixed; 
+  top: 0;
+  right: 0; 
+  height: 100vh; 
+  overflow: hidden; 
   transition: width 0.3s;
-  position: relative;
+  z-index: 100;
 }
 .sidebar.collapsed {
   width: 60px;
 }
-
+.sidebar.collapsed + .main-content {
+  margin-right: 60px;
+}
 .home-btn {
   margin: 10px 0;
   padding: 8px 12px;
@@ -205,6 +209,10 @@ const logout = () => {
 .main-content {
   flex: 1;
   padding: 20px;
+  margin-right: 260px;
+  height: 100vh;
+  overflow-y: auto; 
+  transition: margin-right 0.3s;
 }
 .header {
   background: white;

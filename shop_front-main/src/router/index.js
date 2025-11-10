@@ -169,30 +169,30 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach((to) => {
-  const loginStore = useLoginStore()
-  if (!loginStore.token) {
-    loginStore.loadFromCookies()
-  }
+// router.beforeEach((to) => {
+//   const loginStore = useLoginStore()
+//   if (!loginStore.token) {
+//     loginStore.loadFromCookies()
+//   }
 
-  const isAuthenticated = loginStore.isAuthenticated
-  const isAdmin = loginStore.isAdmin
+//   const isAuthenticated = loginStore.isAuthenticated
+//   const isAdmin = loginStore.isAdmin
 
-  if (to.path.startsWith('/admin') && !isAuthenticated) {
-    return { name: 'Login' }
-  }
+//   if (to.path.startsWith('/admin') && !isAuthenticated) {
+//     return { name: 'Login' }
+//   }
 
-  if (to.path.startsWith('/user') && !isAuthenticated) {
-    return { name: 'Login' }
-  }
+//   if (to.path.startsWith('/user') && !isAuthenticated) {
+//     return { name: 'Login' }
+//   }
 
-  if (to.path.startsWith('/admin') && isAuthenticated && !isAdmin) {
-    return { name: 'MainPage' }
-  }
+//   if (to.path.startsWith('/admin') && isAuthenticated && !isAdmin) {
+//     return { name: 'MainPage' }
+//   }
 
-  if (isAuthenticated && to.name === 'Login') {
-    return { name: 'MainPage' }
-  }
-})
+//   if (isAuthenticated && to.name === 'Login') {
+//     return { name: 'MainPage' }
+//   }
+// })
 
 export default router

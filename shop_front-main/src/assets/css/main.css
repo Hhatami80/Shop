@@ -14,9 +14,19 @@ html, body {
 button{
   font-family: 'IRANSansX', sans-serif;
 }
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #f9c710 !important;
+  box-shadow: 0 0 4px rgba(249, 199, 16, 0.4);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
 
 .Toastify__toast,
 .Toastify__toast-body,
 .Toastify__toast-container {
   font-family: 'IRANSansX', sans-serif !important;
+  direction: rtl;
 }

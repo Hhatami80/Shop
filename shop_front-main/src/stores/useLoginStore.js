@@ -16,7 +16,7 @@ export const useLoginStore = defineStore('login', {
   actions: {
     async login() {
       if (!this.loginUser.username || !this.loginUser.password) {
-        toast.warning('فیلدها نباید خالی باشند')
+        toast.warning('لطفا تمامی اطلاعات را وارد کنید')
         return false
       }
 

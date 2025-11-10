@@ -145,12 +145,45 @@ const goToBankSection = () => {
   padding: 48px;
   display: flex;
   flex-direction: column;
-  gap: 60px;
-  
+  gap: 30px;
   background: linear-gradient(165deg, #f6f7fc, #e6ebf5);
   border-radius: 32px;
   box-shadow: inset 0 0 50px rgba(255, 255, 255, 0.25);
+  
 }
+
+
+.bank-warning {
+  background: #fff4e5;
+  border: 1px solid #ffd699;
+  color: #8b5e3c;
+  padding: 16px 20px;
+  border-radius: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  
+  font-weight: 500;
+  font-size: 0.95rem;
+  animation: fadeSlide 0.4s ease;
+}
+
+.go-bank-btn {
+  background: linear-gradient(135deg, #f9c710, #f8b900);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.go-bank-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
 
 .wallet-top-row {
   display: flex;
@@ -165,16 +198,21 @@ const goToBankSection = () => {
   max-width: 420px;
   display: flex;
   align-items: stretch;
+  transition: transform 0.3s ease;
 }
-
 .wallet-card-wrapper > * {
-  width: 400px;
+  width: 100%;
   height: 100%;
   border-radius: 20px;
   background: linear-gradient(145deg, #ffffff, #e8ecf4);
   box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+.wallet-card-wrapper:hover > * {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.12);
+}
+
 
 .wallet-actions {
   flex: 1;
@@ -190,7 +228,7 @@ const goToBankSection = () => {
 }
 
 .wallet-actions h3 {
-  font-size: 1.75rem;
+  font-size: 1.8rem;
   font-weight: 800;
   margin-bottom: 28px;
   color: #222;
@@ -201,60 +239,72 @@ const goToBankSection = () => {
 
 .action-row {
   display: flex;
-  gap: 8px;
-  flex-wrap: nowrap;
+  gap: 12px;
+  flex-wrap: wrap;
   align-items: center;
 }
 
 .action-row input {
-  flex: 0 0 120px;
-  padding: 10px 12px;
-  border-radius: 10px;
+  flex: 0 0 140px;
+  padding: 12px 14px;
+  border-radius: 12px;
   border: 1px solid #dcdfe3;
   font-size: 0.95rem;
   background: #fafafa;
   outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
 }
+.action-row input:focus {
+  border-color: #f9c710;
+  box-shadow: 0 0 6px rgba(249, 199, 16, 0.4);
+}
+
 
 .action-row button {
   flex: 0 0 auto;
-  padding: 10px 16px;
+  padding: 10px 18px;
   font-size: 0.95rem;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   border: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.25s ease;
 }
 
 .btn-charge {
   background: linear-gradient(135deg, #ffe670, #f9c710);
   color: #1a1a1a;
 }
+.btn-charge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(249, 199, 16, 0.4);
+}
 
 .btn-withdraw {
   background: linear-gradient(135deg, #ff5c5c, #dc3545);
   color: #fff;
 }
+.btn-withdraw:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(220, 53, 69, 0.35);
+}
+
 
 .wallet-transactions {
   background: rgba(255, 255, 255, 0.97);
   padding: 40px;
   border-radius: 24px;
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.07);
-}
-
-.wallet-transactions h3 {
-  font-size: 1.75rem;
-  margin-bottom: 24px;
-  border-bottom: 3px solid #f9c710;
-  display: inline-block;
-  padding-bottom: 8px;
+  transition: all 0.3s ease;
 }
 
 .transactions-table {
   width: 100%;
   border-collapse: collapse;
   background: #fff;
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
@@ -278,6 +328,8 @@ const goToBankSection = () => {
 
 .transactions-table tbody tr:hover {
   background: #fffde7;
+  transform: scale(1.01);
+  transition: all 0.2s;
 }
 
 .transactions-table td.credit {
@@ -290,14 +342,23 @@ const goToBankSection = () => {
   font-weight: bold;
 }
 
+
 .empty-state {
   padding: 80px 0;
   text-align: center;
+  animation: fadeScaleIn 0.4s ease;
 }
-
 .empty-state .fa-icon {
   font-size: 3.5rem;
+  color: #f9c710;
+  animation: bounce 1.2s infinite;
 }
+.empty-state p {
+  font-size: 1.1rem;
+  margin-top: 14px;
+  color: #555;
+}
+
 
 .pagination {
   display: flex;
@@ -328,39 +389,34 @@ const goToBankSection = () => {
 .pagination span {
   font-weight: bold;
 }
-.bank-warning {
-  background: #fff8e1;
-  border: 1px solid #ffe082;
-  color: #795548;
-  padding: 16px 20px;
-  border-radius: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  font-weight: 500;
-  font-size: 0.95rem;
+
+
+@keyframes fadeScaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-.go-bank-btn {
-  background: linear-gradient(135deg, #f9c710, #f8b900);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.3s;
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
-.go-bank-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+@keyframes fadeSlide {
+  0% { opacity: 0; transform: translateY(-10px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
+
 
 @media (max-width: 1000px) {
   .wallet-top-row {
     flex-direction: column;
+    gap: 30px;
   }
   .wallet-card-wrapper,
   .wallet-actions {
@@ -368,4 +424,5 @@ const goToBankSection = () => {
     max-width: 100%;
   }
 }
+
 </style>

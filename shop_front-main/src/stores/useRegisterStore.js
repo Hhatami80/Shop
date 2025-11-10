@@ -31,7 +31,7 @@ export const useRegisterStore = defineStore('register', {
       const { username, phone, password, confirm_password } = this.registerUser
 
       if (!username || !phone || !password || !confirm_password) {
-        toast.warning('همه فیلدها الزامی هستند')
+        toast.warning('لطفا تمامی اطلاعات را وارد کنید')
         return false
       }
 
