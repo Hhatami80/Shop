@@ -105,7 +105,6 @@ const removeItem = (section, index) => {
   max-width: 850px;
   margin: 40px auto;
   direction: rtl;
-  font-family: 'Vazirmatn', sans-serif;
   color: var(--text-dark);
   box-shadow: 0 10px 30px var(--shadow-light);
   border: 1px solid var(--border-light);
