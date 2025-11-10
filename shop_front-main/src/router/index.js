@@ -28,6 +28,7 @@ import CategoryPage from '@/views/CategoryPage.vue'
 import ProductDetailPage from '@/views/ProductDetailPage.vue'
 import ContactUs from '@/views/ContactUs.vue'
 import AdminTransactions from '@/components/AdminTransactions.vue'
+import ProductPage from '@/views/ProductPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -41,6 +42,7 @@ const router = createRouter({
     { path: '/games', name: 'games', component: Games },
     { path: '/forgotPassword', name: 'forgotPassword', component: ForgotPassword },
     { path: '/categories', name: 'categoryPage', component: CategoryPage },
+    {path: '/productpage' , name:'productpage' , component: ProductPage},
     {
       path: '/payment',
       name: 'payment',

@@ -48,7 +48,7 @@
           <button class="size-guide golden-button">راهنمای سایز</button>
         </div>
 
-        <div class="price">{{ toPersianNumber(product.price) }} ریال</div>
+        <div class="price">{{ toPersianNumber(product.price) }} تومان</div>
 
         <div class="quantity">
           <span>تعداد</span>
@@ -107,7 +107,7 @@
         <div v-for="(item, index) in relatedProducts" :key="index" class="product-card">
           <img :src="item.image" :alt="item.title" />
           <p class="name">{{ item.title }}</p>
-          <p class="price">{{ toPersianNumber(item.price) }} ریال</p>
+          <p class="price">{{ toPersianNumber(item.price) }} تومان</p>
         </div>
       </div>
     </div>

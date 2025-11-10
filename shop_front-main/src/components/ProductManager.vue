@@ -77,7 +77,7 @@
             />
             <div v-if="form.imagePreview" class="image-preview-wrapper large">
               <img :src="form.imagePreview" class="image-preview" alt="پیش‌نمایش" />
-              <button type="button" class="remove-image">×</button>
+              <button type="button" class="remove-image" @click="removeMainImage">×</button>
             </div>
           </div>
 
@@ -371,6 +371,11 @@ const totalPages = computed(() => Math.ceil(adminStore.products.length / pageSiz
 function nextPage() {
   if (currentPage.value < totalPages.value) currentPage.value++
 }
+function removeMainImage() {
+  form.imageFile = null
+  form.imagePreview = null
+}
+
 
 function prevPage() {
   if (currentPage.value > 1) currentPage.value--
@@ -493,7 +498,7 @@ async function submitForm() {
         properties: [...form.properties],
         image: form.imagePreview,
       })
-      toast.success('محصول با موفقیت اضافه شد.')
+      toast.success('محصول با موفقیت اضافه شد')
     }
 
     resetForm()
@@ -527,6 +532,14 @@ function editProduct(product, index) {
   form.imagePreview = product.image || null
   form.galleryFiles = []
   form.galleryPreviews = []
+
+if (Array.isArray(product.images) && product.images.length) {
+    form.galleryPreviews = product.images.map(img => img.image)
+  } else {
+    form.galleryPreviews = []
+  }
+
+  form.galleryFiles = []
 
   if (typeof product.properties === 'string') {
     try {
@@ -672,6 +685,7 @@ textarea.input {
   min-height: 48px;
   width: 100%;
   resize: vertical;
+  font-family: 'IRANSansX';
 }
 
 /* .image-preview {

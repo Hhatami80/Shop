@@ -12,7 +12,7 @@ export const useRegisterStore = defineStore('register', {
       confirm_password: '',
     },
     otpCode: '',
-    step: 'form', 
+    step: 'form',
   }),
 
   actions: {
@@ -57,7 +57,20 @@ export const useRegisterStore = defineStore('register', {
           return false
         }
       } catch (error) {
-        toast.error(error.response?.data?.errors || 'خطا در ثبت‌نام')
+        let errMsg = 'خطا در ثبت‌نام'
+
+        if (error.response?.data?.errors) {
+          const errs = error.response.data.errors
+          if (typeof errs === 'object') {
+            errMsg = Object.values(errs).flat().join('، ')
+          } else if (typeof errs === 'string') {
+            errMsg = errs
+          }
+        } else if (error.response?.data?.message) {
+          errMsg = error.response.data.message
+        }
+
+        toast.error(errMsg)
         return false
       }
     },
@@ -78,7 +91,16 @@ export const useRegisterStore = defineStore('register', {
           return false
         }
       } catch (error) {
-        toast.error(error.response?.data?.errors || 'خطا در تأیید کد')
+        let errMsg = 'خطا در تأیید کد'
+
+        if (error.response?.data?.errors) {
+          const errs = error.response.data.errors
+          errMsg = typeof errs === 'object' ? Object.values(errs).flat().join('، ') : errs
+        } else if (error.response?.data?.message) {
+          errMsg = error.response.data.message
+        }
+
+        toast.error(errMsg)
         return false
       }
     },

@@ -50,7 +50,7 @@ export const useFooterStore = defineStore('footer', {
         }
 
         await footerService.updateFooter(payload)
-        toast.success('اطلاعات فوتر با موفقیت ذخیره شد.')
+        
         return true
       } catch (err) {
         toast.error(`خطا در ذخیره‌سازی: ${err?.message || 'خطایی هنگام ذخیره اطلاعات رخ داد'}`)

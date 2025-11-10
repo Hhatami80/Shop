@@ -1,18 +1,15 @@
 <template>
-  <div class="category-product-page">
+  <div class="products-page">
     <StickyHeader :visible="true" />
     <Banner />
 
     <div class="breadcrumb">
       <router-link to="/">صفحه اصلی</router-link>
-      <span v-if="categoryName"> / {{ categoryName }}</span>
+      <span> / همه محصولات</span>
     </div>
+
     <section class="filter-bar">
-      <div
-        class="filter-right"
-        :class="{ active: isFilterOpen }"
-        @click="toggleFilterMenu"
-      >
+      <div class="filter-right" :class="{ active: isFilterOpen }" @click="toggleFilterMenu">
         <i class="fas fa-sliders-h"></i>
         <span>مرتب‌سازی</span>
         <div v-if="isFilterOpen" class="filter-dropdown" @click.stop>
@@ -32,9 +29,7 @@
       >
         <div class="featured-image-wrapper">
           <img :src="product.image" alt="محصول ویژه" class="featured-image" />
-          <span v-if="product.discount" class="featured-discount">
-            {{ product.discount }}%
-          </span>
+          <span v-if="product.discount" class="featured-discount"> {{ product.discount }}% </span>
         </div>
         <div class="featured-info">
           <h3 class="featured-name">{{ product.title }}</h3>
@@ -52,9 +47,7 @@
       >
         <div class="product-image-wrapper">
           <img :src="product.image" alt="تصویر محصول" class="product-image" />
-          <span v-if="product.discount" class="discount-badge">
-            {{ product.discount }}%
-          </span>
+          <span v-if="product.discount" class="discount-badge"> {{ product.discount }}% </span>
         </div>
         <h4 class="product-name">{{ product.title }}</h4>
         <p class="product-price">{{ toPersianNumber(product.price) }} تومان</p>
@@ -75,91 +68,60 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
-import { useRoute } from "vue-router";
-import StickyHeader from "@/components/StickyHeader.vue";
-import Banner from "@/components/Banner.vue";
-import { useCategoryStore } from "@/stores/useCategoryStore";
+import { ref, computed, onMounted } from 'vue'
+import StickyHeader from '@/components/StickyHeader.vue'
+import Banner from '@/components/Banner.vue'
+import { useCategoryStore } from '@/stores/useCategoryStore'
 
-const categoryStore = useCategoryStore();
-const route = useRoute();
+const categoryStore = useCategoryStore()
 
-const isFilterOpen = ref(false);
-const selectedSort = ref("");
-const currentPage = ref(1);
-const itemsPerPage = 8;
+const isFilterOpen = ref(false)
+const selectedSort = ref('')
+const currentPage = ref(1)
+const itemsPerPage = 8
 
-const categoryName = ref("");
+const allProducts = computed(() => categoryStore.allProducts || [])
+const featuredProducts = computed(() => allProducts.value.slice(0, 2))
+const gridProducts = ref([])
 
-const currentCategoryId = computed(() => Number(route.params.id));
-
-const allProducts = computed(() =>
-  categoryStore.getProductsByCategory(currentCategoryId.value)
-);
-const featuredProducts = computed(() => allProducts.value.slice(0, 2));
-const gridProducts = ref([]);
-
-watch(
-  allProducts,
-  () => {
-    gridProducts.value = allProducts.value.slice(2);
-    currentPage.value = 1;
-  },
-  { immediate: true }
-);
-
-watch(
-  [() => categoryStore.allCategories, currentCategoryId],
-  () => {
-    const cat = categoryStore.getCategoryById(currentCategoryId.value);
-    categoryName.value = cat ? cat.title || cat.name : "";
-  },
-  { immediate: true }
-);
+onMounted(async () => {
+  await categoryStore.getAllProducts()
+  gridProducts.value = allProducts.value.slice(2)
+})
 
 function toggleFilterMenu() {
-  isFilterOpen.value = !isFilterOpen.value;
-}
-function sortBy(type) {
-  selectedSort.value = type;
-  if (type === "priceAsc") gridProducts.value.sort((a, b) => a.price - b.price);
-  if (type === "priceDesc") gridProducts.value.sort((a, b) => b.price - a.price);
-  if (type === "discount") gridProducts.value.sort((a, b) => b.discount - a.discount);
-  isFilterOpen.value = false;
+  isFilterOpen.value = !isFilterOpen.value
 }
 
-const totalPages = computed(() => Math.ceil(gridProducts.value.length / itemsPerPage));
+function sortBy(type) {
+  selectedSort.value = type
+  if (type === 'priceAsc') gridProducts.value.sort((a, b) => a.price - b.price)
+  if (type === 'priceDesc') gridProducts.value.sort((a, b) => b.price - a.price)
+  if (type === 'discount') gridProducts.value.sort((a, b) => b.discount - a.discount)
+  isFilterOpen.value = false
+}
+
+const totalPages = computed(() => Math.ceil(gridProducts.value.length / itemsPerPage))
+
 const paginatedProducts = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  return gridProducts.value.slice(start, start + itemsPerPage);
-});
+  const start = (currentPage.value - 1) * itemsPerPage
+  return gridProducts.value.slice(start, start + itemsPerPage)
+})
+
 function changePage(page) {
-  currentPage.value = page;
+  currentPage.value = page
 }
 
 function toPersianNumber(number) {
-  if (number === null || number === undefined) return "";
-  return Number(number).toLocaleString("fa-IR");
+  if (number === null || number === undefined) return ''
+  return Number(number).toLocaleString('fa-IR')
 }
-
-onMounted(async () => {
-  await categoryStore.getAllCategories();
-  await categoryStore.getAllProducts();
-});
-
-watch(
-  () => route.params.id,
-  () => {
-    currentPage.value = 1;
-  }
-);
 </script>
 
 <style scoped>
-@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css");
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 
-.category-product-page {
-  
+.products-page {
   direction: rtl;
   background: #f9f9f9;
 }
@@ -169,6 +131,7 @@ watch(
   font-size: 14px;
   color: #333;
 }
+
 .breadcrumb a {
   color: #333;
   text-decoration: none;
@@ -214,16 +177,6 @@ watch(
   box-shadow: 0 2px 8px rgba(255, 202, 40, 0.4);
 }
 
-.filter-right i {
-  font-size: 18px;
-  color: inherit;
-  transition: transform 0.3s ease;
-}
-
-.filter-right.active i {
-  transform: rotate(90deg);
-}
-
 .filter-dropdown {
   position: absolute;
   top: 48px;
@@ -237,18 +190,6 @@ watch(
   flex-direction: column;
   min-width: 160px;
   z-index: 10;
-  animation: dropdownFade 0.3s ease forwards;
-}
-
-@keyframes dropdownFade {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .filter-dropdown button {
@@ -258,20 +199,12 @@ watch(
   text-align: right;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s ease;
   color: #333;
+  transition: all 0.2s ease;
 }
-
 .filter-dropdown button:hover {
   background-color: #fff8e1;
   color: #000;
-}
-
-.product-card,
-.featured-card {
-  text-decoration: none;
-  color: inherit;
-  display: block;
 }
 
 .featured-products {
@@ -290,6 +223,7 @@ watch(
   overflow: hidden;
   background: #fff;
   text-align: right;
+  text-decoration: none !important;
 }
 
 .featured-image-wrapper {
@@ -355,13 +289,6 @@ watch(
   }
 }
 
-.product-card {
-  background: #fff;
-  overflow: hidden;
-  text-align: right;
-  padding-bottom: 10px;
-}
-
 .product-image-wrapper {
   position: relative;
   width: 100%;
@@ -384,16 +311,34 @@ watch(
   font-size: 16px;
 }
 
+.product-card {
+  text-decoration: none !important;
+  background: #fff;
+  overflow: hidden;
+  text-align: right;
+  padding: 10px;
+  border: none;
+  box-shadow: none;
+}
+
 .product-name {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
-  margin-bottom: 2px;
   color: #000;
+  margin: 10px 0 4px 0;
+  padding: 0;
+  border: none;
+  line-height: 1.4;
 }
 
 .product-price {
   color: #000;
   font-weight: bold;
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  line-height: 1.3;
 }
 
 .pagination {

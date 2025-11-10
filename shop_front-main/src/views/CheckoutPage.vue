@@ -58,7 +58,11 @@
       </div>
     </div>
 
-    <p v-else class="empty">سبد خرید شما خالی است.</p>
+    <div v-else class="empty">
+  <p>سبد خرید شما خالی است.</p>
+  <button class="btn gold-btn" @click="goToUserPanel">رفتن به پنل کاربری</button>
+</div>
+
   </div>
 </template>
 
@@ -131,6 +135,10 @@ const proceedToPayment = async () => {
     loading.value = false;
   }
 };
+const goToUserPanel = () => {
+  router.push('/user') 
+};
+
 </script>
 <style scoped>
 .checkout-page {
@@ -294,6 +302,12 @@ f h2 {
   border-radius: 16px;
   border: 2px dashed #f8b900;
 }
+.empty .btn {
+  margin-top: 20px;
+  font-size: 1rem;
+  padding: 10px 24px;
+}
+
 
 @media (max-width: 900px) {
   .checkout-container {
