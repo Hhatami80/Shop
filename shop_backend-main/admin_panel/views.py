@@ -468,7 +468,7 @@ class FooterUpdateView(APIView):
                 'phone': '۰۲۱-۱۲۳۴۵۶۷۸',
                 'email': 'info@shop.ir',
                 'address': 'تهران، خیابان انقلاب، پلاک ۱۲۳',
-                'text': 'به فروشگاه ما خوش آمدید! بهترین درب‌ها را با بهترین قیمت ارائه می‌دهیم.'
+                'text': 'متن توضیحات شما'
             }
         )
         site_serializer = SiteSettingSerializer(site_setting, context={'request': request})
@@ -484,32 +484,24 @@ class FooterUpdateView(APIView):
         )
 
         # --- Footer Links (Box 1) ---
-        if not footer_linkbox_1.footer_link.exists():
-            FooterLink.objects.bulk_create([
-                FooterLink(title='درباره ما', url='/about', footer_link_box=footer_linkbox_1),
-                FooterLink(title='تماس با ما', url='/contact', footer_link_box=footer_linkbox_1),
-                FooterLink(title='سؤالات متداول', url='/faq', footer_link_box=footer_linkbox_1),
-            ])
-        links = footer_linkbox_1.footer_link.all()
+        if footer_linkbox_1.footer_link.exists():
+            links = footer_linkbox_1.footer_link.all()
+        else:
+            links = []
         links_serializer = FooterLinkSerializer(links, many=True)
 
         # --- Services Links (Box 2) ---
-        if not footer_linkbox_2.footer_link.exists():
-            FooterLink.objects.bulk_create([
-                FooterLink(title='سفارش سازی', url='/service/customize', footer_link_box=footer_linkbox_2),
-                FooterLink(title='گارانتی محصولات', url='/service/warranty', footer_link_box=footer_linkbox_2),
-                FooterLink(title='پشتیبانی مشتریان', url='/service/support', footer_link_box=footer_linkbox_2),
-            ])
-        services = footer_linkbox_2.footer_link.all()
+        if footer_linkbox_2.footer_link.exists():  
+            services = footer_linkbox_2.footer_link.all()
+        else:
+            services = []
         services_serializer = FooterLinkSerializer(services, many=True)
 
         # --- Badges Section ---
-        if not TrustSymbols.objects.exists():
-            TrustSymbols.objects.bulk_create([
-                TrustSymbols(image='badges/enamad.png'),
-                TrustSymbols(image='badges/zarinpal.png'),
-            ])
-        badges = TrustSymbols.objects.all()
+        if  TrustSymbols.objects.exists(): 
+            badges = TrustSymbols.objects.all()
+        else:
+            badges = []
         badge_serializer = TrustSymbolSerializer(badges, many=True, context={'request': request})
 
         # --- Response ---
