@@ -1,33 +1,30 @@
 <template>
   <transition name="fade">
-    <div v-if="visible" :class="['header-sticky', { blurred: isBlurred }]">
+    <div v-if="visible" :class="['header-sticky', { blurred: useScrollBlur && isBlurred }]">
       <div class="icons">
-        <router-link to="/">
-          <i class="fas fa-home"></i>
-        </router-link>
-        <router-link to="/shop-cart" class="cart-icon">
-          <i class="fas fa-shopping-cart"></i>
-          <transition name="badge-pop" mode="out-in">
-            <span
-              v-if="cartStore.totalQuantity > 0"
-              class="cart-badge"
-              :key="cartStore.totalQuantity"
-            >
-              {{ cartStore.totalQuantity }}
-            </span>
-          </transition>
-        </router-link>
+        <router-link to="/"><i class="fas fa-home"></i></router-link>
 
-        <i class="fas fa-heart"></i>
+       
         <template v-if="loginStore.isAuthenticated">
+          <router-link to="/shop-cart" class="cart-icon">
+            <i class="fas fa-shopping-cart"></i>
+            <transition name="badge-pop" mode="out-in">
+              <span v-if="cartStore.totalQuantity > 0" class="cart-badge" :key="cartStore.totalQuantity">
+                {{ cartStore.totalQuantity }}
+              </span>
+            </transition>
+          </router-link>
+          <i class="fas fa-heart"></i>
+
           <router-link v-if="loginStore.isAdmin" to="/admin" class="user-icon" title="پنل ادمین">
             <i class="fas fa-crown"></i>
           </router-link>
-
           <router-link v-else to="/user" class="user-icon" title="پروفایل کاربری">
             <i class="fas fa-user-circle"></i>
           </router-link>
         </template>
+
+        
         <router-link v-else to="/login">
           <i class="fas fa-sign-in-alt"></i>
         </router-link>
@@ -36,15 +33,15 @@
       <button ref="stickyMenuBtn" class="menu-btn" @click="toggleMenu">☰</button>
     </div>
   </transition>
+
+
   <transition name="sticky-slide-fade">
     <div v-if="drawerOpen" class="sticky-menu-box" @click.self="drawerOpen = false">
       <button class="sticky-close-btn" @click="drawerOpen = false">×</button>
       <ul>
         <li v-for="item in headerStore.menuItems" :key="item.id">
           <template v-if="item.url?.startsWith?.('#')">
-            <a href="#" @click.prevent="scrollToSection(item.url)">
-              {{ item.title }}
-            </a>
+            <a href="#" @click.prevent="scrollToSection(item.url)">{{ item.title }}</a>
           </template>
           <template v-else>
             <router-link :to="item.url">{{ item.title }}</router-link>
@@ -61,16 +58,18 @@ import { useHeaderStore } from '@/stores/useHeaderStore'
 import { useLoginStore } from '@/stores/useLoginStore'
 import { useCartStore } from '@/stores/useCartStore'
 
-const cartStore = useCartStore()
-
 const props = defineProps({
-  visible: { type: Boolean, default: false },
+  visible: { type: Boolean, default: true },
+  useScrollBlur: { type: Boolean, default: true },  
+  showOnScroll: { type: Boolean, default: false }   
 })
 
-const drawerOpen = ref(false)
-const headerStore = useHeaderStore()
+const cartStore = useCartStore()
 const loginStore = useLoginStore()
+const headerStore = useHeaderStore()
+const drawerOpen = ref(false)
 const isBlurred = ref(false)
+const isVisible = ref(!props.showOnScroll)  
 
 function toggleMenu() {
   drawerOpen.value = !drawerOpen.value
@@ -85,16 +84,29 @@ function scrollToSection(selector) {
 }
 
 const handleScroll = () => {
-  isBlurred.value = window.scrollY > 50
+  if (props.useScrollBlur) {
+    isBlurred.value = window.scrollY > 50
+  }
+  if (props.showOnScroll && window.scrollY > 50) {
+    isVisible.value = true
+  }
 }
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
+  if (props.useScrollBlur || props.showOnScroll) {
+    window.addEventListener('scroll', handleScroll)
+  }
   loginStore.loadFromCookies()
   cartStore.fetchCart()
 })
-onUnmounted(() => window.removeEventListener('scroll', handleScroll))
+
+onUnmounted(() => {
+  if (props.useScrollBlur || props.showOnScroll) {
+    window.removeEventListener('scroll', handleScroll)
+  }
+})
 </script>
+
 
 <style scoped>
 .header-sticky {

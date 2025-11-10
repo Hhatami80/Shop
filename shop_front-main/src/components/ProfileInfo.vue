@@ -6,8 +6,10 @@
       <div class="avatar-section">
         <img
           :src="store.profile.previewImage || store.profile.image || defaultAvatar"
-          alt="Profile"
+          alt="profile"
+          class="table-avatar"
         />
+
         <label class="upload-label">
           <input type="file" accept="image/*" @change="onFileChange" />
           تغییر تصویر
@@ -16,45 +18,25 @@
 
       <div class="form-group">
         <label> نام کاربری:</label>
-        <input
-          v-model="store.profile.username"
-          type="text"
-          
-        />
+        <input v-model="store.profile.username" type="text" />
       </div>
       <div class="form-group">
         <label> نام:</label>
-        <input
-          v-model="store.profile.first_name"
-          type="text"
-          placeholder="مثال رضا "
-        />
+        <input v-model="store.profile.first_name" type="text" placeholder="مثال رضا " />
       </div>
       <div class="form-group">
         <label> نام خانوادگی:</label>
-        <input
-          v-model="store.profile.last_name"
-          type="text"
-          placeholder="مثال رضایی"
-        />
+        <input v-model="store.profile.last_name" type="text" placeholder="مثال رضایی" />
       </div>
 
       <div class="form-group">
         <label>ایمیل:</label>
-        <input
-          v-model="store.profile.email"
-          type="email"
-          placeholder="example@mail.com"
-        />
+        <input v-model="store.profile.email" type="email" placeholder="example@mail.com" />
       </div>
 
       <div class="form-group">
         <label>شماره تماس:</label>
-        <input
-          v-model="store.profile.phone"
-          type="text"
-          placeholder="مثلاً 09121234567"
-        />
+        <input v-model="store.profile.phone" type="text" placeholder="مثلاً 09121234567" />
       </div>
 
       <div class="form-group">
@@ -84,7 +66,6 @@
           <th>شماره تماس</th>
           <th>تاریخ تولد</th>
           <th>عکس</th>
-          <th>ویرایش</th>
         </tr>
       </thead>
       <tbody>
@@ -106,9 +87,6 @@
             />
             <span v-else>-</span>
           </td>
-          <td>
-            <button class="btn edit-btn" @click="editProfile">ویرایش</button>
-          </td>
         </tr>
       </tbody>
     </table>
@@ -116,60 +94,61 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
-import { useUserStore } from "@/stores/useUserStore";
-import jalaali from "jalaali-js";
+import { ref, onMounted, computed } from 'vue'
+import { useUserStore } from '@/stores/useUserStore'
+import jalaali from 'jalaali-js'
+import defaultAvatar from '@/assets/image/icons/avatar1.jpg'
 
-const store = useUserStore();
-const defaultAvatar = "/logos/default.png";
+const store = useUserStore()
 
-const DatePicker = ref(null);
-const datePickerLoaded = ref(false);
+
+const DatePicker = ref(null)
+const datePickerLoaded = ref(false)
 
 function toJalali(gDate) {
-  if (!gDate) return "";
-  const [gy, gm, gd] = gDate.split("-").map(Number);
-  const { jy, jm, jd } = jalaali.toJalaali(gy, gm, gd);
-  return `${jy}/${String(jm).padStart(2, "0")}/${String(jd).padStart(2, "0")}`;
+  if (!gDate) return ''
+  const [gy, gm, gd] = gDate.split('-').map(Number)
+  const { jy, jm, jd } = jalaali.toJalaali(gy, gm, gd)
+  return `${jy}/${String(jm).padStart(2, '0')}/${String(jd).padStart(2, '0')}`
 }
 
 const birthdateShamsi = computed(() => {
-  const date = store.profile.birthdate;
-  if (!date) return "-";
+  const date = store.profile.birthdate
+  if (!date) return '-'
 
-  if (date.includes("/")) return date;
+  if (date.includes('/')) return date
 
-  return toJalali(date);
-});
+  return toJalali(date)
+})
 
 onMounted(async () => {
-  const module = await import("vue3-persian-datetime-picker");
-  DatePicker.value = module.default;
-  datePickerLoaded.value = true;
-  await store.fetchProfile();
-});
+  const module = await import('vue3-persian-datetime-picker')
+  DatePicker.value = module.default
+  datePickerLoaded.value = true
+  await store.fetchProfile()
+})
 
 const onFileChange = (e) => {
-  const file = e.target.files[0];
-  if (file) store.updateProfileImage(file);
-};
+  const file = e.target.files[0]
+  if (file) store.updateProfileImage(file)
+}
 
 const saveProfile = async () => {
-  const formData = new FormData();
-  formData.append("username", store.profile.username);
-  formData.append("first_name", store.profile.first_name);
-  formData.append("last_name", store.profile.last_name);
-  formData.append("email", store.profile.email);
-  formData.append("phone", store.profile.phone);
+  const formData = new FormData()
+  formData.append('username', store.profile.username)
+  formData.append('first_name', store.profile.first_name)
+  formData.append('last_name', store.profile.last_name)
+  formData.append('email', store.profile.email)
+  formData.append('phone', store.profile.phone)
 
-  if (store.profile.birthdate) formData.append("birthdate", store.profile.birthdate);
+  if (store.profile.birthdate) formData.append('birthdate', store.profile.birthdate)
 
-  if (store.profile.image instanceof File) formData.append("image", store.profile.image);
+  if (store.profile.image instanceof File) formData.append('image', store.profile.image)
 
-  await store.updateProfile(formData);
-};
+  await store.updateProfile(formData)
+}
 
-const editProfile = () => {};
+const editProfile = () => {}
 </script>
 
 <style scoped>
@@ -288,40 +267,49 @@ component:focus {
 
 .preview-table {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.preview-table th,
-.preview-table td {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: center;
-  font-size: 0.9rem;
-  border-radius: 6px;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 25px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  background: #fff;
 }
 
 .preview-table th {
   background: linear-gradient(135deg, #f9c710, #f8b900);
   color: white;
+  padding: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .preview-table td {
-  background: #f9f9f9;
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #f3f3f3;
+  font-size: 0.9rem;
 }
 
-.preview-table td button {
-  background-color: #f8b900;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.preview-table tr:last-child td {
+  border-bottom: none;
 }
 
-.preview-table td button:hover {
-  background-color: #f9c710;
+.preview-table tr:nth-child(even) td {
+  background-color: #fffdf3;
+}
+
+.preview-table tr:hover td {
+  background-color: #fff6d6;
+  transition: 0.3s;
+}
+
+.table-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f9c710;
+  background: #fff8dc;
 }
 </style>

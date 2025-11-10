@@ -2,22 +2,25 @@
   <div class="addresses-section">
     <h3>مدیریت آدرس‌ها</h3>
 
-  
     <div class="address-form">
       <div class="form-group">
-        <label>استان:</label>
-        <select v-model="form.province_id" @change="updateCities">
-          <option disabled value="">انتخاب کنید</option>
-          <option v-for="p in store.provinces" :key="p.id" :value="p.id">{{ p.name }}</option>
-        </select>
+        <BaseSelect
+          label="استان:"
+          v-model="form.province_id"
+          :options="store.provinces"
+          placeholder="انتخاب کنید"
+          @change="updateCities"
+        />
       </div>
 
       <div class="form-group">
-        <label>شهر:</label>
-        <select v-model="form.city_id" :disabled="!form.province_id">
-          <option disabled value="">انتخاب کنید</option>
-          <option v-for="c in store.cities" :key="c.id" :value="c.id">{{ c.name }}</option>
-        </select>
+        <BaseSelect
+          label="شهر:"
+          v-model="form.city_id"
+          :options="store.cities"
+          :disabled="!form.province_id"
+          placeholder="انتخاب کنید"
+        />
       </div>
 
       <div class="form-group">
@@ -42,83 +45,86 @@
 
       <div class="form-group full">
         <label>آدرس کامل:</label>
-        <textarea v-model="form.full_address" placeholder="مثلاً تهران، نیاوران، کوچه گلستان، پلاک ۱۲۳"></textarea>
+        <textarea
+          v-model="form.full_address"
+          placeholder="مثلاً تهران، نیاوران، کوچه گلستان، پلاک ۱۲۳"
+        ></textarea>
       </div>
 
       <button class="btn gold-btn" @click="saveAddress">
-        {{ editMode ? "ویرایش آدرس" : "افزودن آدرس" }}
+        {{ editMode ? 'ویرایش آدرس' : 'افزودن آدرس' }}
       </button>
     </div>
 
-    
     <table class="addresses-table" v-if="store.addresses.length">
-  <thead>
-    <tr>
-      <th>استان</th>
-      <th>شهر</th>
-      <th>محله</th>
-      <th>کوچه</th>
-      <th>پلاک</th>
-      <th>کد پستی</th>
-      <th>آدرس کامل</th>
-      <th>عملیات</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr v-for="(addr, idx) in store.addresses" :key="addr.id">
-      <td>{{ addr.province.name }}</td>
-      <td>{{ addr.city.name }}</td>
-      <td>{{ addr.neighborhood }}</td>
-      <td>{{ addr.street }}</td>
-      <td>{{ addr.plate }}</td>
-      <td>{{ addr.postal_code }}</td>
-      <td>{{ addr.full_address }}</td>
-      <td>
-        <div class="action-buttons">
-          <button class="btn edit-btn" @click="editAddress(addr)"> ویرایش</button>
-          <button class="btn delete-btn" @click="deleteAddress(addr.id, idx)"> حذف</button>
-        </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
+      <thead>
+        <tr>
+          <th>استان</th>
+          <th>شهر</th>
+          <th>محله</th>
+          <th>کوچه</th>
+          <th>پلاک</th>
+          <th>کد پستی</th>
+          <th>آدرس کامل</th>
+          <th>عملیات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(addr, idx) in store.addresses" :key="addr.id">
+          <td>{{ addr.province.name }}</td>
+          <td>{{ addr.city.name }}</td>
+          <td>{{ addr.neighborhood }}</td>
+          <td>{{ addr.street }}</td>
+          <td>{{ addr.plate }}</td>
+          <td>{{ addr.postal_code }}</td>
+          <td>{{ addr.full_address }}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn edit-btn" @click="editAddress(addr)">ویرایش</button>
+              <button class="btn delete-btn" @click="deleteAddress(addr.id, idx)">حذف</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from "vue";
-import { useUserStore } from "@/stores/useUserStore";
-import { toast } from "vue3-toastify";
+import { reactive, ref, onMounted } from 'vue'
+import BaseSelect from "@/components/BaseSelect.vue";
 
-const store = useUserStore();
+import { useUserStore } from '@/stores/useUserStore'
+import { toast } from 'vue3-toastify'
 
-const editMode = ref(false);
-const editingId = ref(null);
+const store = useUserStore()
+
+const editMode = ref(false)
+const editingId = ref(null)
 
 const form = reactive({
-  province_id: "",
-  city_id: "",
-  neighborhood: "",
-  street: "",
-  plate: "",
-  postal_code: "",
-  full_address: "",
-});
+  province_id: '',
+  city_id: '',
+  neighborhood: '',
+  street: '',
+  plate: '',
+  postal_code: '',
+  full_address: '',
+})
 
 const resetForm = () => {
   Object.assign(form, {
-    province_id: "",
-    city_id: "",
-    neighborhood: "",
-    street: "",
-    plate: "",
-    postal_code: "",
-    full_address: "",
-  });
-  editMode.value = false;
-  editingId.value = null;
-};
+    province_id: '',
+    city_id: '',
+    neighborhood: '',
+    street: '',
+    plate: '',
+    postal_code: '',
+    full_address: '',
+  })
+  editMode.value = false
+  editingId.value = null
+}
 
 const validateForm = () => {
   if (
@@ -130,41 +136,40 @@ const validateForm = () => {
     !form.postal_code ||
     !form.full_address
   ) {
-    toast.error("لطفاً همه فیلدها را پر کنید");
-    return false;
+    toast.error('لطفاً همه فیلدها را پر کنید')
+    return false
   }
   if (!/^\d+$/.test(form.plate)) {
-    toast.error("پلاک باید فقط عدد باشد");
-    return false;
+    toast.error('پلاک باید فقط عدد باشد')
+    return false
   }
   if (!/^\d{10}$/.test(form.postal_code)) {
-    toast.error("کد پستی باید ۱۰ رقم باشد");
-    return false;
+    toast.error('کد پستی باید ۱۰ رقم باشد')
+    return false
   }
-  return true;
-};
+  return true
+}
 
 const saveAddress = async () => {
-  if (!validateForm()) return;
+  if (!validateForm()) return
 
   try {
     if (editMode.value) {
-      await store.updateAddress(editingId.value, { ...form });
-
+      await store.updateAddress(editingId.value, { ...form })
     } else {
-      await store.addAddress({ ...form });
-      toast.success("آدرس جدید افزوده شد");
+      await store.addAddress({ ...form })
+      toast.success('آدرس جدید افزوده شد')
     }
-    resetForm();
-    await store.fetchAddresses();
+    resetForm()
+    await store.fetchAddresses()
   } catch (err) {
-    toast.error("خطا در ذخیره آدرس");
+    toast.error('خطا در ذخیره آدرس')
   }
-};
+}
 
 const editAddress = (addr) => {
-  editMode.value = true;
-  editingId.value = addr.id;
+  editMode.value = true
+  editingId.value = addr.id
   Object.assign(form, {
     province_id: addr.province.id,
     city_id: addr.city.id,
@@ -173,35 +178,32 @@ const editAddress = (addr) => {
     plate: addr.plate,
     postal_code: addr.postal_code,
     full_address: addr.full_address,
-  });
-};
+  })
+}
 
 const deleteAddress = async (id, idx) => {
   try {
-    await store.deleteAddress(idx);
-    toast.success("آدرس حذف شد");
+    await store.deleteAddress(idx)
+    toast.success('آدرس حذف شد')
   } catch {
-    toast.error("خطا در حذف آدرس");
+    toast.error('خطا در حذف آدرس')
   }
-};
+}
 
 const updateCities = async () => {
   if (form.province_id) {
-    await store.fetchCities(form.province_id);
+    await store.fetchCities(form.province_id)
   }
-};
+}
 
 onMounted(async () => {
-  await store.fetchProvinces();
-  await store.fetchAddresses();
-});
+  await store.fetchProvinces()
+  await store.fetchAddresses()
+})
 </script>
 
 <style scoped>
-
-
 .addresses-section {
-  
   display: flex;
   flex-direction: column;
   gap: 25px;
@@ -220,6 +222,9 @@ onMounted(async () => {
 .form-group {
   display: flex;
   flex-direction: column;
+}
+.form-group:focus{
+  border-color: #f9c710;
 }
 
 .form-group.full {
@@ -243,28 +248,24 @@ textarea {
 }
 
 .btn {
-  padding: 8px 16px; 
+  padding: 8px 16px;
   border: none;
   border-radius: 10px;
   font-weight: bold;
   cursor: pointer;
   transition: 0.3s;
   grid-column: auto;
-  justify-self: start; 
+  justify-self: start;
 }
-
 
 .gold-btn {
   background: #f9c710;
   color: white;
-  
 }
-
 
 .gold-btn:hover {
   background: #ffd740;
 }
-
 
 .addresses-table {
   width: 100%;
@@ -307,11 +308,14 @@ textarea {
   border-bottom: none;
 }
 
-
 .action-buttons {
   display: flex;
   justify-content: center;
   gap: 8px;
+}
+input,
+textarea{
+  outline: none;
 }
 
 .action-buttons .btn {
@@ -342,4 +346,3 @@ textarea {
   background: #c62828;
 }
 </style>
-

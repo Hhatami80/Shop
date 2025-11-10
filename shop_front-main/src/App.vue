@@ -1,8 +1,8 @@
 <template>
-  <Header v-if="!isAdminRoute && !isUserPanel && !isCategoryRoute && !isProductRoute" />
+  <Header v-if="!isAdminRoute && !isUserPanel && !isCategoryRoute && !isProductRoute && !isLoginRoute && !isRegisterRoute" />
   <router-view></router-view>
 
-  <Footer class="footer" v-if="!isAdminRoute" />
+  <Footer class="footer" v-if="!isAdminRoute && !isLoginRoute && !isRegisterRoute && !isUserPanel" />
 </template>
 
 <script setup>
@@ -15,6 +15,11 @@ const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 const isUserPanel = computed(() => route.path.startsWith('/user'))
 const isCategoryRoute = computed(() => route.path.startsWith('/categories'))
 const isProductRoute = computed(() => route.path.startsWith('/product'))
+const isLoginRoute = computed(() => route.path.startsWith('/login'))
+const isRegisterRoute = computed(() => route.path.startsWith('/register'))
+
+
+
 
 </script>
 <style>

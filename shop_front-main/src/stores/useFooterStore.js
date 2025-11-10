@@ -98,8 +98,8 @@ export const useFooterStore = defineStore('footer', {
       }
     },
 
-    addBadge() {
-      this.badges.push({ image: '' })
+    addBadge(data) {
+      this.badges.push(data)
     },
 
     removeBadge(index) {

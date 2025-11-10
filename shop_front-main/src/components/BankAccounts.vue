@@ -12,9 +12,9 @@
           placeholder="6037 9912 3456 7890"
           @input="onCardInput"
         />
-        <div class="bank-detect">
-          <img :src="detectedBank.bank_logo || '/logos/default.png'" class="bank-logo" />
-          <span>{{ detectedBank.bank_title || '---' }}</span>
+        <div class="bank-detect" v-if="newBank.cardNumber.trim().length >= 6">
+          <img :src="detectedBank.bank_logo" class="bank-logo" v-if="detectedBank.bank_logo" />
+          <span>{{ detectedBank.bank_title }}</span>
         </div>
       </div>
 
@@ -127,7 +127,7 @@ const handleAddBank = async () => {
 
   try {
     const added = await store.addBankAccount(bankInfo)
-    await store.fetchBankAccounts();
+    await store.fetchBankAccounts()
     store.bankAccounts.push({
       ...added,
       bankName: detectedBank.value.bank_title || 'نامشخص',
