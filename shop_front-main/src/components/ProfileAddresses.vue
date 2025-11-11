@@ -182,12 +182,7 @@ const editAddress = (addr) => {
 }
 
 const deleteAddress = async (id, idx) => {
-  try {
     await store.deleteAddress(idx)
-    toast.success('آدرس حذف شد')
-  } catch {
-    toast.error('خطا در حذف آدرس')
-  }
 }
 
 const updateCities = async () => {

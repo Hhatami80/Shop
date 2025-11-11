@@ -1,0 +1,15 @@
+{
+  "site_name": "سایت قهوه",
+  "aboutus_title": "درباره ما",
+  "aboutus_text": "خوش آمدید",
+  "phone": "09123456789",
+  "email": "test@gmail.com",
+  "address": "خیایان اول",
+  "header_links": {
+    "/": "صفحه اصلی"
+  },
+  "footer_link_boxes": [
+    "لینک های مفید",
+    "سرویس ها"
+  ]
+}

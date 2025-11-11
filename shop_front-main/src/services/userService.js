@@ -32,7 +32,7 @@ export const userService = {
     return api.put(`/user/addresses/${id}/`, data)
   },
   deleteAddress(id) {
-    return api.delete(`/user/addresses/${id}`)
+    return api.delete(`/user/addresses/${id}/`)
   },
 
   getBankInfo() {
