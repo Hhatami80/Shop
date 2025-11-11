@@ -165,14 +165,11 @@ const getStatusClass = (status) =>
 
 const cancelOrder = async (order) => {
   if (!confirm("آیا مطمئن هستید می‌خواهید این سفارش را لغو کنید؟")) return;
-
+  $forceUpdate
   await orderStore.cancelUserOrder(order.id);
   await orderStore.fetchOrders()
 };
 
-// const formatPaymentMethod = (method) =>
-//   ({ online: "پرداخت آنلاین", cod: "پرداخت در محل", wallet: "کیف پول" }[method] ||
-//   "نامشخص");
 </script>
 
 <style scoped>
