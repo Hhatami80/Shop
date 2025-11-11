@@ -119,10 +119,15 @@ async function toggleMenu() {
   border-bottom: 1px solid gold;
   position: relative;
   direction: rtl;
+  transition: all 0.3s ease;
 }
+
 .logo {
   height: 300px;
+  max-width: 90%;
+  object-fit: contain;
 }
+
 .menu-btn {
   position: absolute;
   right: 20px;
@@ -132,6 +137,7 @@ async function toggleMenu() {
   border: none;
   cursor: pointer;
 }
+
 .search-wrapper {
   display: flex;
   justify-content: center;
@@ -198,4 +204,74 @@ async function toggleMenu() {
   transform: translateX(20px);
   opacity: 0;
 }
+
+
+@media (max-width: 1024px) {
+  .header-main {
+    height: 220px;
+    padding: 15px;
+  }
+  .logo {
+    height: 180px;
+  }
+  .menu-btn {
+    font-size: 26px;
+    top: 40px;
+  }
+  .search-wrapper {
+    margin-top: 30px;
+    height: 80px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-main {
+    height: auto;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 10px 15px;
+    text-align: center;
+  }
+  .logo {
+    height: 120px;
+    margin: 10px auto;
+  }
+  .menu-btn {
+    top: 10px;
+    right: 10px;
+  }
+  .search-wrapper {
+    margin-top: 15px;
+    height: auto;
+    padding: 10px;
+  }
+  .menu-box {
+    min-width: 90%;
+    top: 60px !important;
+    left: 5% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-main {
+    padding: 5px 10px;
+  }
+  .logo {
+    height: 100px;
+  }
+  .menu-btn {
+    font-size: 24px;
+    top: 5px;
+    right: 5px;
+  }
+  .search-wrapper {
+    margin-top: 10px;
+    height: auto;
+  }
+  .menu-box {
+    min-width: 95%;
+    padding: 10px 15px;
+  }
+}
+
 </style>

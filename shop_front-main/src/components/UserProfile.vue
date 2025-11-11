@@ -2,83 +2,48 @@
   <div class="profile-card">
     <h3>پروفایل کاربری</h3>
 
+  
     <div class="profile-tabs">
-      <button :class="{ active: tab === 'info' }" @click="changeTab('info')">
+      <router-link
+        to="/user/profile/info"
+        class="tab-btn"
+        :class="{ active: $route.path.endsWith('/info') }"
+      >
         مشخصات فردی
-      </button>
-      <button :class="{ active: tab === 'addresses' }" @click="changeTab('addresses')">
+      </router-link>
+      <router-link
+        to="/user/profile/addresses"
+        class="tab-btn"
+        :class="{ active: $route.path.endsWith('/addresses') }"
+      >
         آدرس‌ها
-      </button>
-      <button :class="{ active: tab === 'bank' }" @click="changeTab('bank')">
+      </router-link>
+      <router-link
+        to="/user/profile/bank"
+        class="tab-btn"
+        :class="{ active: $route.path.endsWith('/bank') }"
+      >
         حساب بانکی
-      </button>
+      </router-link>
     </div>
 
-    <div v-if="tab === 'info'">
-      <ProfileInfo />
-    </div>
-
-    <div v-if="tab === 'addresses'" class="profile-form">
-      <ProfileAddresses />
-    </div>
-
-    <div v-if="tab === 'bank'">
-      <BankAccounts />
+  
+    <div class="tab-content">
+      <router-view />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import ProfileInfo from "@/components/ProfileInfo.vue";
-import ProfileAddresses from "@/components/ProfileAddresses.vue";
-import BankAccounts from "@/components/BankAccounts.vue";
-import { useUserStore } from "@/stores/useUserStore";
 
-const store = useUserStore();
-const route = useRoute();
-const router = useRouter();
-
-const tab = ref(route.query.tab || "info");
-
-onMounted(async () => {
-  await Promise.all([
-    store.fetchProfile(),
-    store.fetchAddresses(),
-    store.fetchBankAccounts(),
-  ]);
-
-  if (route.query.tab) tab.value = route.query.tab;
-});
-
-watch(
-  () => route.query.tab,
-  (newTab) => {
-    if (newTab) tab.value = newTab;
-  }
-);
-const changeTab = (newTab) => {
-  tab.value = newTab;
-  router.replace({ query: { ...route.query, tab: newTab } });
-};
 </script>
+
 <style scoped>
 .profile-card {
   background: linear-gradient(180deg, #ffffff 0%, #fdfaf3 100%);
   border-radius: 20px;
   padding: 35px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
-  transition: 0.3s ease;
-  animation: fadeIn 0.4s ease;
-}
-
-.profile-card h3 {
-  text-align: center;
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 25px;
-  color: #333;
 }
 
 .profile-tabs {
@@ -89,7 +54,7 @@ const changeTab = (newTab) => {
   flex-wrap: wrap;
 }
 
-.profile-tabs button {
+.tab-btn {
   padding: 10px 24px;
   border-radius: 25px;
   border: none;
@@ -97,154 +62,19 @@ const changeTab = (newTab) => {
   color: #555;
   font-weight: 600;
   cursor: pointer;
-  transition: 0.3s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.profile-tabs button:hover {
-  background: #fff8dc;
-  color: #333;
-}
-
-.profile-tabs button.active {
+.tab-btn.active {
   background: linear-gradient(135deg, #f9c710, #f8b900);
   color: white;
   box-shadow: 0 4px 10px rgba(249, 199, 16, 0.4);
-  transform: translateY(-2px);
 }
 
-.profile-form {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px 25px;
-  background: #fafafa;
-  padding: 25px;
-  border-radius: 18px;
-  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.03);
-}
-
-.avatar-section {
-  grid-column: 1 / -1;
-  text-align: center;
-  margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.avatar-section img {
-  width: 130px;
-  height: 130px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #f9c710;
-  box-shadow: 0 4px 12px rgba(249, 199, 16, 0.3);
-  transition: 0.3s ease;
-}
-
-.avatar-section img:hover {
-  transform: scale(1.05);
-}
-
-.upload-label {
-  margin-top: 10px;
-  cursor: pointer;
-  background: #fff8dc;
-  border-radius: 20px;
-  padding: 6px 16px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #444;
-  transition: 0.3s;
-  border: 1px solid #f9c710;
-}
-
-.upload-label:hover {
-  background: #f9c710;
-  color: white;
-}
-
-.upload-label input {
-  display: none;
-  outline: none !important;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-label {
-  font-weight: 600;
-  margin-bottom: 6px;
-  color: #333;
-}
-
-input {
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  background: white;
-  transition: all 0.3s ease;
-}
-input:focus {
-  border-color: #f8b900;
-  box-shadow: 0 0 0 3px rgba(248, 185, 0, 0.2);
-  outline: none;
-}
-
-.btn {
-  grid-column: 1 / -1;
-  border: none;
-  padding: 9px 0;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.gold-btn {
-  background: linear-gradient(135deg, #f9c710, #f8b900);
-  color: white;
-  box-shadow: 0 4px 10px rgba(191, 162, 52, 0.4);
-}
-
-.gold-btn:hover {
-  background: linear-gradient(135deg, #ffd740, #f9c710);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(191, 162, 52, 0.5);
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@media (max-width: 768px) {
-  .profile-form {
-    grid-template-columns: 1fr;
-    padding: 20px;
-  }
-
-  .profile-tabs {
-    gap: 10px;
-  }
-
-  .profile-tabs button {
-    padding: 8px 18px;
-    font-size: 0.9rem;
-  }
-
-  .avatar-section img {
-    width: 100px;
-    height: 100px;
-  }
+.tab-content {
+  margin-top: 20px;
 }
 </style>

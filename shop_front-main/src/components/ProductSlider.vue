@@ -65,6 +65,7 @@ const openModal = (product) => {
   padding: 40px 20px;
   background-color: #f8f8f8;
   direction: rtl;
+  transition: all 0.3s ease;
 }
 
 .section-title {
@@ -95,4 +96,44 @@ const openModal = (product) => {
   font-size: 18px;
   color: #666;
 }
+
+
+@media (max-width: 1024px) {
+  .section-title {
+    font-size: 22px;
+    margin-bottom: 25px;
+  }
+  .product-slider-container {
+    padding: 30px 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  .product-slider-container {
+    padding: 25px 10px;
+  }
+
+  
+  .product-swiper {
+    padding-bottom: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-title {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+  .product-slider-container {
+    padding: 20px 5px;
+  }
+  .product-swiper {
+    padding-bottom: 20px;
+  }
+}
+
 </style>

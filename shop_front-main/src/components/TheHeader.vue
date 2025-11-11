@@ -1,43 +1,54 @@
 <template>
-  <header class="admin-header">
-    <h1>داشبورد مدیریت</h1>
+  <header class="admin-header ">
+    <h1>{{ title }}</h1>
     <div class="topbar-actions">
-        <button class="action-btn" @click="$emit('goHome')">
-            <fa-icon :icon="['fas', 'home']" />
-        </button>
+      <button v-if="showHomeBtn" class="action-btn" @click="$emit('goHome')">
+        <fa-icon :icon="['fas','home']" />
+      </button>
 
-        <div class="profile-dropdown-container" @click="toggleProfileMenu">
-            <button class="profile-btn">
-                <fa-icon :icon="['fas', 'user-circle']" />
-                <span>حساب کاربری</span>
-            </button>
-            <div v-if="showProfileMenu" class="profile-dropdown">
-                <ul>
-                    <li @click="openChangePasswordModal">تغییر رمز عبور</li>
-                    <li @click="$emit('logout')">خروج</li>
-                </ul>
-            </div>
+      <div class="profile-dropdown-container" @click="toggleProfileMenu">
+        <button class="profile-btn">
+          <fa-icon :icon="['fas','user-circle']" />
+          <span>{{ user.name }}</span>
+        </button>
+        <div v-if="showProfileMenu" class="profile-dropdown">
+          <ul>
+            <li v-for="item in profileMenu" :key="item.label" @click="handleProfileItem(item)">
+              {{ item.label }}
+            </li>
+          </ul>
         </div>
+      </div>
     </div>
   </header>
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue';
+import { ref } from 'vue'
 
-const emit = defineEmits(['goHome', 'logout', 'openChangePasswordModal']);
+const props = defineProps({
+  title: { type: String, default: 'پنل کاربری' },
+  user: { type: Object, required: true },
+  profileMenu: { type: Array, default: () => [] },
+  showHomeBtn: { type: Boolean, default: true },
+})
 
-const showProfileMenu = ref(false);
+const emit = defineEmits(['goHome','profileAction'])
+
+const showProfileMenu = ref(false)
 
 function toggleProfileMenu() {
-    showProfileMenu.value = !showProfileMenu.value; 
+  showProfileMenu.value = !showProfileMenu.value
 }
 
-function openChangePasswordModal() {
-    emit('openChangePasswordModal'); 
-    showProfileMenu.value = false;
+function handleProfileItem(item) {
+  if(item.action) emit('profileAction', item.action)
+  showProfileMenu.value = false
 }
 </script>
+
+
+
 
 <style scoped>
 .admin-header {

@@ -84,13 +84,12 @@ onMounted(() => {
   justify-content: space-between;
   padding: 50px 40px;
   border-radius: 8px;
-  
   direction: rtl;
   gap: 40px;
-  position: relative;
   flex-wrap: wrap;
+  position: relative;
+  transition: all 0.3s ease;
 }
-
 
 .footer-column {
   flex: 1 1 220px;
@@ -99,14 +98,12 @@ onMounted(() => {
   gap: 12px;
 }
 
-
 .footer-column h4 {
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 10px;
   color: #fff;
 }
-
 
 .footer-column ul {
   list-style: none;
@@ -129,7 +126,6 @@ onMounted(() => {
   color: #ffc107;
 }
 
-
 .contact-list li {
   display: flex;
   align-items: center;
@@ -140,7 +136,6 @@ onMounted(() => {
   color: #ffc107;
   font-size: 16px;
 }
-
 
 .social-icons {
   position: absolute;
@@ -170,13 +165,14 @@ onMounted(() => {
   transform: scale(1.1);
 }
 
-
 .image-container {
   display: flex;
   gap: 15px;
   background-color: #111;
   padding: 15px;
   border-radius: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
 }
 
 .image-container img {
@@ -184,14 +180,23 @@ onMounted(() => {
   height: auto;
   border-radius: 6px;
   object-fit: contain;
+  transition: all 0.3s ease;
 }
 
+
+@media (max-width: 1024px) {
+  .footer {
+    padding: 40px 30px;
+    gap: 30px;
+  }
+}
 
 @media (max-width: 768px) {
   .footer {
     flex-direction: column;
     align-items: center;
     padding: 30px 20px;
+    gap: 20px;
   }
 
   .footer-column {
@@ -207,7 +212,38 @@ onMounted(() => {
 
   .image-container {
     justify-content: center;
+    gap: 10px;
+  }
+
+  .image-container img {
+    width: 60px;
   }
 }
+
+@media (max-width: 480px) {
+  .footer {
+    padding: 20px 10px;
+    gap: 15px;
+  }
+
+  .footer-column h4 {
+    font-size: 14px;
+  }
+
+  .footer-column ul li {
+    font-size: 13px;
+  }
+
+  .social-icon {
+    width: 35px;
+    height: 35px;
+    font-size: 16px;
+  }
+
+  .image-container img {
+    width: 50px;
+  }
+}
+
 
 </style>

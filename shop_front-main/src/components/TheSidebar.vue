@@ -2,26 +2,32 @@
   <aside class="admin-sidebar">
     <div class="logo-area">
       <h2 class="logo">
-        <fa-icon :icon="['fas', 'crown']" class="logo-icon" />
-        <span>پنل ادمین</span>
+        <fa-icon :icon="logoIcon" class="logo-icon" />
+        <span>{{ title }}</span>
       </h2>
     </div>
 
     <div class="user-profile-sidebar">
-      <div class="user-avatar"></div>
+      <div
+        class="user-avatar"
+        :style="{ backgroundImage: `url(${avatarUrl})` }"
+      ></div>
       <div class="user-info">
-        <p class="user-name">{{ userStore.profile.username }} </p>
-        <p class="user-role">Super Admin</p>
+        <p class="user-name">{{ user.username }}</p>
+        <p class="user-role">{{ user.role || 'کاربر' }}</p>
       </div>
     </div>
 
     <nav class="sidebar-menu-nav">
       <ul class="main-menu">
-        <li v-for="item in menuItems" :key="item.path">
+        <li
+          v-for="item in menuItems"
+          :key="item.path"
+        >
           <div
             class="sidebar-item"
             :class="{ active: item.active }"
-            @click="item.submenu ? $emit('toggleSubmenu', item.path) : $emit('goTo', item.path)"
+            @click="item.submenu ? toggleSubmenu(item.path) : goTo(item.path)"
           >
             <span>
               <fa-icon :icon="item.icon" class="menu-icon" />
@@ -29,7 +35,7 @@
             </span>
             <fa-icon
               v-if="item.submenu"
-              :icon="['fas', item.submenuOpen ? 'chevron-up' : 'chevron-down']"
+              :icon="item.submenuOpen ? ['fas','chevron-up'] : ['fas','chevron-down']"
               class="arrow-icon"
             />
           </div>
@@ -38,8 +44,8 @@
             <li
               v-for="sub in item.submenu"
               :key="sub.path"
-              :class="{ active: $route.path.startsWith(sub.path) }"
-              @click="$emit('goTo', sub.path)"
+              :class="{ active: sub.active }"
+              @click="goTo(sub.path)"
             >
               {{ sub.name }}
             </li>
@@ -47,7 +53,7 @@
         </li>
 
         <li class="sidebar-item logout-item" @click="$emit('logout')">
-          <fa-icon :icon="['fas', 'sign-out-alt']" class="menu-icon" /> خروج
+          <fa-icon :icon="['fas','sign-out-alt']" class="menu-icon" /> خروج
         </li>
       </ul>
     </nav>
@@ -55,26 +61,43 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits , onMounted} from 'vue'
-import { useRoute } from 'vue-router'
-import { useUserStore } from '@/stores/useUserStore'
-const userStore = useUserStore()
+import { computed, watch } from 'vue'
+import { useLoginStore } from '@/stores/useLoginStore'
+import defaultAvatar from '@/assets/image/icons/avatar1.jpg' 
 
 const props = defineProps({
-  menuItems: {
-    type: Array,
-    required: true,
-  },
+  title: { type: String, default: 'پنل کاربری' },
+  logoIcon: { type: Array, default: () => ['fas','crown'] },
+  user: { type: Object, required: true },
+  menuItems: { type: Array, default: () => [] },
 })
-const emit = defineEmits(['logout', 'goTo', 'toggleSubmenu'])
 
-onMounted(async () => {
-    await userStore.fetchProfile(); 
-});
+const emit = defineEmits(['goTo','toggleSubmenu','logout'])
 
-const $route = useRoute()
+const loginStore = useLoginStore()
+
+
+const avatarUrl = computed(() => {
+  return loginStore.user?.data?.image
+    ? `${loginStore.user.data.image}?t=${Date.now()}`
+    : defaultAvatar
+})
+
+
+watch(
+  () => loginStore.user,
+  () => {
+  }
+)
+
+function toggleSubmenu(path) {
+  emit('toggleSubmenu', path)
+}
+
+function goTo(path) {
+  emit('goTo', path)
+}
 </script>
-
 <style scoped>
 .admin-sidebar {
   width: 250px;

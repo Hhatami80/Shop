@@ -40,15 +40,15 @@ onMounted(() => {
   flex-wrap: wrap;
   color: #111111;
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
 }
 
 .content {
   flex: 1;
-  min-width: 300px;
+  min-width: 280px;
   max-width: 600px;
   text-align: right;
-  margin-right: auto;
-  margin-left: auto;
+  margin: 0 auto;
 }
 
 .image {
@@ -59,7 +59,9 @@ onMounted(() => {
 }
 
 .image img {
-  max-width: 90%;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
   max-height: 400px;
   border-radius: 12px;
   object-fit: cover;
@@ -72,12 +74,14 @@ onMounted(() => {
   margin-bottom: 1rem;
   font-size: 2rem;
 }
+
 .content p {
   line-height: 1.6;
   color: #222222;
   margin-bottom: 1.5rem;
   text-align: justify;
 }
+
 .content button {
   background-color: #f9c710;
   border: none;
@@ -86,10 +90,10 @@ onMounted(() => {
   border-radius: 6px;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 .content button:hover {
-  background-color: #f9c710;
+  background-color: #e5b809;
 }
 
 .loading {
@@ -103,16 +107,62 @@ onMounted(() => {
   background-color: #f9f7f1;
   color: #333333;
 }
+
+
+@media (max-width: 1024px) {
+  .about-us {
+    padding: 2rem 4rem;
+    gap: 2rem;
+  }
+}
+
 @media (max-width: 768px) {
   .about-us {
     flex-direction: column-reverse;
     text-align: center;
+    padding: 1.5rem 2rem;
   }
+
+  .content {
+    text-align: center;
+  }
+
   .content button {
     width: 100%;
   }
+
   .image {
+    margin-left: 0;
     margin-bottom: 1.5rem;
   }
+
+  .image img {
+    max-height: 300px;
+  }
 }
+
+@media (max-width: 480px) {
+  .about-us {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .content h2 {
+    font-size: 1.5rem;
+  }
+
+  .content p {
+    font-size: 0.9rem;
+  }
+
+  .image img {
+    max-height: 220px;
+  }
+
+  .content button {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+}
+
 </style>
