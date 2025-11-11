@@ -12,12 +12,10 @@
 
     <div class="content">
       <div class="product-gallery">
-        
         <div class="main-image">
           <img :src="product.image" :alt="product.title" />
         </div>
 
-        
         <div class="gallery-images" v-if="product.images?.length">
           <img v-for="(img, i) in product.images" :key="i" :src="img.image" :alt="product.title" />
         </div>
@@ -60,9 +58,14 @@
         </div>
 
         <div class="buy-section">
-          <button class="add-to-cart golden-button" @click="addToCart(product.id)">
-            افزودن به سبد خرید
+          <button
+            class="add-to-cart golden-button"
+            @click="addToCart(product.id)"
+            :disabled="alreadyInCart"
+          >
+            {{ alreadyInCart ? 'افزوده شد' : 'افزودن به سبد خرید' }}
           </button>
+
           <p class="stock" v-if="product.stock <= 2">
             تنها {{ toPersianNumber(product.stock) }} عدد در انبار موجود است
           </p>
@@ -163,6 +166,10 @@ const categoryTitle = computed(() => {
   const category = categoryStore.allCategories.find((c) => c.id === product.value?.category?.id)
   return category ? category.title : ''
 })
+const alreadyInCart = computed(() =>
+  cartStore.items.some((item) => item.product.id === productId.value)
+)
+
 
 const relatedProducts = computed(() => {
   if (!product.value?.category?.id) return []
@@ -186,8 +193,13 @@ async function loadProduct() {
 }
 
 async function addToCart(productId) {
+  if (alreadyInCart.value) {
+    alert('این محصول قبلاً به سبد خرید شما اضافه شده است.')
+    return
+  }
   await cartStore.addItem(productId, quantity.value)
 }
+
 
 const isCommentModalOpen = ref(false)
 const commentForm = ref({
@@ -252,7 +264,7 @@ watch(
   background-color: white;
   padding: 30px 60px;
   direction: rtl;
-  
+
   color: #2f3e34;
 }
 
@@ -375,7 +387,7 @@ watch(
   text-align: right;
   display: flex;
   flex-direction: column;
-  gap: 12px; 
+  gap: 12px;
   align-items: flex-start;
 }
 
@@ -406,7 +418,6 @@ watch(
   background: #f9c710;
   color: #000;
 }
-
 
 .product-gallery {
   display: flex;

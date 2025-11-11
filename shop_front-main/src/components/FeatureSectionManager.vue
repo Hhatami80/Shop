@@ -75,13 +75,13 @@ function onFileChange(event) {
   const img = new Image()
   img.onload = () => {
     if (img.width > maxWidth || img.height > maxHeight) {
-      toast.error(`عرض تصویر نباید بیشتر از ${maxWidth}px و ارتفاع بیشتر از ${maxHeight}px باشد.`)
+      toast.error(`عکس باید دقیقا ${maxWidth}*${maxHeight} باشد`)
       selectedFile.value = null
       previewImage.value = null
       return
     }
     if (img.width < minWidth || img.height < minHeight) {
-      toast.error(`عرض تصویر نباید کمتر از ${minWidth}px و ارتفاع کمتر از ${minHeight}px باشد.`)
+      toast.error(`عکس باید دقیقا ${maxWidth}*${maxHeight} باشد`)
       selectedFile.value = null
       previewImage.value = null
       return

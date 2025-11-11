@@ -6,7 +6,7 @@
 
        
         <template v-if="loginStore.isAuthenticated">
-          <router-link to="/shop-cart" class="cart-icon">
+          <router-link to="/user/shop-cart" class="cart-icon">
             <i class="fas fa-shopping-cart"></i>
             <transition name="badge-pop" mode="out-in">
               <span v-if="cartStore.totalQuantity > 0" class="cart-badge" :key="cartStore.totalQuantity">
