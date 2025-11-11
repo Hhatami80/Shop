@@ -112,7 +112,7 @@ const prevPage = () => {
 }
 
 const goToPayment = async () => {
-  if (amount.value <= 0) return toast.error('مبلغ وارد شده صحیح نیست')
+  if (amount.value < 100) return toast.error('حداقل مبلغ قابل شارژ 100 تومان میباشد.')
   wallet.pendingAmount = amount.value
   router.push({ name: 'WalletPayment' })
 }

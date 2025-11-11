@@ -476,7 +476,7 @@ class WalletPaymentRequestView(APIView):
         amount = request.data.get("amount")
 
         if not amount or (float(amount) <= 0) or (float(amount) < 100):
-            return Response({"message": "مبلغ نامعتبر است"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "حداقل مبلغ ممکن 100 تومان میبشد."}, status=status.HTTP_400_BAD_REQUEST)
 
         wallet, _ = Wallet.objects.get_or_create(user=user)
 
