@@ -12,12 +12,11 @@
 
     <div class="content">
       <div class="product-gallery">
-        <div class="main-image">
-          <img :src="product.image" :alt="product.title" />
-        </div>
-
-        <div class="gallery-images" v-if="product.images?.length">
-          <img v-for="(img, i) in product.images" :key="i" :src="img.image" :alt="product.title" />
+        <div class="gallery-grid" v-if="product.images?.length >= 3">
+          <img :src="product.image" alt="عکس اصلی" />
+          <img :src="product.images[0].image" alt="گالری ۱" />
+          <img :src="product.images[1].image" alt="گالری ۲" />
+          <img :src="product.images[2].image" alt="گالری ۳" />
         </div>
       </div>
 
@@ -167,9 +166,8 @@ const categoryTitle = computed(() => {
   return category ? category.title : ''
 })
 const alreadyInCart = computed(() =>
-  cartStore.items.some((item) => item.product.id === productId.value)
+  cartStore.items.some((item) => item.product.id === productId.value),
 )
-
 
 const relatedProducts = computed(() => {
   if (!product.value?.category?.id) return []
@@ -199,7 +197,6 @@ async function addToCart(productId) {
   }
   await cartStore.addItem(productId, quantity.value)
 }
-
 
 const isCommentModalOpen = ref(false)
 const commentForm = ref({
@@ -262,7 +259,7 @@ watch(
 <style scoped>
 .product-page {
   background-color: white;
-  padding: 30px 60px;
+  padding: 20px 40px;
   direction: rtl;
 
   color: #2f3e34;
@@ -286,14 +283,16 @@ watch(
 
 .content {
   display: flex;
-  justify-content: space-between;
-  gap: 40px;
+  flex-direction: row; 
+  gap: 0px; 
   align-items: flex-start;
+  justify-content: flex-start; 
 }
 
 .product-info {
-  flex: 1;
+  flex: auto;
   text-align: right;
+  margin-left: 190px;
 }
 
 .title {
@@ -420,46 +419,59 @@ watch(
 }
 
 .product-gallery {
-  display: flex;
-  width: 500px;
-  flex-direction: column;
-  gap: 12px;
+  flex: 1 1 auto; 
+  margin-right: 60px;
 }
 
-.product-gallery .main-image img {
-  width: 100%;
-  height: 400px;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid #eee;
-}
-
-.product-gallery .gallery-images {
+.gallery-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 250px 250px; 
+  grid-template-rows: 350px 350px;   
   gap: 12px;
 }
 
-.product-gallery .gallery-images img {
+
+.gallery-grid img:nth-child(1) {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2; 
+}
+
+.gallery-grid img:nth-child(2) {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+}
+
+.gallery-grid img:nth-child(3) {
+  grid-column: 1 / 2;
+  grid-row: 2 / 3; 
+}
+
+.gallery-grid img:nth-child(4) {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3; 
+}
+
+.gallery-grid img {
   width: 100%;
-  height: 200px;
+  height: 100%;
   object-fit: cover;
   border-radius: 6px;
   border: 1px solid #eee;
 }
-
 .related-products {
   margin-top: 60px;
   text-align: right;
 }
-
 .related-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  display: flex;
   gap: 25px;
+  justify-content: center; 
+  flex-wrap: wrap;
 }
 
 .product-card {
+  flex: 0 0 200px; 
+  max-width: 200px; 
   border: 1px solid #ddd;
   height: 500px;
   border-radius: 10px;

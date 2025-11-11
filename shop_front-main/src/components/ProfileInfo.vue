@@ -1,42 +1,60 @@
 <template>
   <div class="profile-section">
-    <h3>فرم پروفایل</h3>
+    <h3>پروفایل کاربری</h3>
 
+    <!-- فرم پروفایل -->
     <form @submit.prevent="saveProfile" class="profile-form">
+      <!-- Avatar Section -->
       <div class="avatar-section">
         <img
-          :src="store.profile.previewImage || store.profile.image || defaultAvatar"
+          :src="
+            store.profile.previewImage ||
+            (typeof store.profile.image === 'string' ? store.profile.image : defaultAvatar)
+          "
           alt="profile"
           class="table-avatar"
         />
-
-        <label class="upload-label">
+        <label class="upload-label" v-if="editing">
           <input type="file" accept="image/*" @change="onFileChange" />
           تغییر تصویر
         </label>
       </div>
 
+      <!-- فیلدها -->
       <div class="form-group">
-        <label> نام کاربری:</label>
-        <input v-model="store.profile.username" type="text" />
+        <label>نام کاربری:</label>
+        <input v-model="store.profile.username" type="text" :disabled="!editing" />
+        <span class="error" v-if="errors.username">{{ errors.username }}</span>
       </div>
+
       <div class="form-group">
-        <label> نام:</label>
-        <input v-model="store.profile.first_name" type="text" placeholder="مثال رضا " />
+        <label>نام:</label>
+        <input v-model="store.profile.first_name" type="text" :disabled="!editing" />
+        <span class="error" v-if="errors.first_name">{{ errors.first_name }}</span>
       </div>
+
       <div class="form-group">
-        <label> نام خانوادگی:</label>
-        <input v-model="store.profile.last_name" type="text" placeholder="مثال رضایی" />
+        <label>نام خانوادگی:</label>
+        <input v-model="store.profile.last_name" type="text" :disabled="!editing" />
+        <span class="error" v-if="errors.last_name">{{ errors.last_name }}</span>
       </div>
 
       <div class="form-group">
         <label>ایمیل:</label>
-        <input v-model="store.profile.email" type="email" placeholder="example@mail.com" />
+        <input v-model="store.profile.email" type="email" :disabled="!editing" />
+        <span class="error" v-if="errors.email">{{ errors.email }}</span>
       </div>
 
       <div class="form-group">
         <label>شماره تماس:</label>
-        <input v-model="store.profile.phone" type="text" placeholder="مثلاً 09121234567" />
+        <input
+          v-model="store.profile.phone"
+          type="text"
+          :disabled="!editing"
+          placeholder="مثلاً 09121234567"
+          @input="onPhoneInput"
+        />
+        <span class="error" v-if="errors.phone">{{ errors.phone }}</span>
       </div>
 
       <div class="form-group">
@@ -49,13 +67,17 @@
           placeholder="انتخاب تاریخ"
           color="#f9c710"
           position="bottom"
+          :disabled="!editing"
         />
       </div>
 
-      <button type="submit" class="btn gold-btn">ذخیره تغییرات</button>
+      <button type="submit" class="btn gold-btn" :disabled="!editing || saving">
+        {{ saving ? 'در حال ذخیره ...' : 'ذخیره تغییرات' }}
+      </button>
     </form>
 
-    <h4>پیش‌نمایش مقادیر فرم</h4>
+    <!-- جدول پیش‌نمایش -->
+    <h4>پیش‌نمایش اطلاعات</h4>
     <table class="preview-table">
       <thead>
         <tr>
@@ -66,6 +88,7 @@
           <th>شماره تماس</th>
           <th>تاریخ تولد</th>
           <th>عکس</th>
+          <th>عملیات</th>
         </tr>
       </thead>
       <tbody>
@@ -87,6 +110,9 @@
             />
             <span v-else>-</span>
           </td>
+          <td>
+            <button class="edit-btn" @click="editing = true">ویرایش</button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -94,17 +120,27 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useUserStore } from '@/stores/useUserStore'
-import jalaali from 'jalaali-js'
 import defaultAvatar from '@/assets/image/icons/avatar1.jpg'
+import jalaali from 'jalaali-js'
+import { toast } from 'vue3-toastify'
 
 const store = useUserStore()
-
-
 const DatePicker = ref(null)
 const datePickerLoaded = ref(false)
+const saving = ref(false)
+const editing = ref(false)
 
+const errors = reactive({
+  username: '',
+  first_name: '',
+  last_name: '',
+  email: '',
+  phone: '',
+})
+
+// تبدیل میلادی به شمسی
 function toJalali(gDate) {
   if (!gDate) return ''
   const [gy, gm, gd] = gDate.split('-').map(Number)
@@ -115,12 +151,11 @@ function toJalali(gDate) {
 const birthdateShamsi = computed(() => {
   const date = store.profile.birthdate
   if (!date) return '-'
-
   if (date.includes('/')) return date
-
   return toJalali(date)
 })
 
+// Load DatePicker dynamically
 onMounted(async () => {
   const module = await import('vue3-persian-datetime-picker')
   DatePicker.value = module.default
@@ -128,27 +163,60 @@ onMounted(async () => {
   await store.fetchProfile()
 })
 
+// محدود کردن شماره تماس به 11 رقم و فقط اعداد
+const onPhoneInput = (e) => {
+  let val = e.target.value.replace(/\D/g, '')
+  if (val.length > 11) val = val.slice(0, 11)
+  store.profile.phone = val
+}
+
+// پیش‌نمایش تصویر قبل از ذخیره
 const onFileChange = (e) => {
   const file = e.target.files[0]
-  if (file) store.updateProfileImage(file)
+  if (!file) return
+  store.profile.image = file
+  store.profile.previewImage = URL.createObjectURL(file)
 }
 
+// اعتبارسنجی فرم
+function validateForm() {
+  let valid = true
+  errors.username = store.profile.username ? '' : 'نام کاربری الزامی است'
+  errors.first_name = store.profile.first_name ? '' : 'نام الزامی است'
+  errors.last_name = store.profile.last_name ? '' : 'نام خانوادگی الزامی است'
+  errors.email = /^\S+@\S+\.\S+$/.test(store.profile.email) ? '' : 'ایمیل معتبر نیست'
+  errors.phone = /^\d{11}$/.test(store.profile.phone) ? '' : 'شماره تماس باید 11 رقم باشد'
+
+  Object.values(errors).forEach((err) => {
+    if (err) valid = false
+  })
+  return valid
+}
+
+// ذخیره فرم
 const saveProfile = async () => {
-  const formData = new FormData()
-  formData.append('username', store.profile.username)
-  formData.append('first_name', store.profile.first_name)
-  formData.append('last_name', store.profile.last_name)
-  formData.append('email', store.profile.email)
-  formData.append('phone', store.profile.phone)
-
-  if (store.profile.birthdate) formData.append('birthdate', store.profile.birthdate)
-
-  if (store.profile.image instanceof File) formData.append('image', store.profile.image)
-
-  await store.updateProfile(formData)
+  if (!validateForm()) {
+    toast.error('لطفا فیلدهای فرم را بررسی کنید')
+    return
+  }
+  saving.value = true
+  try {
+    const formData = new FormData()
+    formData.append('username', store.profile.username)
+    formData.append('first_name', store.profile.first_name)
+    formData.append('last_name', store.profile.last_name)
+    formData.append('email', store.profile.email)
+    formData.append('phone', store.profile.phone)
+    if (store.profile.birthdate) formData.append('birthdate', store.profile.birthdate)
+    if (store.profile.image instanceof File) formData.append('image', store.profile.image)
+    await store.updateProfile(formData)
+    editing.value = false
+  } catch {
+    toast.error('خطا در ذخیره پروفایل')
+  } finally {
+    saving.value = false
+  }
 }
-
-const editProfile = () => {}
 </script>
 
 <style scoped>
@@ -304,6 +372,32 @@ component:focus {
   transition: 0.3s;
 }
 
+.table-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f9c710;
+  background: #fff8dc;
+}
+.error {
+  color: #f44336;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+.edit-btn {
+  background: #f9c710;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: 0.3s;
+}
+.edit-btn:hover {
+  background: #f8b900;
+  color: white;
+}
 .table-avatar {
   width: 48px;
   height: 48px;

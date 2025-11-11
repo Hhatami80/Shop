@@ -1,20 +1,30 @@
 <template>
-  <aside class="admin-sidebar">
+  <aside class="admin-sidebar" :class="{ admin: isAdmin }">
     <div class="logo-area">
       <h2 class="logo">
         <fa-icon :icon="logoIcon" class="logo-icon" />
-        <span>{{ title }}</span>
+        <span>{{ panelTitle }}</span>
       </h2>
     </div>
 
     <div class="user-profile-sidebar">
-      <img class="user-avatar" :src="avatarUrl" alt="avatar" />
-
-
+      <div class="avatar-wrapper">
+        <transition name="avatar-fade" mode="out-in">
+          <img
+            :key="avatarUrl"
+            class="user-avatar"
+            :src="avatarUrl"
+            alt="avatar"
+            @error="onImageError"
+          />
+        </transition>
+      </div>
 
       <div class="user-info">
-        <p class="user-name">{{ user.username }}</p>
-        <p class="user-role">{{ user.role || 'کاربر' }}</p>
+        <p class="user-name">{{ user.username || 'کاربر مهمان' }}</p>
+        <p class="user-role">
+          {{ isAdmin ? 'مدیر سیستم' : user.role || 'کاربر عادی' }}
+        </p>
       </div>
     </div>
 
@@ -58,36 +68,42 @@
 </template>
 
 <script setup>
-import { computed, watch ,ref } from 'vue'
-import { useLoginStore } from '@/stores/useLoginStore'
+import { computed } from 'vue'
 import defaultAvatar from '@/assets/image/icons/avatar1.jpg'
-
+import { useUserStore } from '@/stores/useUserStore'
 
 const props = defineProps({
-  title: { type: String, default: 'پنل کاربری' },
-  logoIcon: { type: Array, default: () => ['fas', 'crown'] },
   user: { type: Object, required: true },
   menuItems: { type: Array, default: () => [] },
+  logoIcon: { type: Array, default: () => ['fas', 'crown'] },
 })
-const avatarUrl = ref(defaultAvatar)
-watch(
-  () => props.user.image,
-  (newVal) => {
-    avatarUrl.value = newVal || defaultAvatar
-  },
-  { immediate: true } 
-)
+
 const emit = defineEmits(['goTo', 'toggleSubmenu', 'logout'])
+const store = useUserStore()
 
-const loginStore = useLoginStore()
+const isAdmin = computed(() => props.user.role === 'admin')
+const panelTitle = computed(() => (isAdmin.value ? 'پنل ادمین' : 'پنل کاربری'))
 
+const avatarUrl = computed(() => {
+  let img = props.user?.image || store.profile?.image
 
+  if (!img) return defaultAvatar
 
+  if (img.startsWith('http://')) {
+    img = img.replace('http://', window.location.protocol + '//')
+  }
 
-watch(
-  () => loginStore.user,
-  () => {},
-)
+  if (!img.startsWith('http')) {
+    const base = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+    img = `${base}${img.startsWith('/') ? '' : '/'}${img}`
+  }
+
+  return img
+})
+
+function onImageError(e) {
+  e.target.src = defaultAvatar
+}
 
 function toggleSubmenu(path) {
   emit('toggleSubmenu', path)
@@ -97,70 +113,109 @@ function goTo(path) {
   emit('goTo', path)
 }
 </script>
+
 <style scoped>
 .admin-sidebar {
   width: 250px;
   background-color: #1a1a1a;
-  color: #ffffff;
+  color: #fff;
   position: fixed;
   top: 0;
   right: 0;
   height: 100%;
-  padding: 0;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   z-index: 1001;
   box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.admin-sidebar.admin {
+  background-color: #111827;
 }
 
 .logo-area {
   background-color: #2c2c2c;
   padding: 20px 25px;
   border-bottom: 1px solid #3a3a3a;
+  text-align: center;
 }
 
 .logo {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   color: #ffd700;
-  margin: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .logo-icon {
-  font-size: 28px;
-  margin-left: 10px;
+  font-size: 26px;
 }
 
 .user-profile-sidebar {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  padding: 20px 25px;
+  padding: 25px 10px;
   border-bottom: 1px solid #3a3a3a;
+  background-color: #222;
+}
+
+.avatar-wrapper {
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #ffd700;
+  margin-bottom: 10px;
+}
+
+.avatar-fade-enter-active,
+.avatar-fade-leave-active {
+  transition: all 0.5s ease;
+}
+.avatar-fade-enter-from {
+  opacity: 0;
+  transform: scale(0.9);
+}
+.avatar-fade-leave-to {
+  opacity: 0;
+  transform: scale(1.1);
 }
 
 .user-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  background-color: #fff8dc;
+  transition: 0.3s ease;
 }
 
+.user-avatar:hover {
+  transform: scale(1.05);
+}
 
-.user-info .user-name {
+.user-info {
+  text-align: center;
+}
+
+.user-name {
   font-weight: bold;
-  font-size: 15px;
-  margin-bottom: 2px;
+  font-size: 16px;
+  margin-bottom: 4px;
 }
 
-.user-info .user-role {
-  font-size: 12px;
-  color: #aaaaaa;
+.user-role {
+  font-size: 13px;
+  color: #bbbbbb;
 }
 
 .main-menu {
   list-style: none;
   padding: 15px 0;
+  flex-grow: 1;
 }
 
 .sidebar-item {
@@ -169,23 +224,16 @@ function goTo(path) {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #ffffff;
   transition:
     background 0.3s,
     color 0.3s;
   font-size: 15px;
 }
 
-.sidebar-item:hover {
+.sidebar-item:hover,
+.sidebar-item.active {
   background-color: #2c2c2c;
   color: #ffd700;
-}
-
-.sidebar-item.active {
-  background-color: #ffd700;
-  color: #1a1a1a;
-  border-right: 4px solid #ffffff;
-  padding-right: 21px;
 }
 
 .sidebar-item span {
@@ -228,22 +276,6 @@ function goTo(path) {
 .submenu-list li.active {
   color: #ffd700;
   font-weight: 600;
-}
-
-.logout-item {
-  margin-top: 20px;
-  color: #ffd700;
-  border-top: 1px solid #3a3a3a;
-}
-
-.logout-item:hover {
-  background-color: #2c2c2c;
-  color: #ffffff;
-}
-.menu-icon {
-  font-size: 18px;
-  margin-left: 15px;
-  width: 20px;
 }
 
 .logout-item {

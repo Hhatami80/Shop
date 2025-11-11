@@ -119,24 +119,14 @@ const handleAddBank = async () => {
     return toast.error('شماره حساب معتبر نیست (حداکثر 12 رقم)')
   if (!validateIranianIBAN(iban)) return toast.error('شماره شبا معتبر نیست')
 
-  const bankInfo = {
-    cardNumber: card,
-    accountNumber: accountNum,
-    iban,
-  }
+  const bankInfo = { cardNumber: card, accountNumber: accountNum, iban }
 
   try {
-    const added = await store.addBankAccount(bankInfo)
-    await store.fetchBankAccounts()
-    store.bankAccounts.push({
-      ...added,
-      bankName: detectedBank.value.bank_title || 'نامشخص',
-      bankLogo: detectedBank.value.bank_logo || '/logos/default.png',
-    })
+    await store.addBankAccount(bankInfo)
+    await store.fetchBankAccounts()  
 
-    newBank.cardNumber = ''
-    newBank.accountNumber = ''
-    newBank.iban = ''
+    
+    Object.assign(newBank, { cardNumber: '', accountNumber: '', iban: '' })
 
     toast.success('حساب بانکی با موفقیت اضافه شد!')
   } catch (err) {
@@ -144,6 +134,7 @@ const handleAddBank = async () => {
     toast.error('خطا در افزودن حساب بانکی')
   }
 }
+
 
 const handleDeleteBank = async (index) => {
   await store.deleteBankAccount(index)
