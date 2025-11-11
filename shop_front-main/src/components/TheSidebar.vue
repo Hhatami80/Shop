@@ -8,10 +8,10 @@
     </div>
 
     <div class="user-profile-sidebar">
-      <div
-        class="user-avatar"
-        :style="{ backgroundImage: `url(${avatarUrl})` }"
-      ></div>
+      <img class="user-avatar" :src="avatarUrl" alt="avatar" />
+
+
+
       <div class="user-info">
         <p class="user-name">{{ user.username }}</p>
         <p class="user-role">{{ user.role || 'کاربر' }}</p>
@@ -20,10 +20,7 @@
 
     <nav class="sidebar-menu-nav">
       <ul class="main-menu">
-        <li
-          v-for="item in menuItems"
-          :key="item.path"
-        >
+        <li v-for="item in menuItems" :key="item.path">
           <div
             class="sidebar-item"
             :class="{ active: item.active }"
@@ -35,7 +32,7 @@
             </span>
             <fa-icon
               v-if="item.submenu"
-              :icon="item.submenuOpen ? ['fas','chevron-up'] : ['fas','chevron-down']"
+              :icon="item.submenuOpen ? ['fas', 'chevron-up'] : ['fas', 'chevron-down']"
               class="arrow-icon"
             />
           </div>
@@ -53,7 +50,7 @@
         </li>
 
         <li class="sidebar-item logout-item" @click="$emit('logout')">
-          <fa-icon :icon="['fas','sign-out-alt']" class="menu-icon" /> خروج
+          <fa-icon :icon="['fas', 'sign-out-alt']" class="menu-icon" /> خروج
         </li>
       </ul>
     </nav>
@@ -61,33 +58,35 @@
 </template>
 
 <script setup>
-import { computed, watch } from 'vue'
+import { computed, watch ,ref } from 'vue'
 import { useLoginStore } from '@/stores/useLoginStore'
-import defaultAvatar from '@/assets/image/icons/avatar1.jpg' 
+import defaultAvatar from '@/assets/image/icons/avatar1.jpg'
+
 
 const props = defineProps({
   title: { type: String, default: 'پنل کاربری' },
-  logoIcon: { type: Array, default: () => ['fas','crown'] },
+  logoIcon: { type: Array, default: () => ['fas', 'crown'] },
   user: { type: Object, required: true },
   menuItems: { type: Array, default: () => [] },
 })
-
-const emit = defineEmits(['goTo','toggleSubmenu','logout'])
+const avatarUrl = ref(defaultAvatar)
+watch(
+  () => props.user.image,
+  (newVal) => {
+    avatarUrl.value = newVal || defaultAvatar
+  },
+  { immediate: true } 
+)
+const emit = defineEmits(['goTo', 'toggleSubmenu', 'logout'])
 
 const loginStore = useLoginStore()
 
 
-const avatarUrl = computed(() => {
-  return loginStore.user?.data?.image
-    ? `${loginStore.user.data.image}?t=${Date.now()}`
-    : defaultAvatar
-})
 
 
 watch(
   () => loginStore.user,
-  () => {
-  }
+  () => {},
 )
 
 function toggleSubmenu(path) {
@@ -143,10 +142,10 @@ function goTo(path) {
 .user-avatar {
   width: 40px;
   height: 40px;
-  background-color: #ffd700;
   border-radius: 50%;
-  margin-left: 10px;
+  object-fit: cover;
 }
+
 
 .user-info .user-name {
   font-weight: bold;
@@ -171,7 +170,9 @@ function goTo(path) {
   justify-content: space-between;
   align-items: center;
   color: #ffffff;
-  transition: background 0.3s, color 0.3s;
+  transition:
+    background 0.3s,
+    color 0.3s;
   font-size: 15px;
 }
 
@@ -214,7 +215,9 @@ function goTo(path) {
   cursor: pointer;
   font-size: 14px;
   color: #aaaaaa;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .submenu-list li:hover {

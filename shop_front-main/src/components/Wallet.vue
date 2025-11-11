@@ -134,7 +134,7 @@ const formatDate = (dateStr) => {
 }
 const formatPrice = (amount) => Number(amount)?.toLocaleString('fa-IR') || '0'
 const goToBankSection = () => {
-  router.push({ name: 'UserProfile', query: { tab: 'bank' } })
+  router.push('/user/profile/bank')
 }
 </script>
 

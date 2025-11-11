@@ -7,7 +7,7 @@
       </button>
 
       <div class="profile-dropdown-container" @click="toggleProfileMenu">
-        <button class="profile-btn">
+        <button class="action-btn">
           <fa-icon :icon="['fas','user-circle']" />
           <span>{{ user.name }}</span>
         </button>
