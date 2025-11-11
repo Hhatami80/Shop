@@ -2,95 +2,96 @@
   <div class="base-select">
     <label v-if="label">{{ label }}</label>
 
-    <div class="select-wrapper" :class="{ disabled }">
-      <select
-        v-model="localValue"
-        :disabled="disabled"
-        @change="$emit('change', localValue)"
-      >
-        <option disabled value="">{{ placeholder }}</option>
-        <option
-          v-for="option in options"
-          :key="option[valueKey]"
-          :value="option[valueKey]"
-        >
-          {{ option[labelKey] }}
-        </option>
-      </select>
+    <div class="custom-select" @click="toggle">
+      <span>{{ selectedLabel || placeholder }}</span>
       <i class="fas fa-chevron-down"></i>
     </div>
+
+    <ul v-if="open" class="dropdown-list">
+      <li
+        v-for="option in options"
+        :key="option[valueKey]"
+        @click="select(option)"
+        class="dropdown-item"
+      >
+        {{ option[labelKey] }}
+      </li>
+    </ul>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, computed } from 'vue'
 
 const props = defineProps({
   modelValue: [String, Number],
-  options: { type: Array, default: () => [] },
+  options: Array,
   label: String,
-  placeholder: { type: String, default: "انتخاب کنید" },
-  valueKey: { type: String, default: "id" },
-  labelKey: { type: String, default: "name" },
-  disabled: Boolean,
-});
+  placeholder: { type: String, default: 'انتخاب کنید' },
+  valueKey: { type: String, default: 'id' },
+  labelKey: { type: String, default: 'name' }
+})
 
-const emit = defineEmits(["update:modelValue", "change"]);
+const emit = defineEmits(['update:modelValue', 'change'])
 
-const localValue = ref(props.modelValue);
+const open = ref(false)
+const toggle = () => (open.value = !open.value)
+const select = (option) => {
+  emit('update:modelValue', option[props.valueKey])
+  emit('change', option)
+  open.value = false
+}
 
-watch(
-  () => props.modelValue,
-  (val) => (localValue.value = val)
-);
-
-watch(localValue, (val) => emit("update:modelValue", val));
+const selectedLabel = computed(() => {
+  const item = props.options.find(o => o[props.valueKey] === props.modelValue)
+  return item ? item[props.labelKey] : ''
+})
 </script>
 
 <style scoped>
 .base-select {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-label {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: #333;
-}
-
-.select-wrapper {
   position: relative;
+  display: inline-block;
+  width: 100%;
 }
 
-.select-wrapper select {
-  width: 100%;
+.custom-select {
   padding: 10px 35px 10px 10px;
   border: 1px solid #ccc;
   border-radius: 8px;
-  font-size: 0.9rem;
-  outline: none;
+  cursor: pointer;
   background: white;
-  appearance: none;
-  transition: border-color 0.2s ease;
+  position: relative;
 }
 
-.select-wrapper select:focus {
-  border-color: #f9c710;
-}
-
-.select-wrapper i {
+.custom-select i {
   position: absolute;
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
   color: #777;
-  pointer-events: none;
 }
 
-.select-wrapper.disabled {
-  opacity: 0.6;
-  pointer-events: none;
+.dropdown-list {
+  position: absolute;
+  width: 100%;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: white;
+  list-style: none;
+  padding: 0;
+  z-index: 10;
+  overflow-y: auto;
+  max-height: 180px; /* 👈 controls dropdown height */
+}
+
+.dropdown-item {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background: #f5f5f5;
 }
 </style>

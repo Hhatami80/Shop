@@ -8,7 +8,8 @@
     <table v-else class="transactions-table">
       <thead>
         <tr>
-          <th>کاربر</th>
+          <th>نام کاربری</th>
+          <th>نام و نام خانوادگی</th>
           <th>مبلغ</th>
           <th>نوع تراکنش</th>
           <th>کد رهگیری</th>
@@ -18,7 +19,8 @@
       </thead>
       <tbody>
         <tr v-for="t in paginatedTransactions" :key="t.id">
-          <td>{{ t.user?.fullname || t.user_id || '—' }}</td>
+          <td>{{ t.user?.username || t.id || '—' }}</td>
+          <td>{{ t.user?.fullname || '—'}}</td>
           <td>{{ t.amount?.toLocaleString('fa-IR') }} تومان</td>
           <td>{{ t.type }}</td>
           <td>{{ t.internal_tracking_id }}</td>
