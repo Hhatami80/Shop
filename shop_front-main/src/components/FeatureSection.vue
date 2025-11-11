@@ -76,14 +76,13 @@ onMounted(() => {
 .main-banner {
   direction: rtl;
   display: flex;
-  height: 400px;
-  background: #fff;
   flex-direction: row-reverse;
-  overflow: hidden;
+  background: #fff;
   border-radius: 12px;
+  overflow: hidden;
   margin: 0 3px;
+  min-height: 400px;
 }
-
 
 .left-section {
   background: #ffe7b3;
@@ -91,7 +90,8 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: center; 
-  padding-left: 20px;      
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .static-box {
@@ -102,6 +102,7 @@ onMounted(() => {
   border-bottom: 1px solid #ddd;
   gap: 12px; 
   flex: 1;
+  transition: all 0.3s;
 }
 
 .side-icon img {
@@ -121,7 +122,9 @@ onMounted(() => {
   padding: 8px;
   border-radius: 8px;
   font-weight: bold;
-  align-self: center; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .icon-btn i {
@@ -194,29 +197,83 @@ onMounted(() => {
 }
 
 
+@media (max-width: 1024px) {
+  .main-banner {
+    min-height: 350px;
+  }
+}
+
 @media (max-width: 768px) {
   .main-banner {
     flex-direction: column-reverse;
-    height: auto;
+    min-height: auto;
   }
+
   .left-section, .right-section {
     width: 100%;
     padding: 12px;
   }
+
   .banner-content {
     position: static;
     transform: none;
     text-align: center;
     max-width: 100%;
-    margin-top: -60px;
+    margin-top: -50px;
   }
+
   .shop-btn {
     width: 100%;
   }
+
   .static-box {
     justify-content: center;
     gap: 10px;
+    text-align: center;
+  }
+
+  .side-icon img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .banner-content h2 {
+    font-size: 22px;
+  }
+
+  .banner-content p {
+    font-size: 14px;
   }
 }
+
+@media (max-width: 480px) {
+  .main-banner {
+    border-radius: 8px;
+  }
+
+  .banner-content h2 {
+    font-size: 18px;
+  }
+
+  .banner-content p {
+    font-size: 12px;
+  }
+
+  .shop-btn {
+    padding: 6px;
+  }
+
+  .side-icon img {
+    width: 35px;
+    height: 35px;
+  }
+
+  .static-box {
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px;
+  }
+}
+
 
 </style>

@@ -63,7 +63,7 @@ const openModal = (product) => {
   padding: 40px 20px;
   background: linear-gradient(to bottom, #000 50%, #fff 50%);
   direction: rtl;
-  
+  transition: all 0.3s ease;
 }
 
 .section-title {
@@ -89,4 +89,44 @@ const openModal = (product) => {
   position: relative;
   z-index: 1;
 }
+
+@media (max-width: 1024px) {
+  .product-slider-container {
+    padding: 30px 15px;
+  }
+  .section-title {
+    font-size: 22px;
+    margin-bottom: 25px;
+  }
+  .product-swiper {
+    padding-bottom: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .product-slider-container {
+    padding: 25px 10px;
+  }
+  .section-title {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  .product-swiper {
+    padding-bottom: 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-slider-container {
+    padding: 20px 5px;
+  }
+  .section-title {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+  .product-swiper {
+    padding-bottom: 20px;
+  }
+}
+
 </style>

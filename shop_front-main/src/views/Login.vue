@@ -109,6 +109,7 @@ async function loginUser() {
   background-color: #f9f9f9;
   min-height: 100vh;
   display: flex;
+  margin-top: 10px;
   justify-content: center;
   align-items: center;
   padding: 2rem;
