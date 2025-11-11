@@ -12,6 +12,8 @@ class ProductMainPageSerializer(serializers.ModelSerializer):
 
 
 class BestSellerSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True)
+
     class Meta:
         model = Product
         fields = ['id', 'title', 'price', 'description', 'image']

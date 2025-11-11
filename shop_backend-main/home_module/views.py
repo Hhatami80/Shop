@@ -24,17 +24,32 @@ class BannerView(APIView):
 
 class ProductView(APIView):
     def get(self, request: Request):
-        product = Product.objects.prefetch_related('properties', 'images').filter(is_active=True).order_by('-id')
-        product_serializer = ProductSerializer(product, many=True, context={'request': request})
-        discounted_products = Product.objects.filter(is_active=True).exclude(discount=None)
-        discounted_serializer = ProductMainPageSerializer(discounted_products, many=True, context={'request': request})
-        new_products = Product.objects.filter(is_active=True).order_by('-created_date')[:6]
-        new_product_serializer = ProductMainPageSerializer(new_products, many=True, context={'request': request})
-        return Response({
-            'products': product_serializer.data,
-            'discounted_product': discounted_serializer.data,
-            'new_products': new_product_serializer.data,
-        }, status.HTTP_200_OK)
+        try:
+            products_query = (Product.objects
+                              .select_related('category')
+                              .prefetch_related('images')
+                              .filter(is_active=True, is_done=False))
+
+            available_products = products_query.all()
+            product_serializer = ProductSerializer(available_products, many=True, context={'request': request})
+            discounted_products = available_products
+            discounted_products_serializer = ProductSerializer(discounted_products, many=True, context={'request': request})
+            new_products = products_query.order_by('-created_date').all()
+            new_products_serializer = ProductSerializer(new_products, many=True, context={'request': request})
+            return Response({
+                'products': product_serializer.data,
+                'discounted_products': discounted_products_serializer.data,
+                'new_products': new_products_serializer.data
+            }, status.HTTP_200_OK)
+        except Product.DoesNotExist:
+            return Response({
+                'products': [],
+                'discounted_products': [],
+                'new_products': [],
+            }, status.HTTP_404_NOT_FOUND)
+
+
+
 
 
 class ProductCategoryView(APIView):
@@ -138,12 +153,9 @@ class AboutUsMainView(APIView):
 
 class BestSellerView(APIView):
     def get(self, request: Request):
-        products = Product.objects.filter(is_done=False, is_active=True)
-        random = Product.objects.filter(is_active=True).get(pk=1)
-        best_seller = BestSellerSerializer(products, many=True, context={'request': request})
-        return Response({'products': best_seller.data,
-                         'image': request.build_absolute_uri(random.image.url) if random.image else None},
-                        status.HTTP_200_OK)
+        product = Product.objects.filter(is_active=True, is_done=False).order_by('-created_date').all()
+        serializer = BestSellerSerializer(product, many=True, context={'request': request})
+        return Response({'bestsellers': serializer.data})
 
 
 class ProductSearchView(APIView):

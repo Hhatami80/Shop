@@ -46,6 +46,7 @@ class ProductGallerySerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     parser_classes = [MultiPartParser, FormParser]
+    image = serializers.ImageField(use_url=True)
     images = ProductGallerySerializer(many=True, read_only=True)
     category = CategorySerializer(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(

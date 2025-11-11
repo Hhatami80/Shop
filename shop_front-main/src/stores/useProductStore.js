@@ -42,7 +42,7 @@ export const useProductStore = defineStore('product', {
       this.loading = true
       this.error = null
       try {
-        const response = await adminService.getAdminPageProducts()
+        const response = await productService.get()
         this.new_products = response.data.new_products.map((p) => ({
           ...p,
           price: Number(p.price) || 0,
@@ -112,7 +112,7 @@ export const useProductStore = defineStore('product', {
       this.error = null
       try {
         const response = await productService.getBestSellers()
-        this.bestsellers = response.data.products.map((p) => ({
+        this.bestsellers = response.data.bestsellers.map((p) => ({
           id: p.id,
           title: p.title,
           description: p.description || '',
