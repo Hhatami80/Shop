@@ -959,18 +959,128 @@ textarea.input {
   align-items: center;
   z-index: 1000;
   backdrop-filter: blur(5px);
+  padding: 15px; /* اضافه شد برای فاصله با کناره‌ها */
+  box-sizing: border-box;
 }
 
 .modal-content {
   background-color: #ffffff;
-  padding: 40px;
+  padding: 25px 20px; /* کاهش padding برای ریسپانسیو */
   border-radius: 15px;
-  width: 90%;
-  max-width: 550px;
+  width: 100%;
+  max-width: 500px; /* محدودیت مناسب */
+  max-height: 90vh; /* جلوگیری از بزرگ شدن بیش از ارتفاع صفحه */
+  overflow-y: auto; /* اسکرول عمودی اگر محتوا زیاد بود */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   position: relative;
   animation: slide-in 0.3s ease-out;
   direction: rtl;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #555;
+  transition: color 0.2s;
+}
+.modal-close-btn:hover {
+  color: #dc3545;
+}
+
+.modal-images {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.main-image-wrapper {
+  width: 100%;
+  max-width: 250px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  border: 3px solid #ffd700;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.main-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gallery-thumbnails {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.gallery-thumbnails .gallery-thumb {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.gallery-thumbnails .gallery-thumb.active {
+  border: 2px solid #ffd700;
+}
+
+.modal-main-info {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px dashed #ddd;
+}
+
+.modal-text-info {
+  flex: 1;
+  text-align: right;
+}
+
+/* ================== ریسپانسیو موبایل ================== */
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 15px;
+    max-width: 100%;
+  }
+  .modal-main-info {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .modal-text-info {
+    text-align: center;
+  }
+  .main-image-wrapper {
+    max-width: 180px;
+  }
+  .gallery-thumbnails .gallery-thumb {
+    width: 50px;
+    height: 50px;
+  }
+  .modal-price span {
+    display: inline-block;
+    margin-right: 5px;
+  }
+  .prop-list-modal {
+    grid-template-columns: 1fr;
+  }
 }
 
 .image-section {
@@ -1148,15 +1258,15 @@ input:checked + .slider:before {
     opacity: 1;
   }
 }
-.modal-images {
+/* .modal-images {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 15px;
   margin-bottom: 25px;
-}
+} */
 
-.main-image-wrapper {
+/* .main-image-wrapper {
   width: 250px;
   height: 250px;
   border: 3px solid #ffd700;
@@ -1172,14 +1282,14 @@ input:checked + .slider:before {
   transition:
     transform 0.3s,
     box-shadow 0.3s;
-}
+} */
 
-.main-image:hover {
+/* .main-image:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-}
+} */
 
-.gallery-images {
+/* .gallery-images {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -1196,14 +1306,14 @@ input:checked + .slider:before {
     transform 0.2s,
     box-shadow 0.2s;
   cursor: pointer;
-}
+} */
 
-.gallery-thumb:hover {
+/* .gallery-thumb:hover {
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
+} */
 
-.modal-close-btn {
+/* .modal-close-btn {
   position: absolute;
   top: 55px;
   left: 15px;
@@ -1218,7 +1328,7 @@ input:checked + .slider:before {
 }
 .modal-close-btn:hover {
   color: #dc3545;
-}
+} */
 
 .product-modal-title {
   font-size: 26px;
@@ -1233,14 +1343,14 @@ input:checked + .slider:before {
   margin: 15px 0 25px 0;
 }
 
-.modal-main-info {
+/* .modal-main-info {
   display: flex;
   gap: 25px;
   align-items: flex-start;
   margin-bottom: 25px;
   padding-bottom: 20px;
   border-bottom: 1px dashed #ddd;
-}
+} */
 
 .modal-product-image {
   width: 150px;
