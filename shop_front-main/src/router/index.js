@@ -28,11 +28,11 @@ import UserList from '@/components/UserList.vue'
 import ShoppingCart from '@/components/ShoppingCart.vue'
 import AdminOrders from '@/components/AdminOrders.vue'
 import CommetsManager from '@/components/CommetsManager.vue'
+import CategoryDetail from '@/views/CategoryDetail.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // صفحات عمومی
     { path: '/', name: 'MainPage', component: MainPage },
     { path: '/login', name: 'Login', component: Login },
     { path: '/register', name: 'Register', component: Register },
@@ -41,11 +41,53 @@ const router = createRouter({
     { path: '/games', name: 'games', component: Games },
     { path: '/forgotPassword', name: 'forgotPassword', component: ForgotPassword },
     { path: '/categories', name: 'categoryPage', component: CategoryPage },
+    { path: '/categories/:id', name: 'categorydetail', component: CategoryDetail },
     { path: '/productpage', name: 'productpage', component: ProductPage },
     { path: '/product/:id', name: 'ProductDetail', component: ProductDetailPage },
     { path: '/contactus', name: 'contactus', component: ContactUs },
+    {
+      path: '/payment',
+      name: 'payment',
+      component: () => import('@/views/PaymentPage.vue'),
+      meta: { title: 'پرداخت سفارش' },
+    },
+    {
+      path: '/payment/verify',
+      name: 'PaymentVerify',
+      component: () => import('@/views/PaymentVerify.vue'),
+      meta: { title: 'بررسی پرداخت' },
+    },
+    {
+      path: '/checkout',
+      name: 'checkout',
+      component: () => import('@/views/CheckoutPage.vue'),
+      meta: { title: 'تسویه حساب' },
+    },
+    {
+      path: '/payment/gateway',
+      name: 'payment-gateway',
+      component: () => import('@/views/PaymentGatewayPage.vue'),
+      meta: { title: 'انتخاب درگاه پرداخت' },
+    },
+    {
+      path: '/order-success',
+      name: 'OrderSuccess',
+      component: () => import('@/views/OrderSuccessPage.vue'),
+      meta: { title: 'ثبت موفق سفارش' },
+    },
+    {
+      path: '/wallet/payment',
+      name: 'WalletPayment',
+      component: () => import('@/views/WalletPaymentPage.vue'),
+      meta: { title: 'شارژ کیف پول' },
+    },
+    {
+      path: '/wallet/verify',
+      name: 'WalletVerify',
+      component: () => import('@/views/WalletVerify.vue'),
+      meta: { title: 'تأیید پرداخت کیف پول' },
+    },
 
-    
     {
       path: '/user',
       component: UserPanel,
@@ -69,7 +111,6 @@ const router = createRouter({
       ],
     },
 
-    
     {
       path: '/admin',
       component: AdminPanel,
@@ -93,33 +134,30 @@ const router = createRouter({
   ],
 })
 
+router.beforeEach((to) => {
+  const loginStore = useLoginStore()
+  if (!loginStore.token) {
+    loginStore.loadFromCookies()
+  }
 
+  const isAuthenticated = loginStore.isAuthenticated
+  const isAdmin = loginStore.isAdmin
 
+  if (to.path.startsWith('/admin') && !isAuthenticated) {
+    return { name: 'Login' }
+  }
 
-// router.beforeEach((to) => {
-//   const loginStore = useLoginStore()
-//   if (!loginStore.token) {
-//     loginStore.loadFromCookies()
-//   }
+  if (to.path.startsWith('/user') && !isAuthenticated) {
+    return { name: 'Login' }
+  }
 
-//   const isAuthenticated = loginStore.isAuthenticated
-//   const isAdmin = loginStore.isAdmin
+  if (to.path.startsWith('/admin') && isAuthenticated && !isAdmin) {
+    return { name: 'MainPage' }
+  }
 
-//   if (to.path.startsWith('/admin') && !isAuthenticated) {
-//     return { name: 'Login' }
-//   }
-
-//   if (to.path.startsWith('/user') && !isAuthenticated) {
-//     return { name: 'Login' }
-//   }
-
-//   if (to.path.startsWith('/admin') && isAuthenticated && !isAdmin) {
-//     return { name: 'MainPage' }
-//   }
-
-//   if (isAuthenticated && to.name === 'Login') {
-//     return { name: 'MainPage' }
-//   }
-// })
+  if (isAuthenticated && to.name === 'Login') {
+    return { name: 'MainPage' }
+  }
+})
 
 export default router

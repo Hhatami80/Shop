@@ -22,9 +22,11 @@
       </section>
     </main>
 
-    <ChangePasswordModal
-      v-if="showPasswordModal"
-      @close="showPasswordModal = false"
+    <ChangePasswordModal v-if="showPasswordModal" @close="showPasswordModal = false" />
+    <ConfirmLogoutModal
+      v-if="showLogoutConfirm"
+      @confirm="confirmLogout"
+      @cancel="showLogoutConfirm = false"
     />
   </div>
 </template>
@@ -38,24 +40,20 @@ import 'vue3-toastify/dist/index.css'
 import TheSidebar from '@/components/TheSidebar.vue'
 import TheHeader from '@/components/TheHeader.vue'
 import ChangePasswordModal from '@/components/ChangePasswordModal.vue'
+import ConfirmLogoutModal from '@/components/ConfirmLogoutModal.vue'
 
 import { useLoginStore } from '@/stores/useLoginStore'
 
 const router = useRouter()
 const route = useRoute()
 const loginStore = useLoginStore()
-
+const showLogoutConfirm = ref(false)
 const showPasswordModal = ref(false)
-
 
 loginStore.loadFromCookies()
 const user = computed(() => loginStore.user || { name: 'کاربر مهمان', role: 'user' })
 
-
-const headerTitle = computed(() =>
-  user.value.role === 'admin' ? 'پنل ادمین' : 'پنل کاربری'
-)
-
+const headerTitle = computed(() => (user.value.role === 'admin' ? 'پنل ادمین' : 'پنل کاربری'))
 
 const profileMenu = computed(() =>
   user.value.role === 'admin'
@@ -63,9 +61,8 @@ const profileMenu = computed(() =>
         { label: 'تغییر رمز عبور', action: 'changePassword' },
         { label: 'خروج', action: 'logout' },
       ]
-    : [{ label: 'خروج', action: 'logout' }]
+    : [{ label: 'خروج', action: 'logout' }],
 )
-
 
 const menuStatus = ref({ '/admin/dashboard': false })
 
@@ -86,25 +83,84 @@ const sidebarMenuItems = computed(() => {
         ],
         active: isActiveRoute('/admin/header') || isActiveRoute('/admin/footer'),
       },
-      { name: 'مدیریت مقالات', icon: ['fas', 'feather-alt'], path: '/admin/articles', active: isActiveRoute('/admin/articles') },
-      { name: 'مدیریت درباره ما', icon: ['fas', 'info-circle'], path: '/admin/aboutusmanager', active: isActiveRoute('/admin/aboutusmanager') },
-      { name: 'مدیریت بنر', icon: ['fas', 'image'], path: '/admin/bannermanager', active: isActiveRoute('/admin/bannermanager') },
-      { name: 'مدیریت محصولات', icon: ['fas', 'box-open'], path: '/admin/productmanager', active: isActiveRoute('/admin/productmanager') },
-      { name: 'مدیریت دسته بندی‌ها', icon: ['fas', 'tags'], path: '/admin/categorymanager', active: isActiveRoute('/admin/categorymanager') },
-      { name: 'لیست سفارشات', icon: ['fas', 'receipt'], path: '/admin/orderlist', active: isActiveRoute('/admin/orderlist') },
-      { name: 'مدیریت تراکنش‌ها', icon: ['fas', 'wallet'], path: '/admin/transactions', active: isActiveRoute('/admin/transactions') },
-      { name: 'لیست کاربران', icon: ['fas', 'users'], path: '/admin/userslist', active: isActiveRoute('/admin/userslist') },
-      { name: 'مدیریت نظرات', icon: ['fas', 'comments'], path: '/admin/comments', active: isActiveRoute('/admin/comments') },
+      {
+        name: 'مدیریت مقالات',
+        icon: ['fas', 'feather-alt'],
+        path: '/admin/articles',
+        active: isActiveRoute('/admin/articles'),
+      },
+      {
+        name: 'مدیریت درباره ما',
+        icon: ['fas', 'info-circle'],
+        path: '/admin/aboutusmanager',
+        active: isActiveRoute('/admin/aboutusmanager'),
+      },
+      {
+        name: 'مدیریت بنر',
+        icon: ['fas', 'image'],
+        path: '/admin/bannermanager',
+        active: isActiveRoute('/admin/bannermanager'),
+      },
+      {
+        name: 'مدیریت محصولات',
+        icon: ['fas', 'box-open'],
+        path: '/admin/productmanager',
+        active: isActiveRoute('/admin/productmanager'),
+      },
+      {
+        name: 'مدیریت دسته بندی‌ها',
+        icon: ['fas', 'tags'],
+        path: '/admin/categorymanager',
+        active: isActiveRoute('/admin/categorymanager'),
+      },
+      {
+        name: 'لیست سفارشات',
+        icon: ['fas', 'receipt'],
+        path: '/admin/orderlist',
+        active: isActiveRoute('/admin/orderlist'),
+      },
+      {
+        name: 'مدیریت تراکنش‌ها',
+        icon: ['fas', 'wallet'],
+        path: '/admin/transactions',
+        active: isActiveRoute('/admin/transactions'),
+      },
+      {
+        name: 'لیست کاربران',
+        icon: ['fas', 'users'],
+        path: '/admin/userslist',
+        active: isActiveRoute('/admin/userslist'),
+      },
+      {
+        name: 'مدیریت نظرات',
+        icon: ['fas', 'comments'],
+        path: '/admin/comments',
+        active: isActiveRoute('/admin/comments'),
+      },
     ]
   } else {
     return [
-      { name: 'خانه', path: '/user/dashboard', icon: ['fas', 'home'], active: isActiveRoute('/user/dashboard') },
-      { name: 'سفارشات من', path: '/user/orders', icon: ['fas', 'receipt'], active: isActiveRoute('/user/orders') },
-      { name: 'کیف پول', path: '/user/wallet', icon: ['fas', 'wallet'], active: isActiveRoute('/user/wallet') },
+      {
+        name: 'خانه',
+        path: '/user/dashboard',
+        icon: ['fas', 'home'],
+        active: isActiveRoute('/user/dashboard'),
+      },
+      {
+        name: 'سفارشات من',
+        path: '/user/orders',
+        icon: ['fas', 'receipt'],
+        active: isActiveRoute('/user/orders'),
+      },
+      {
+        name: 'کیف پول',
+        path: '/user/wallet',
+        icon: ['fas', 'wallet'],
+        active: isActiveRoute('/user/wallet'),
+      },
     ]
   }
 })
-
 
 function goTo(path) {
   router.push(path)
@@ -124,6 +180,11 @@ function handleProfileAction(action) {
 }
 
 function logout() {
+  
+  showLogoutConfirm.value = true
+}
+function confirmLogout() {
+  showLogoutConfirm.value = false
   loginStore.logout()
   toast.info('شما از حساب خارج شدید!')
   router.push('/login')
