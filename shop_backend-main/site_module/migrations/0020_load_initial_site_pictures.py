@@ -15,7 +15,7 @@ def load_initial_site_pictures(apps, schema_editor):
     Category = apps.get_model('product_module', 'ProductCategory')
     Product = apps.get_model('product_module', 'Product')
 
-    base_dir = pathlib.Path(__file__).parent.absolute()
+    base_dir = pathlib.Path(__file__).parent.parent.absolute()
     data_folder = base_dir / "initial_data"
     footer_badge_images_dir = data_folder / "symbols"
     logo_path = data_folder / 'logo.png'
@@ -32,8 +32,9 @@ def load_initial_site_pictures(apps, schema_editor):
             )
 
     # site text stuff, footer and header links and site logo
-    with (open(initial_values_path, mode='utf-8') as init_file,
-          open(logo_path, mode='rb') as logo):
+    with (open(initial_values_path, encoding='utf-8') as init_file,
+          open(logo_path, mode='rb') as logo,
+          open(main_page_banner_path, mode='rb') as main_page_banner,):
         initial_values = json.load(init_file)
 
         site_setting, created = SiteSetting.objects.get_or_create(
@@ -44,9 +45,10 @@ def load_initial_site_pictures(apps, schema_editor):
             phone=initial_values['phone'],
             email=initial_values['email'],
             address=initial_values['address'],
+            imageurl=File(main_page_banner, name='main_page_banner.jpg'),
         )
 
-        for key, val in initial_values['header_links']:
+        for key, val in initial_values['header_links'].items():
             Header.objects.get_or_create(
                 title=val,
                 url=key,
@@ -78,7 +80,8 @@ def load_initial_site_pictures(apps, schema_editor):
                                                   image=File(product_img, name=f"{i}.png"),
                                                   category=category,
                                                   price=100 * i,
-                                                  discount=i * 2)
+                                                  discount=i * 2,
+                                                  is_active=True,)
 
 
 class Migration(migrations.Migration):

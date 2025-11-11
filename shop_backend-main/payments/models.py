@@ -19,7 +19,7 @@ class Transaction(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="transactions")
     amount = models.DecimalField(max_digits=20, decimal_places=0)
-    reference_id = models.CharField(max_length=100, null=True, blank=True, default="INTERNAL"+str(uuid.uuid4))
+    reference_id = models.CharField(max_length=100, null=True, blank=True, default="INTERNAL_PAYMENT")
     internal_tracking_id = models.CharField(max_length=100, unique=True)
     gateway = models.CharField(max_length=50, default="manual")  # or "zarinpal", "paypal", etc.
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)

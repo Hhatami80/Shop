@@ -48,7 +48,7 @@ const productStore = useProductStore()
 const selectedProductId = ref(null)
 
 const discountedProducts = computed(() =>
-  productStore.products.filter((p) => p.discounted_price > 0)
+  productStore.products.filter((p) => p.discount > 0)
 )
 
 const newProducts = computed(() => productStore.new_products)
