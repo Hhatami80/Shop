@@ -97,11 +97,11 @@ class LoginView(APIView):
                         return Response({'errors': 'اکانت کاربر فعال نیست'}, status.HTTP_422_UNPROCESSABLE_ENTITY)
 
                 else:
-                    return Response({'errors': {'password': 'رمز عبور صحیح نیست'}},
+                    return Response({'errors': {'password': 'اطلاعات وارد شده اشتباه میباشد'}},
                                     status.HTTP_422_UNPROCESSABLE_ENTITY)
 
             else:
-                return Response({'errors': {'username': 'همچین کاربری وجود ندارد'}},
+                return Response({'errors': {'username': 'اطلاعات وارد شده اشتباه میباشد'}},
                                 status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         return Response({'errors': login_serializer.errors}, status.HTTP_422_UNPROCESSABLE_ENTITY)
