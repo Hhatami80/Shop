@@ -103,7 +103,7 @@ onMounted(async () => {
 
 function maskCard(cardNumber) {
   if (!cardNumber) return ''
-  return '**** **** **** ' + cardNumber.slice(-4)
+  return cardNumber.slice(-4) + '**** **** **** '
 }
 
 function onCardInput(e) {

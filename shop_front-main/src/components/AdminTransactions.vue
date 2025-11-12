@@ -96,6 +96,7 @@ onMounted(async () => {
 })
 </script>
 
+
 <style scoped>
 .admin-transactions {
   max-width: 1200px;
@@ -108,6 +109,15 @@ onMounted(async () => {
   font-family: 'IRANSansX';
 }
 
+h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+
 .transactions-table {
   width: 100%;
   border-collapse: collapse;
@@ -116,16 +126,20 @@ onMounted(async () => {
 
 .transactions-table th,
 .transactions-table td {
-  border: 1px solid #eee;
   padding: 12px;
   text-align: center;
-  font-size: 0.9rem;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
 }
 
 .transactions-table th {
-  background-color: #f9c710;
-  color: #fff;
-  font-weight: 600;
+  background: #ffd700;
+  font-weight: 700;
+  color: #222;
+}
+
+.transactions-table tr:hover td {
+  background: #fcfcfc;
 }
 
 .empty-state {
@@ -144,44 +158,48 @@ onMounted(async () => {
 }
 
 .status-badge.success {
-  background: #4caf50;
+  background: #28a745;
   color: #fff;
 }
 .status-badge.failed {
-  background: #e53935;
+  background: #dc3545;
   color: #fff;
 }
 .status-badge.pending {
-  background: #ffb300;
-  color: #fff;
+  background: #ffc107;
+  color: #222;
 }
 
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 15px;
   margin-top: 25px;
-  font-size: 14px;
+  gap: 10px;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #ffd700;
+  color: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 600;
 }
 
-.pagination-btn {
-  background-color: #ffd700;
-  color: #1a1a1a;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.pagination-btn:hover:not(:disabled) {
-  background-color: #e5c100;
-}
-
-.pagination-btn:disabled {
-  opacity: 0.5;
+.pagination button:disabled {
+  background: #ccc;
   cursor: not-allowed;
 }
+
+.pagination span {
+  font-weight: bold;
+  color: #444;
+}
 </style>
+
+

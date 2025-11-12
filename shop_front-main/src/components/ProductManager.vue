@@ -242,7 +242,7 @@
         <h3 class="product-modal-title">مشخصات: {{ selectedProduct.title }}</h3>
         <hr class="modal-divider" />
 
-        <!-- ✅ گالری و تصویر اصلی -->
+        
         <div class="modal-images">
           <div class="main-image-wrapper">
             <img
@@ -252,7 +252,7 @@
             />
           </div>
 
-          <!-- ✅ نمایش تصاویر گالری -->
+          
           <div
             v-if="selectedProduct.images?.length || selectedProduct.galleryPreviews?.length"
             class="gallery-thumbnails"
@@ -269,7 +269,7 @@
           </div>
         </div>
 
-        <!-- ✅ اطلاعات اصلی -->
+        
         <div class="modal-main-info">
           <div class="modal-text-info">
             <p class="modal-price">
@@ -291,11 +291,11 @@
           </div>
         </div>
 
-        <!-- ✅ توضیحات -->
+        
         <h4 class="modal-subtitle">توضیحات</h4>
         <p class="modal-description">{{ selectedProduct.description }}</p>
 
-        <!-- ✅ ویژگی‌ها -->
+       
         <div
           v-if="selectedProduct.properties && selectedProduct.properties.length"
           class="modal-properties-list"
@@ -313,7 +313,7 @@
           </ul>
         </div>
 
-        <!-- ✅ دکمه ویرایش -->
+        
         <button
           class="modal-edit-btn"
           @click="
@@ -677,7 +677,7 @@ onMounted(() => {
 textarea.input {
   width: 100%;
   padding: 12px 14px;
-  font-family: 'Vazirmatn';
+  
   font-size: 15px;
   border: 1px solid #ddd;
   border-radius: 10px;
@@ -959,18 +959,18 @@ textarea.input {
   align-items: center;
   z-index: 1000;
   backdrop-filter: blur(5px);
-  padding: 15px; /* اضافه شد برای فاصله با کناره‌ها */
+  padding: 15px; 
   box-sizing: border-box;
 }
 
 .modal-content {
   background-color: #ffffff;
-  padding: 25px 20px; /* کاهش padding برای ریسپانسیو */
+  padding: 25px 20px; 
   border-radius: 15px;
   width: 100%;
-  max-width: 500px; /* محدودیت مناسب */
-  max-height: 90vh; /* جلوگیری از بزرگ شدن بیش از ارتفاع صفحه */
-  overflow-y: auto; /* اسکرول عمودی اگر محتوا زیاد بود */
+  max-width: 500px; 
+  max-height: 90vh;
+  overflow-y: auto; 
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   position: relative;
   animation: slide-in 0.3s ease-out;
@@ -1053,7 +1053,7 @@ textarea.input {
   text-align: right;
 }
 
-/* ================== ریسپانسیو موبایل ================== */
+
 @media (max-width: 768px) {
   .modal-content {
     padding: 15px;

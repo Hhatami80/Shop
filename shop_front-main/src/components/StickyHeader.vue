@@ -4,16 +4,20 @@
       <div class="icons">
         <router-link to="/"><i class="fas fa-home"></i></router-link>
 
-       
         <template v-if="loginStore.isAuthenticated">
           <router-link to="/user/shop-cart" class="cart-icon">
             <i class="fas fa-shopping-cart"></i>
             <transition name="badge-pop" mode="out-in">
-              <span v-if="cartStore.totalQuantity > 0" class="cart-badge" :key="cartStore.totalQuantity">
+              <span
+                v-if="cartStore.totalQuantity > 0"
+                class="cart-badge"
+                :key="cartStore.totalQuantity"
+              >
                 {{ cartStore.totalQuantity }}
               </span>
             </transition>
           </router-link>
+
           <i class="fas fa-heart"></i>
 
           <router-link v-if="loginStore.isAdmin" to="/admin" class="user-icon" title="پنل ادمین">
@@ -24,7 +28,6 @@
           </router-link>
         </template>
 
-        
         <router-link v-else to="/login">
           <i class="fas fa-sign-in-alt"></i>
         </router-link>
@@ -34,8 +37,8 @@
     </div>
   </transition>
 
-
-  <transition name="sticky-slide-fade">
+  
+  <transition name="drawer-slide">
     <div v-if="drawerOpen" class="sticky-menu-box" @click.self="drawerOpen = false">
       <button class="sticky-close-btn" @click="drawerOpen = false">×</button>
       <ul>
@@ -60,8 +63,8 @@ import { useCartStore } from '@/stores/useCartStore'
 
 const props = defineProps({
   visible: { type: Boolean, default: true },
-  useScrollBlur: { type: Boolean, default: true },  
-  showOnScroll: { type: Boolean, default: false }   
+  useScrollBlur: { type: Boolean, default: true },
+  showOnScroll: { type: Boolean, default: false },
 })
 
 const cartStore = useCartStore()
@@ -69,7 +72,7 @@ const loginStore = useLoginStore()
 const headerStore = useHeaderStore()
 const drawerOpen = ref(false)
 const isBlurred = ref(false)
-const isVisible = ref(!props.showOnScroll)  
+const isVisible = ref(!props.showOnScroll)
 
 function toggleMenu() {
   drawerOpen.value = !drawerOpen.value
@@ -84,31 +87,23 @@ function scrollToSection(selector) {
 }
 
 const handleScroll = () => {
-  if (props.useScrollBlur) {
-    isBlurred.value = window.scrollY > 50
-  }
-  if (props.showOnScroll && window.scrollY > 50) {
-    isVisible.value = true
-  }
+  if (props.useScrollBlur) isBlurred.value = window.scrollY > 50
+  if (props.showOnScroll && window.scrollY > 50) isVisible.value = true
 }
 
 onMounted(() => {
-  if (props.useScrollBlur || props.showOnScroll) {
-    window.addEventListener('scroll', handleScroll)
-  }
+  if (props.useScrollBlur || props.showOnScroll) window.addEventListener('scroll', handleScroll)
   loginStore.loadFromCookies()
   cartStore.fetchCart()
 })
 
 onUnmounted(() => {
-  if (props.useScrollBlur || props.showOnScroll) {
-    window.removeEventListener('scroll', handleScroll)
-  }
+  if (props.useScrollBlur || props.showOnScroll) window.removeEventListener('scroll', handleScroll)
 })
 </script>
 
-
 <style scoped>
+
 .header-sticky {
   position: fixed;
   top: 0;
@@ -119,14 +114,14 @@ onUnmounted(() => {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   z-index: 1500;
   direction: rtl;
-  display: block;
   transition: all 0.3s ease-in-out;
 }
 
 .header-sticky.blurred {
   backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.7);
 }
+
 
 .icons {
   position: absolute;
@@ -141,7 +136,7 @@ onUnmounted(() => {
 .icons a,
 .icons i {
   color: #222;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   cursor: pointer;
   transition:
     color 0.2s ease,
@@ -154,20 +149,12 @@ onUnmounted(() => {
   transform: scale(1.08);
 }
 
-.user-icon i {
-  color: #444;
-  font-size: 1.25rem;
-}
-.user-icon:hover i {
-  color: #f9c710;
-}
-
 .menu-btn {
   position: absolute;
   top: 50%;
   right: 20px;
   transform: translateY(-50%);
-  font-size: 24px;
+  font-size: 26px;
   background: none;
   border: none;
   cursor: pointer;
@@ -184,8 +171,9 @@ onUnmounted(() => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 12px 16px;
   z-index: 3000;
-  min-width: 220px;
+  min-width: 240px;
   direction: rtl;
+  transition: all 0.3s ease;
 }
 
 .sticky-menu-box ul {
@@ -193,7 +181,6 @@ onUnmounted(() => {
   margin: 0;
   padding: 0;
 }
-
 .sticky-menu-box ul li {
   margin-bottom: 10px;
 }
@@ -204,10 +191,13 @@ onUnmounted(() => {
   text-decoration: none;
   color: #333;
   font-weight: 600;
+  transition: color 0.2s ease;
 }
 .sticky-menu-box ul li a:hover {
   color: #f9c710;
 }
+
+
 .sticky-close-btn {
   position: absolute;
   top: 8px;
@@ -216,39 +206,15 @@ onUnmounted(() => {
   background: none;
   border: none;
   cursor: pointer;
+  transition: 0.3s;
 }
 .sticky-close-btn:hover {
   color: #e63946;
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.25s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.sticky-slide-fade-enter-active,
-.sticky-slide-fade-leave-active {
-  transition:
-    transform 0.25s ease,
-    opacity 0.25s ease;
-}
-.sticky-slide-fade-enter-from {
-  transform: translateY(-8px);
-  opacity: 0;
-}
-.sticky-slide-fade-leave-to {
-  transform: translateY(-8px);
-  opacity: 0;
-}
 .cart-icon {
   position: relative;
-  display: inline-block;
 }
-
 .cart-badge {
   position: absolute;
   top: -6px;
@@ -259,55 +225,60 @@ onUnmounted(() => {
   font-weight: 700;
   padding: 2px 6px;
   border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transform-origin: center;
 }
 
 
-.badge-pop-enter-active,
-.badge-pop-leave-active {
-  transition:
-    transform 0.2s ease,
-    opacity 0.2s ease;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.25s ease;
 }
-.badge-pop-enter-from {
-  transform: scale(0.5);
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
-.badge-pop-enter-to {
-  transform: scale(1);
-  opacity: 1;
+.drawer-slide-enter-active,
+.drawer-slide-leave-active {
+  transition:
+    transform 0.3s ease,
+    opacity 0.25s ease;
 }
-.badge-pop-leave-from {
-  transform: scale(1);
-  opacity: 1;
+.drawer-slide-enter-from {
+  transform: translateX(100%);
+  opacity: 0;
 }
-.badge-pop-leave-to {
-  transform: scale(0.5);
+.drawer-slide-leave-to {
+  transform: translateX(100%);
   opacity: 0;
 }
 
 @media (max-width: 768px) {
   .sticky-menu-box {
-    left: 0;
+    top: 0;
     right: 0;
-    width: 85%;
-    max-width: 420px;
-    margin: 0 8px;
-    height: calc(100% - 60px);
+    
+    height: 100dvh;
+    width: 40%;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    padding: 70px 25px 25px;
     overflow-y: auto;
-    border-radius: 8px;
+  }
+
+  .sticky-close-btn {
+    top: 14px;
+    left: 20px;
+    font-size: 28px;
   }
 
   .icons {
-    right: 14px;
+    left: 14px;
     gap: 12px;
   }
 
   .menu-btn {
-    left: 14px;
+    right: 14px;
+    font-size: 24px;
   }
 }
 </style>

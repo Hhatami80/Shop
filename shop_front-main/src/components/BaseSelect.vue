@@ -83,7 +83,7 @@ const selectedLabel = computed(() => {
   padding: 0;
   z-index: 10;
   overflow-y: auto;
-  max-height: 180px; /* 👈 controls dropdown height */
+  max-height: 180px; 
 }
 
 .dropdown-item {

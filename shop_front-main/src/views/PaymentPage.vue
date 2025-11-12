@@ -24,77 +24,84 @@
 
       <div v-else class="cod-section">
         <p>سفارش شما در محل پرداخت خواهد شد</p>
-        <button class="btn gold-btn" @click="confirmCOD" :disabled="loading">
+        <button
+          v-if="!showUserPanelBtn"
+          class="btn gold-btn"
+          @click="confirmCOD"
+          :disabled="loading"
+        >
           تأیید و ثبت سفارش
         </button>
+
+        <button v-else class="btn gold-btn" @click="goToUserPanel">رفتن به پنل کاربری</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import { useCartStore } from "@/stores/useCartStore";
-import { useOrderStore } from "@/stores/useOrderStore";
-import { toast } from "vue3-toastify";
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useCartStore } from '@/stores/useCartStore'
+import { useOrderStore } from '@/stores/useOrderStore'
+import { toast } from 'vue3-toastify'
 
-const router = useRouter();
-const route = useRoute();
-const cart = useCartStore();
-const orderStore = useOrderStore();
-
-const method = route.query.method || "online";
-const gateway = route.query.gateway || "zarinpal";
-const loading = ref(false);
+const router = useRouter()
+const route = useRoute()
+const cart = useCartStore()
+const orderStore = useOrderStore()
+const showUserPanelBtn = ref(false);
+const method = route.query.method || 'online'
+const gateway = route.query.gateway || 'zarinpal'
+const loading = ref(false)
 
 const total = computed(() =>
   (cart.items || []).reduce(
     (acc, i) => acc + i.quantity * (i.product.final_price || i.product.price),
-    0
-  )
-);
+    0,
+  ),
+)
 
-const methodText = method === "online" ? "پرداخت آنلاین" : "پرداخت در محل";
-const gatewayName = computed(() => (gateway === "zarinpal" ? "زرین‌پال" : "نامشخص"));
+const methodText = method === 'online' ? 'پرداخت آنلاین' : 'پرداخت در محل'
+const gatewayName = computed(() => (gateway === 'zarinpal' ? 'زرین‌پال' : 'نامشخص'))
 
 onMounted(async () => {
   if (!cart.items.length) {
-    await cart.fetchCart();
+    await cart.fetchCart()
   }
-});
+})
 
 const processOnline = async () => {
   if (!cart.items.length) {
-    await cart.fetchCart();
+    await cart.fetchCart()
   }
 
-  loading.value = true;
+  loading.value = true
 
   try {
     const payload = {
-      payment_method: "online",
+      payment_method: 'online',
       gateway: gateway,
       items: cart.items.map((i) => ({
         product_id: i.product.id,
         quantity: i.quantity,
       })),
-    };
+    }
 
-    const res = await orderStore.submitOrder(payload);
+    const res = await orderStore.submitOrder(payload)
 
     if (res?.paymentUrl) {
-      window.location.href = res.paymentUrl;
+      window.location.href = res.paymentUrl
     } else {
-      toast.error("خطا در دریافت لینک پرداخت");
+      toast.error('خطا در دریافت لینک پرداخت')
     }
   } catch (err) {
-    console.error(err);
-    toast.error("خطا در ثبت سفارش یا دریافت لینک پرداخت");
+    console.error(err)
+    toast.error('خطا در ثبت سفارش یا دریافت لینک پرداخت')
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const confirmCOD = async () => {
   if (!cart.items.length) {
@@ -113,9 +120,14 @@ const confirmCOD = async () => {
     };
 
     const res = await orderStore.submitOrder(payload);
+
     if (res?.orderId) {
+      
+      showUserPanelBtn.value = true;
+
       toast.success("سفارش با موفقیت ثبت شد ");
-      router.push({ name: "user" });
+
+     
     }
   } catch (err) {
     console.error(err);
@@ -124,11 +136,15 @@ const confirmCOD = async () => {
     loading.value = false;
   }
 };
+
+
+const goToUserPanel = () => {
+  router.push('/user');
+};
 </script>
 
 <style scoped>
 .payment-page {
-  
   max-width: 100vw;
   margin: 50px auto;
   background: #fff;
@@ -152,7 +168,6 @@ h2 {
 
 p {
   margin: 10px 0;
-  
 
   font-size: 1rem;
 }

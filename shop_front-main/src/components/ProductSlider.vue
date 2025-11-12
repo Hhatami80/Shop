@@ -8,9 +8,9 @@
       :slides-per-view="1"
       :space-between="20"
       :breakpoints="{
-        640: { slidesPerView: Math.min(new_products.length, 2) },
-        960: { slidesPerView: Math.min(new_products.length, 3) },
-        1280: { slidesPerView: Math.min(new_products.length, 4) }
+        480: { slidesPerView: Math.min(new_products.length, 2), spaceBetween: 16 },
+        768: { slidesPerView: Math.min(new_products.length, 3), spaceBetween: 18 },
+        1024: { slidesPerView: Math.min(new_products.length, 4), spaceBetween: 20 },
       }"
       :loop="new_products.length > 1"
       :autoplay="{ delay: 4500, disableOnInteraction: false }"
@@ -52,11 +52,9 @@ defineProps({
 
 const cartStore = useCartStore()
 const selectedProduct = ref(null)
-const showModal = ref(false)
 
 const openModal = (product) => {
   selectedProduct.value = product
-  showModal.value = true
 }
 </script>
 
@@ -70,33 +68,33 @@ const openModal = (product) => {
 
 .section-title {
   text-align: center;
-  font-size: 24px;
+  font-size: 26px;
   margin-bottom: 30px;
   color: #222;
-  font-weight: bold;
+  font-weight: 800;
 }
 
 .product-swiper {
-  padding-bottom: 40px;
+  padding-bottom: 45px;
 }
 
 .swiper-pagination-bullet {
   background: #ccc;
   opacity: 1;
+  transition: all 0.3s ease;
 }
 
 .swiper-pagination-bullet-active {
-  background: #2563eb;
-  transform: scale(1.2);
-  transition: 0.3s;
+  background: #facc15;
+  transform: scale(1.3);
 }
 
 .loading {
   text-align: center;
   font-size: 18px;
   color: #666;
+  padding: 20px 0;
 }
-
 
 @media (max-width: 1024px) {
   .section-title {
@@ -116,10 +114,12 @@ const openModal = (product) => {
   .product-slider-container {
     padding: 25px 10px;
   }
-
-  
   .product-swiper {
-    padding-bottom: 30px;
+    padding-bottom: 35px;
+  }
+  .swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
   }
 }
 
@@ -129,11 +129,15 @@ const openModal = (product) => {
     margin-bottom: 15px;
   }
   .product-slider-container {
-    padding: 20px 5px;
+    padding: 20px 8px;
   }
   .product-swiper {
-    padding-bottom: 20px;
+    padding-bottom: 25px;
+  }
+  .swiper-pagination-bullet {
+    width: 12px;
+    height: 12px;
+    margin: 0 6px !important;
   }
 }
-
 </style>

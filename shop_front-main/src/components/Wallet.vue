@@ -1,7 +1,7 @@
 <template>
   <div class="wallet-page">
     <div v-if="!bank" class="bank-warning">
-      ⚠️ برای استفاده از کیف پول، لطفاً حساب بانکی خود را در بخش حساب بانکی وارد کنید.
+       برای استفاده از کیف پول، لطفاً حساب بانکی خود را در بخش حساب بانکی وارد کنید.
       <button class="go-bank-btn" @click="goToBankSection">رفتن به حساب بانکی</button>
     </div>
 
@@ -82,7 +82,7 @@ const wallet = useWalletStore()
 const userStore = useUserStore()
 const router = useRouter()
 
-const amount = ref(0)
+const amount = ref()
 
 const bank = computed(() => (userStore.bankAccounts.length > 0 ? userStore.bankAccounts[0] : null))
 const showBankMessage = computed(() => !bank.value)
