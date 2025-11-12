@@ -19,6 +19,12 @@
           />
         </transition>
       </div>
+      <img class="user-avatar" :src="userStore.profile.image" alt="avatar" />
+
+      
+
+
+
 
       <div class="user-info">
         <p class="user-name">{{ user.username || 'کاربر مهمان' }}</p>
@@ -68,9 +74,19 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+
+import { computed, watch, ref, onMounted } from 'vue'
+import { useLoginStore } from '@/stores/useLoginStore'
 import defaultAvatar from '@/assets/image/icons/avatar1.jpg'
 import { useUserStore } from '@/stores/useUserStore'
+
+const userStore = useUserStore()
+
+onMounted(() => {
+  userStore.fetchProfile()
+})
+
+
 
 const props = defineProps({
   user: { type: Object, required: true },
