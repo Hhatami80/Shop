@@ -8,7 +8,7 @@
     </div>
 
     <div class="user-profile-sidebar">
-      <img class="user-avatar" :src="avatarUrl" alt="avatar" />
+      <img class="user-avatar" :src="userStore.profile.image" alt="avatar" />
 
 
 
@@ -58,10 +58,16 @@
 </template>
 
 <script setup>
-import { computed, watch ,ref } from 'vue'
+import { computed, watch ,ref, onMounted } from 'vue'
 import { useLoginStore } from '@/stores/useLoginStore'
 import defaultAvatar from '@/assets/image/icons/avatar1.jpg'
+import { useUserStore } from '@/stores/useUserStore'
 
+const userStore = useUserStore()
+
+onMounted(() => {
+  userStore.fetchProfile()
+})
 
 const props = defineProps({
   title: { type: String, default: 'پنل کاربری' },

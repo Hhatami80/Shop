@@ -29,8 +29,12 @@
       </div>
     </div>
 
-    <div class="add-btn-container">
+    
+    <div class="add-btn-container" v-if="store.bankAccounts.length == 0">
       <button class="btn gold-btn" @click="handleAddBank">➕ افزودن حساب</button>
+    </div>
+    <div class="add-btn-container" v-else-if="store.bankAccounts.length">
+      <button class="btn gold-btn" disabled>شما یک حساب فعال دارید.</button>
     </div>
 
     <table class="bank-table" v-if="store.bankAccounts.length">
