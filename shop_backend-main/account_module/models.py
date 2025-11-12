@@ -1,3 +1,5 @@
+import os, random
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from rest_framework.authtoken.models import Token
@@ -21,6 +23,13 @@ class ExpiringToken(Token):
         return expiration - now()
 
 
+def get_random_image():
+    images_dir = os.path.join(settings.MEDIA_ROOT, 'images', 'profiles', 'defaults')
+    images = [img for img in os.listdir(images_dir) if not img.startswith('.')]
+    image = random.choice(images)
+    return f'images/profiles/defaults/{image}'
+
+
 class User(AbstractUser):
     ROLE_CHOICE_ADMIN = 'admin'
     ROLE_CHOICE_USER = 'user'
@@ -35,7 +44,8 @@ class User(AbstractUser):
     })
     is_active = models.BooleanField(default=True)
     fullname = models.CharField(null=True, blank=True, verbose_name='نام کاربری', max_length=100)
-    image = models.ImageField(verbose_name='پروفایل کاربر', upload_to='images/profiles', null=True, blank=True)
+    image = models.ImageField(verbose_name='پروفایل کاربر', upload_to='images/profiles',
+                              null=True, blank=True, default=get_random_image)
     role = models.CharField(max_length=20, choices=ROLE_CHOICE, default=ROLE_CHOICE_USER)
     birthdate = models.DateField(blank=True, null=True)
 

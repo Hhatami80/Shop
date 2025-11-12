@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name="reference_id",
             field=models.CharField(
                 blank=True,
-                default="INTERNAL<function uuid4 at 0x000002C6CAA7ADE0>",
+                default="INTERNAL_PAYMENT",
                 max_length=100,
                 null=True,
             ),
