@@ -15,23 +15,23 @@ export const useOrderStore = defineStore('orderStore', {
   }),
 
   actions: {
-    async fetchOrders(page = 1, perPage = 5, status = 'all') {
+    async fetchOrders({ page = 1, perPage = 5, status = 'all', forUser = false } = {}) {
       this.loading = true
       try {
-        const response = await orderService.getAllOrders({ page, perPage, status })
+        const params = { page, perPage, status }
+        const response = forUser
+          ? await orderService.getAllOrders({ page, perPage, status, user: 'current' })
+          : await orderService.getAllOrders({ page, perPage, status })
 
-        if (Array.isArray(response?.data?.data)) {
-          this.orders = response.data.data
-          this.totalOrders = response.data.total || response.data.data.length
-          this.page = page
-          this.perPage = perPage
-        } else {
-          this.orders = []
-          this.totalOrders = 0
-        }
+        this.orders = response?.data?.results || []
+        this.totalOrders = response?.data?.count || 0
+        this.page = page
+        this.perPage = perPage
       } catch (err) {
         console.error('Fetch orders error:', err)
         toast.error('خطا در دریافت سفارش‌ها')
+        this.orders = []
+        this.totalOrders = 0
       } finally {
         this.loading = false
       }
@@ -53,8 +53,7 @@ export const useOrderStore = defineStore('orderStore', {
 
     async submitOrder(payload) {
       const cartStore = useCartStore()
-
-      if (cartStore.items.length === 0) {
+      if (!cartStore.items.length) {
         toast.error('سبد خرید خالی است!')
         return null
       }
@@ -66,9 +65,6 @@ export const useOrderStore = defineStore('orderStore', {
           const result = response?.data?.data || response?.data || {}
           const paymentUrl = result?.paymentUrl
           const orderId = result?.orderId
-
-          console.log('🔹 Zarinpal Payment Response:', result)
-
           if (paymentUrl) {
             toast.success('در حال انتقال به درگاه پرداخت...')
             return { paymentUrl, orderId }
@@ -96,13 +92,7 @@ export const useOrderStore = defineStore('orderStore', {
       this.loading = true
       try {
         const response = await orderService.verifyZarinpalPayment({ authority, order_id, status })
-        const data = response?.data
-        if (data?.success == true) {
-          return true
-        } else {
-          toast.error('پرداخت ناموفق بود ')
-          return false
-        }
+        return response?.data?.success === true
       } catch (err) {
         console.error('Verify payment error:', err)
         toast.error('خطا در بررسی پرداخت')
@@ -124,10 +114,8 @@ export const useOrderStore = defineStore('orderStore', {
 
     async cancelUserOrder(orderId) {
       try {
-        const response = await orderService.updateOrder(orderId, { status: 'canceled' })
-        if (response.status === 204) {
-          this.orders = await this.fetchOrders()
-        }
+        await orderService.updateOrder(orderId, { status: 'canceled' })
+        await this.fetchOrders({ page: this.page, perPage: this.perPage, forUser: true })
         toast.success('سفارش با موفقیت لغو شد')
       } catch (err) {
         console.error('Cancel order error:', err)

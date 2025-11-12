@@ -2,9 +2,9 @@
   <div class="profile-section">
     <h3>پروفایل کاربری</h3>
 
-    <!-- فرم پروفایل -->
-    <form @submit.prevent="saveProfile" class="profile-form">
-      <!-- Avatar Section -->
+    
+    <form @submit.prevent="saveProfile" class="profile-form" novalidate>
+      
       <div class="avatar-section">
         <img
           :src="
@@ -20,7 +20,7 @@
         </label>
       </div>
 
-      <!-- فیلدها -->
+      
       <div class="form-group">
         <label>نام کاربری:</label>
         <input v-model="store.profile.username" type="text" :disabled="!editing" />
@@ -76,7 +76,7 @@
       </button>
     </form>
 
-    <!-- جدول پیش‌نمایش -->
+ 
     <h4>پیش‌نمایش اطلاعات</h4>
     <table class="preview-table">
       <thead>
@@ -140,7 +140,7 @@ const errors = reactive({
   phone: '',
 })
 
-// تبدیل میلادی به شمسی
+
 function toJalali(gDate) {
   if (!gDate) return ''
   const [gy, gm, gd] = gDate.split('-').map(Number)
@@ -155,7 +155,7 @@ const birthdateShamsi = computed(() => {
   return toJalali(date)
 })
 
-// Load DatePicker dynamically
+
 onMounted(async () => {
   const module = await import('vue3-persian-datetime-picker')
   DatePicker.value = module.default
@@ -163,14 +163,14 @@ onMounted(async () => {
   await store.fetchProfile()
 })
 
-// محدود کردن شماره تماس به 11 رقم و فقط اعداد
+
 const onPhoneInput = (e) => {
   let val = e.target.value.replace(/\D/g, '')
   if (val.length > 11) val = val.slice(0, 11)
   store.profile.phone = val
 }
 
-// پیش‌نمایش تصویر قبل از ذخیره
+
 const onFileChange = (e) => {
   const file = e.target.files[0]
   if (!file) return
@@ -178,7 +178,7 @@ const onFileChange = (e) => {
   store.profile.previewImage = URL.createObjectURL(file)
 }
 
-// اعتبارسنجی فرم
+
 function validateForm() {
   let valid = true
   errors.username = store.profile.username ? '' : 'نام کاربری الزامی است'
@@ -193,7 +193,7 @@ function validateForm() {
   return valid
 }
 
-// ذخیره فرم
+
 const saveProfile = async () => {
   if (!validateForm()) {
     toast.error('لطفا فیلدهای فرم را بررسی کنید')

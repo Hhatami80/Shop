@@ -26,7 +26,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="order in paginatedOrders" :key="order.id">
+          <tr v-for="order in orderStore.orders" :key="order.id">
             <td>#{{ order.id }}</td>
             <td>{{ formatDate(order.created_at) }}</td>
             <td>{{ formatPrice(order.total_price) }} تومان</td>
@@ -51,17 +51,19 @@
         </tbody>
       </table>
 
-      <div class="pagination" style="direction: ltr;">
-        <button @click="nextPage" :disabled="currentPage === totalPages">
-          <fa-icon :icon="['fas', 'chevron-left']" />
-        </button>
-        <span>صفحه {{ currentPage }} از {{ totalPages }}</span>
-        <button @click="prevPage" :disabled="currentPage === 1">
+      
+      <div class="pagination" style="direction: ltr;" v-if="orderStore.totalOrders > orderStore.perPage">
+        <button @click="prevPage" :disabled="orderStore.page === 1">
           <fa-icon :icon="['fas', 'chevron-right']" />
+        </button>
+        <span>صفحه {{ orderStore.page }} از {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="orderStore.page === totalPages">
+          <fa-icon :icon="['fas', 'chevron-left']" />
         </button>
       </div>
     </div>
 
+ 
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal">
         <div class="modal-header">
@@ -85,7 +87,7 @@
                 <td>{{ item.quantity }}</td>
                 <td>{{ formatPrice(item.price) }} تومان</td>
                 <td>{{ formatPrice(item.price * item.quantity) }} تومان</td>
-                <td>{{ selectedOrder.payment.payment_method}}</td>
+                <td>{{ selectedOrder.payment.payment_method }}</td>
               </tr>
               <tr v-if="!selectedOrder.items.length">
                 <td colspan="5" class="empty-items">این سفارش محصولی ندارد.</td>
@@ -107,26 +109,29 @@ const orderStore = useOrderStore();
 const showModal = ref(false);
 const selectedOrder = ref({});
 
-const currentPage = ref(1);
-const perPage = 5;
 
-onMounted(() => {
-  orderStore.fetchOrders();
-});
+const totalPages = computed(() =>
+  Math.ceil(orderStore.totalOrders / orderStore.perPage)
+);
 
-const totalPages = computed(() => Math.ceil(orderStore.orders.length / perPage));
 
-const paginatedOrders = computed(() => {
-  const start = (currentPage.value - 1) * perPage;
-  return orderStore.orders.slice(start, start + perPage);
-});
+const fetchOrders = async (page = 1) => {
+  try {
+    await orderStore.fetchOrders({ forUser: true, page, perPage: orderStore.perPage });
+  } catch (err) {
+    console.error(err);
+    toast.error("خطا در دریافت سفارش‌ها");
+  }
+};
+
 
 const nextPage = () => {
-  if (currentPage.value < totalPages.value) currentPage.value++;
+  if (orderStore.page < totalPages.value) fetchOrders(orderStore.page + 1);
 };
 const prevPage = () => {
-  if (currentPage.value > 1) currentPage.value--;
+  if (orderStore.page > 1) fetchOrders(orderStore.page - 1);
 };
+
 
 const openModal = (order) => {
   selectedOrder.value = order;
@@ -136,6 +141,14 @@ const closeModal = () => {
   showModal.value = false;
 };
 
+
+const cancelOrder = async (order) => {
+  if (!confirm("آیا مطمئن هستید می‌خواهید این سفارش را لغو کنید؟")) return;
+  await orderStore.cancelUserOrder(order.id);
+  await fetchOrders(orderStore.page); 
+};
+
+
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
   return new Intl.DateTimeFormat("fa-IR", {
@@ -144,7 +157,6 @@ const formatDate = (dateStr) => {
     day: "2-digit",
   }).format(new Date(dateStr));
 };
-
 const formatPrice = (price) => Number(price)?.toLocaleString("fa-IR") || "0";
 
 const getStatusText = (status) =>
@@ -154,7 +166,6 @@ const getStatusText = (status) =>
     completed: "ارسال‌شده",
     canceled: "لغو‌شده",
   }[status] || "نامشخص");
-
 const getStatusClass = (status) =>
   ({
     pending: "status-pending",
@@ -163,20 +174,19 @@ const getStatusClass = (status) =>
     canceled: "status-canceled",
   }[status] || "");
 
-const cancelOrder = async (order) => {
-  if (!confirm("آیا مطمئن هستید می‌خواهید این سفارش را لغو کنید؟")) return;
-  $forceUpdate
-  await orderStore.cancelUserOrder(order.id);
-  await orderStore.fetchOrders()
-};
-
+onMounted(() => {
+  fetchOrders();
+});
 </script>
+
+
+
 
 <style scoped>
 .user-orders {
   max-width: 900px;
   margin: 40px auto;
-  font-family: "Vazirmatn", sans-serif;
+  
   background: #fff;
   padding: 25px;
   border-radius: 16px;

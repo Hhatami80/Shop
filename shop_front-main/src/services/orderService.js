@@ -1,15 +1,10 @@
 import api from './AxiosService'
 
 export const orderService = {
-  getAllOrders({ page = 1, perPage = 5, status = 'all' } = {}) {
-    const params = {
-      page,
-      per_page: perPage,
-    }
-    if (status && status !== 'all') {
-      params.status = status
-    }
-
+  getAllOrders({ page = 1, perPage = 5, status = 'all', user = null } = {}) {
+    const params = { page, per_page: perPage }
+    if (status && status !== 'all') params.status = status
+    if (user === 'current') params.user = 'current'
     return api.get('/orders/', { params })
   },
 
@@ -22,15 +17,13 @@ export const orderService = {
   },
 
   verifyZarinpalPayment({ authority, order_id, status }) {
-    return api.post('/payments/zarinpal/verify/', {
-      authority: authority,
-      order_id: order_id,
-      status: status,
-    })
+    return api.post('/payments/zarinpal/verify/', { authority, order_id, status })
   },
-  async updateOrder(id, data) {
+
+  updateOrder(id, data) {
     return api.patch(`/orders/${id}`, { status: data.status })
   },
+
   requestChangeStatus(orderId, status) {
     return api.patch(`/admin/orders/${orderId}/change_status/`, { status })
   },
@@ -38,6 +31,7 @@ export const orderService = {
   deleteOrder(id) {
     return api.delete(`/admin/orders/${id}/`)
   },
+
   getOrderById(id) {
     return api.get(`/orders/${id}`)
   },

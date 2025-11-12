@@ -191,18 +191,19 @@ async function submitComment() {
   justify-content: center;
   z-index: 2000;
 }
+
 .modal-content {
   background: white;
   border-radius: 16px;
   max-width: 900px;
   width: 90%;
-  /* max-height: 90%; */
   overflow-y: auto;
   padding: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   position: relative;
   animation: scaleIn 0.3s ease forwards;
 }
+
 @keyframes scaleIn {
   0% {
     transform: scale(0.9);
@@ -213,6 +214,7 @@ async function submitComment() {
     opacity: 1;
   }
 }
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s;
@@ -221,6 +223,7 @@ async function submitComment() {
 .fade-leave-to {
   opacity: 0;
 }
+
 .close-btn {
   position: absolute;
   top: 15px;
@@ -244,10 +247,12 @@ async function submitComment() {
   color: #000;
   transform: scale(1.1);
 }
+
 .tabs {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 .tabs button {
   padding: 10px 20px;
@@ -262,15 +267,17 @@ async function submitComment() {
   background: #facc15;
   color: #fff;
 }
+
 .description {
   text-align: justify;
 }
+
 .tab-content {
   display: flex;
-
   flex-direction: column;
   gap: 20px;
 }
+
 .product-card {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -280,44 +287,54 @@ async function submitComment() {
   border-radius: 16px;
   direction: rtl;
 }
+
 .product-image img {
   width: 100%;
   height: 280px;
   border-radius: 12px;
   border: 1px solid #ddd;
+  object-fit: cover;
 }
+
 .product-details h2 {
   font-size: 22px;
   margin: 0;
 }
+
 .meta {
   display: flex;
   gap: 20px;
   margin-top: 6px;
 }
+
 .meta hr {
   flex-grow: 1;
   border: 0;
   border-top: 1px solid #ddd;
   margin-top: 5px;
 }
+
 .price {
   font-size: 20px;
   color: #000;
   font-weight: bold;
   margin: 20px 0;
 }
+
 .rating-display span {
   color: #facc15;
   font-size: 18px;
   margin-right: 2px;
 }
+
 .actions {
   display: flex;
   align-items: center;
   gap: 15px;
   margin: 15px 0;
+  flex-wrap: wrap;
 }
+
 .quantity-control {
   display: flex;
   align-items: center;
@@ -326,6 +343,7 @@ async function submitComment() {
   overflow: hidden;
   background: rgb(231, 228, 228);
 }
+
 .quantity-control button {
   background: rgb(231, 228, 228);
   color: #000;
@@ -343,11 +361,12 @@ async function submitComment() {
   font-size: 16px;
   background: rgb(231, 228, 228);
 }
+
 .add-to-cart {
   background: #facc15;
   border: none;
   padding: 10px 20px;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
   transition: 0.3s;
@@ -357,10 +376,12 @@ async function submitComment() {
 .add-to-cart:hover {
   background: #eab308;
 }
+
 .share {
   margin-top: 20px;
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
 }
 .share button {
   width: 40px;
@@ -380,6 +401,7 @@ async function submitComment() {
   background: #facc15;
   color: #222;
 }
+
 .add-review {
   border: 1px solid #ddd;
   padding: 15px;
@@ -419,36 +441,17 @@ async function submitComment() {
 .add-review button:hover {
   background: #eab308;
 }
+
 .reviews-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-.review-author {
-  font-weight: bold;
-}
-.review-rating span {
-  color: #facc15;
-  margin-right: 2px;
-}
-.review-rating span.filled {
-  color: gold;
-}
+
 .review-text {
   color: #444;
 }
-.add-review textarea {
-  padding: 3px;
-}
-.add-review textarea:focus {
-  border: 1px solid #6360609d;
-  outline: none;
-}
-.price {
-  font-size: 20px;
-  font-weight: bold;
-  margin: 20px 0;
-}
+
 .old-price {
   text-decoration: line-through;
   color: #888;
@@ -457,4 +460,75 @@ async function submitComment() {
 .new-price {
   color: #e11d48;
 }
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    padding: 15px;
+  }
+
+  .product-card {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 15px;
+  }
+
+  .product-image img {
+    height: 220px;
+  }
+
+  .product-details h2 {
+    font-size: 18px;
+  }
+
+  .price {
+    font-size: 18px;
+  }
+
+  .add-to-cart {
+    width: 100%;
+  }
+
+  .tabs {
+    justify-content: center;
+  }
+
+  .close-btn {
+    top: 10px;
+    left: 10px;
+    width: 35px;
+    height: 35px;
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 10px;
+  }
+
+  .product-details h2 {
+    font-size: 16px;
+  }
+
+  .price {
+    font-size: 16px;
+  }
+
+  .quantity-control button {
+    width: 35px;
+    height: 35px;
+  }
+
+  .quantity-control span {
+    width: 40px;
+  }
+
+  .share button {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+}
+
 </style>

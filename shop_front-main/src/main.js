@@ -50,7 +50,8 @@ import {
   faWallet,
   faUser,
   faBox,
-  faShoppingCart
+  faShoppingCart,
+  faClipboardList
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -84,7 +85,8 @@ library.add(
   faWallet,
   faUser,
   faBox,
-  faShoppingCart
+  faShoppingCart,
+  faClipboardList
 )
 
 const app = createApp(App)

@@ -61,7 +61,7 @@ const profileMenu = [
 
 
 const menuItems = [
-  { name: 'پروفایل', path: '/user/profile/info', icon: ['fas', 'user'] }, // مسیر info
+  { name: 'پروفایل', path: '/user/profile/info', icon: ['fas', 'user'] }, 
   { name: 'سبد خرید', path: '/user/shop-cart', icon: ['fas', 'shopping-cart'] },
   { name: 'کیف پول', path: '/user/wallet', icon: ['fas', 'wallet'] },
   { name: 'سفارش‌ها', path: '/user/orders', icon: ['fas', 'box'] },

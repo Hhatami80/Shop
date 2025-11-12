@@ -5,6 +5,7 @@
       مدیریت سفارش‌ها
     </h1>
 
+    
     <div class="filter">
       <label>فیلتر بر اساس وضعیت:</label>
       <select v-model="statusFilter" @change="filterOrders">
@@ -14,6 +15,7 @@
         <option value="completed">ارسال شد</option>
         <option value="canceled">لغو شد</option>
       </select>
+
       <label>تعداد در هر صفحه:</label>
       <select v-model.number="perPageFilter" @change="changePerPage">
         <option :value="5">5</option>
@@ -23,6 +25,7 @@
       </select>
     </div>
 
+    
     <div v-if="orderStore.loading" class="loading-state">
       <fa-icon :icon="['fas', 'spinner']" pulse /> در حال بارگذاری سفارش‌ها...
     </div>
@@ -31,11 +34,13 @@
       سفارشی برای نمایش وجود ندارد.
     </div>
 
+   
     <div v-else>
       <table class="orders-table">
         <thead>
           <tr>
             <th>شماره سفارش</th>
+            <th>نام کاربر</th>
             <th>تاریخ</th>
             <th>جمع کل</th>
             <th>وضعیت</th>
@@ -45,6 +50,7 @@
         <tbody>
           <tr v-for="order in orderStore.orders" :key="order.id">
             <td>#{{ order.id }}</td>
+            <td>{{ order.user?.username || '---' }}</td>
             <td>{{ formatDate(order.created_at) }}</td>
             <td>{{ formatPrice(order.total_price) }} تومان</td>
             <td>
@@ -64,6 +70,7 @@
         </tbody>
       </table>
 
+      
       <div class="pagination">
         <button @click="prevPage" :disabled="orderStore.page === 1">
           <fa-icon :icon="['fas', 'chevron-left']" />
@@ -75,6 +82,7 @@
       </div>
     </div>
 
+    
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal">
         <h3>جزئیات سفارش #{{ selectedOrder.id }}</h3>
@@ -99,6 +107,7 @@
             </tr>
           </tbody>
         </table>
+
         <div class="modal-actions">
           <button class="btn-delete" @click="deleteOrder(selectedOrder.id)">
             <fa-icon :icon="['fas', 'trash']" /> حذف سفارش
@@ -119,38 +128,41 @@ const orderStore = useOrderStore()
 const showModal = ref(false)
 const selectedOrder = ref({})
 const statusFilter = ref('all')
-
-onMounted(() => {
-  orderStore.fetchOrders(orderStore.page, orderStore.perPage, statusFilter.value)
-})
-
-const totalPages = computed(() => Math.ceil(orderStore.totalOrders / perPageFilter.value))
-
-
 const perPageFilter = ref(orderStore.perPage)
 
-const changePerPage = () => {
-  orderStore.fetchOrders(1, perPageFilter.value, statusFilter.value)
+
+const totalPages = computed(() =>
+  Math.ceil(orderStore.totalOrders / perPageFilter.value)
+)
+
+
+const fetchOrders = async (page = 1) => {
+  await orderStore.fetchOrders({
+    page,
+    perPage: perPageFilter.value,
+    status: statusFilter.value,
+    forUser: false,
+  })
 }
+
 
 const nextPage = () => {
-  if (orderStore.page < totalPages.value) {
-    orderStore.fetchOrders(orderStore.page + 1, perPageFilter.value, statusFilter.value)
-  }
+  if (orderStore.page < totalPages.value) fetchOrders(orderStore.page + 1)
+}
+const prevPage = () => {
+  if (orderStore.page > 1) fetchOrders(orderStore.page - 1)
 }
 
-const prevPage = () => {
-  if (orderStore.page > 1) {
-    orderStore.fetchOrders(orderStore.page - 1, perPageFilter.value, statusFilter.value)
-  }
+
+const changePerPage = () => {
+  fetchOrders(1) 
 }
+
 
 const filterOrders = () => {
-  orderStore.fetchOrders(1, orderStore.perPage, statusFilter.value)
+  fetchOrders(1)
 }
 
-const formatDate = (dateStr) => (dateStr ? new Date(dateStr).toLocaleDateString('fa-IR') : '-')
-const formatPrice = (price) => (price ? Number(price).toLocaleString('fa-IR') : 0)
 
 const changeStatus = async (order) => {
   try {
@@ -159,7 +171,6 @@ const changeStatus = async (order) => {
     toast.error('خطا در تغییر وضعیت سفارش')
   }
 }
-
 const openModal = (order) => {
   selectedOrder.value = order
   showModal.value = true
@@ -168,17 +179,30 @@ const closeModal = () => {
   showModal.value = false
 }
 
+
 const deleteOrder = async (orderId) => {
   if (!confirm('آیا از حذف این سفارش مطمئن هستید؟')) return
   try {
     await orderStore.deleteOrder(orderId)
     toast.success('سفارش حذف شد')
     closeModal()
+    fetchOrders(orderStore.page)
   } catch {
     toast.error('خطا در حذف سفارش')
   }
 }
+
+
+const formatDate = (dateStr) =>
+  dateStr ? new Date(dateStr).toLocaleDateString('fa-IR') : '-'
+const formatPrice = (price) =>
+  price ? Number(price).toLocaleString('fa-IR') : 0
+
+onMounted(() => {
+  fetchOrders()
+})
 </script>
+
 
 <style scoped>
 .admin-orders-page {

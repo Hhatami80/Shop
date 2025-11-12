@@ -23,7 +23,7 @@ const props = defineProps({
   label: String,
   placeholder: String,
   type: { type: String, default: 'text' },
-  unit: String,       // مثلا "تومان"
+  unit: String,       
   disabled: Boolean,
 })
 
@@ -36,7 +36,6 @@ watch(() => props.modelValue, val => {
 })
 
 function onInput(val) {
-  // فقط اعداد مثبت
   const numericValue = val.replace(/[^0-9]/g, '')
   const number = numericValue ? Number(numericValue) : ''
   emit('update:modelValue', number)
