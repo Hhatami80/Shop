@@ -117,7 +117,7 @@ function goTo(path) {
 <style scoped>
 .admin-sidebar {
   width: 250px;
-  background-color: #1a1a1a;
+  background-color: #000;
   color: #fff;
   position: fixed;
   top: 0;
@@ -130,7 +130,7 @@ function goTo(path) {
 }
 
 .admin-sidebar.admin {
-  background-color: #111827;
+  background-color: #000;
 }
 
 .logo-area {
@@ -158,7 +158,7 @@ function goTo(path) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 25px 10px;
+  padding: 15px 10px;
   border-bottom: 1px solid #3a3a3a;
   background-color: #222;
 }
@@ -217,7 +217,23 @@ function goTo(path) {
   padding: 15px 0;
   flex-grow: 1;
 }
+.sidebar-menu-nav {
+  flex-grow: 1; 
+  overflow-y: auto; 
+  padding: 15px 0;
+}
+.sidebar-menu-nav::-webkit-scrollbar {
+  width: 6px;
+}
 
+.sidebar-menu-nav::-webkit-scrollbar-thumb {
+  background-color: #444;
+  border-radius: 3px;
+}
+
+.sidebar-menu-nav::-webkit-scrollbar-track {
+  background-color: #1a1a1a;
+}
 .sidebar-item {
   padding: 12px 25px;
   cursor: pointer;

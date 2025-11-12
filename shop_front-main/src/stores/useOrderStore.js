@@ -7,22 +7,27 @@ export const useOrderStore = defineStore('orderStore', {
   state: () => ({
     loading: false,
     orders: [],
+    totalOrders: 0,
+    page: 1,
+    perPage: 5,
     paymentMethod: 'online',
     gateway: 'zarinpal',
   }),
 
   actions: {
-    async fetchOrders() {
+    async fetchOrders(page = 1, perPage = 5, status = 'all') {
       this.loading = true
       try {
-        const response = await orderService.getAllOrders()
+        const response = await orderService.getAllOrders({ page, perPage, status })
 
         if (Array.isArray(response?.data?.data)) {
           this.orders = response.data.data
-        } else if (Array.isArray(response?.data)) {
-          this.orders = response.data
+          this.totalOrders = response.data.total || response.data.data.length
+          this.page = page
+          this.perPage = perPage
         } else {
           this.orders = []
+          this.totalOrders = 0
         }
       } catch (err) {
         console.error('Fetch orders error:', err)

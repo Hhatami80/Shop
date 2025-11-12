@@ -5,6 +5,24 @@
       مدیریت سفارش‌ها
     </h1>
 
+    <div class="filter">
+      <label>فیلتر بر اساس وضعیت:</label>
+      <select v-model="statusFilter" @change="filterOrders">
+        <option value="all">همه</option>
+        <option value="pending">در انتظار</option>
+        <option value="paid">پرداخت شده</option>
+        <option value="completed">ارسال شد</option>
+        <option value="canceled">لغو شد</option>
+      </select>
+      <label>تعداد در هر صفحه:</label>
+      <select v-model.number="perPageFilter" @change="changePerPage">
+        <option :value="5">5</option>
+        <option :value="10">10</option>
+        <option :value="20">20</option>
+        <option :value="50">50</option>
+      </select>
+    </div>
+
     <div v-if="orderStore.loading" class="loading-state">
       <fa-icon :icon="['fas', 'spinner']" pulse /> در حال بارگذاری سفارش‌ها...
     </div>
@@ -25,7 +43,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="order in paginatedOrders" :key="order.id">
+          <tr v-for="order in orderStore.orders" :key="order.id">
             <td>#{{ order.id }}</td>
             <td>{{ formatDate(order.created_at) }}</td>
             <td>{{ formatPrice(order.total_price) }} تومان</td>
@@ -47,11 +65,11 @@
       </table>
 
       <div class="pagination">
-        <button @click="prevPage" :disabled="currentPage === 1">
+        <button @click="prevPage" :disabled="orderStore.page === 1">
           <fa-icon :icon="['fas', 'chevron-left']" />
         </button>
-        <span>صفحه {{ currentPage }} از {{ totalPages }}</span>
-        <button @click="nextPage" :disabled="currentPage === totalPages">
+        <span> صفحه {{ orderStore.page }} از {{ totalPages }} </span>
+        <button @click="nextPage" :disabled="orderStore.page === totalPages">
           <fa-icon :icon="['fas', 'chevron-right']" />
         </button>
       </div>
@@ -77,9 +95,7 @@
               <td>{{ formatPrice(item.quantity * item.price) }} تومان</td>
             </tr>
             <tr v-if="!selectedOrder.items.length">
-              <td colspan="4" style="text-align: center">
-                هیچ محصولی در این سفارش موجود نیست.
-              </td>
+              <td colspan="4" style="text-align: center">هیچ محصولی در این سفارش موجود نیست.</td>
             </tr>
           </tbody>
         </table>
@@ -95,73 +111,79 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useOrderStore } from "@/stores/useOrderStore";
-import { toast } from "vue3-toastify";
+import { ref, computed, onMounted } from 'vue'
+import { useOrderStore } from '@/stores/useOrderStore'
+import { toast } from 'vue3-toastify'
 
-const orderStore = useOrderStore();
-const showModal = ref(false);
-const selectedOrder = ref({});
-const currentPage = ref(1);
-const perPage = 5;
+const orderStore = useOrderStore()
+const showModal = ref(false)
+const selectedOrder = ref({})
+const statusFilter = ref('all')
 
 onMounted(() => {
-  orderStore.fetchOrders();
-});
+  orderStore.fetchOrders(orderStore.page, orderStore.perPage, statusFilter.value)
+})
 
-const totalPages = computed(() => Math.ceil(orderStore.orders.length / perPage));
+const totalPages = computed(() => Math.ceil(orderStore.totalOrders / perPageFilter.value))
 
-const paginatedOrders = computed(() => {
-  const start = (currentPage.value - 1) * perPage;
-  return orderStore.orders.slice(start, start + perPage);
-});
+
+const perPageFilter = ref(orderStore.perPage)
+
+const changePerPage = () => {
+  orderStore.fetchOrders(1, perPageFilter.value, statusFilter.value)
+}
 
 const nextPage = () => {
-  if (currentPage.value < totalPages.value) currentPage.value++;
-};
-const prevPage = () => {
-  if (currentPage.value > 1) currentPage.value--;
-};
+  if (orderStore.page < totalPages.value) {
+    orderStore.fetchOrders(orderStore.page + 1, perPageFilter.value, statusFilter.value)
+  }
+}
 
-const formatDate = (dateStr) =>
-  dateStr ? new Date(dateStr).toLocaleDateString("fa-IR") : "-";
-const formatPrice = (price) => (price ? Number(price).toLocaleString("fa-IR") : 0);
+const prevPage = () => {
+  if (orderStore.page > 1) {
+    orderStore.fetchOrders(orderStore.page - 1, perPageFilter.value, statusFilter.value)
+  }
+}
+
+const filterOrders = () => {
+  orderStore.fetchOrders(1, orderStore.perPage, statusFilter.value)
+}
+
+const formatDate = (dateStr) => (dateStr ? new Date(dateStr).toLocaleDateString('fa-IR') : '-')
+const formatPrice = (price) => (price ? Number(price).toLocaleString('fa-IR') : 0)
 
 const changeStatus = async (order) => {
   try {
-    await orderStore.updateOrderStatus(order.id, order.status);
-    
-  } catch (error) {
-    toast.error("خطا در تغییر وضعیت سفارش");
+    await orderStore.updateOrderStatus(order.id, order.status)
+  } catch {
+    toast.error('خطا در تغییر وضعیت سفارش')
   }
-};
+}
 
 const openModal = (order) => {
-  selectedOrder.value = order;
-  showModal.value = true;
-};
+  selectedOrder.value = order
+  showModal.value = true
+}
 const closeModal = () => {
-  showModal.value = false;
-};
+  showModal.value = false
+}
 
 const deleteOrder = async (orderId) => {
-  if (!confirm("آیا از حذف این سفارش مطمئن هستید؟")) return;
+  if (!confirm('آیا از حذف این سفارش مطمئن هستید؟')) return
   try {
-    await orderStore.deleteOrder(orderId);
-    toast.success("سفارش حذف شد");
-    closeModal();
-  } catch (err) {
-    console.error(err);
-    toast.error("خطا در حذف سفارش");
+    await orderStore.deleteOrder(orderId)
+    toast.success('سفارش حذف شد')
+    closeModal()
+  } catch {
+    toast.error('خطا در حذف سفارش')
   }
-};
+}
 </script>
 
 <style scoped>
 .admin-orders-page {
   max-width: 1200px;
   margin: 40px auto;
-  
   background: #fff;
   padding: 25px;
   border-radius: 16px;
@@ -175,24 +197,60 @@ h1 {
   gap: 8px;
 }
 
+.filter {
+  display: flex;
+  flex-wrap: wrap; 
+  align-items: center;
+  gap: 15px; 
+  margin-bottom: 20px;
+  background: #f8f9fa; 
+  padding: 12px 15px;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+}
+
+.filter label {
+  font-weight: 500;
+  color: #333;
+  margin-right: 5px;
+}
+
+.filter select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filter select:hover {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0,123,255,0.2);
+}
+
+.filter select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0,123,255,0.3);
+}
+
+
 .orders-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
 }
-
 .orders-table th,
 .orders-table td {
   padding: 12px;
   text-align: center;
   border-bottom: 1px solid #eee;
 }
-
 .orders-table th {
   background: #ffd700;
   font-weight: 700;
 }
-
 .orders-table tr:hover td {
   background: #fcfcfc;
 }
