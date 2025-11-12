@@ -726,7 +726,7 @@ class CategoryBannerView(APIView):
 class OrderAdminViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all().order_by('-created_at')
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def list(self, request, *args, **kwargs):
         orders = self.get_queryset()

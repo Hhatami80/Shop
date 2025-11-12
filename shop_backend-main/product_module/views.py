@@ -1,11 +1,19 @@
 import json
+import requests
 
 from django.shortcuts import render, get_object_or_404, redirect
+from django_filters.rest_framework import DjangoFilterBackend
+from django.conf import settings
+from django.db import transaction
+
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
+from rest_framework import generics
+from rest_framework.decorators import api_view, permission_classes
 
 from account_module.models import User
 from payments.models import Transaction
@@ -15,13 +23,9 @@ from .serializers import ProductSerializer, ProductGallerySerializer, ProductCom
     ProductDescriptionSerializer, ProductPropertySerializer, CartItemSerializer, CartSerializer, \
     ProductRatingSerializer, OrderSerializer, CategoryBannerSerializer, CategorySerializer, WalletSerializer, \
     TransactionSerializer
-from rest_framework.generics import ListAPIView
-from rest_framework import generics
-from rest_framework.decorators import api_view, permission_classes
 from .services import create_order
-import requests
-from django.conf import settings
-from django.db import transaction
+from .filters import OrderFilter
+from .pagination import DefaultPagination
 
 
 # Create your views here.
@@ -191,7 +195,10 @@ class DeleteAllCartItems(APIView):
 class OrderListView(generics.ListAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
-
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = OrderFilter
+    pagination_class = DefaultPagination
+    
     def get_queryset(self):
         if self.request.user.role != 'admin':
             return Order.objects.filter(user=self.request.user).order_by("-created_at")
