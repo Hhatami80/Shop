@@ -108,7 +108,9 @@ export const useOrderStore = defineStore('orderStore', {
         toast.success('وضعیت سفارش به‌روزرسانی شد ')
       } catch (err) {
         console.error('Update order status error:', err)
-        toast.error('خطا در تغییر وضعیت سفارش')
+        const error = err.response?.data.error
+        if (error) toast.warning(error)
+        else toast.error('خطا در تغییر وضعیت سفارش')
       }
     },
 

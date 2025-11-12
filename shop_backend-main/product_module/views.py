@@ -255,7 +255,7 @@ def checkout(request: Request):
         total_cart_value += int(item.product.price) * item.quantity
     if payment_method == Payment.PaymentMethod.Wallet and user.wallet.balance < total_cart_value:
         return Response({
-            "error": "Wallet Balance Low!"
+            "error": "موجودی کیف پول کافی نیست!"
         })
     try:
         order = create_order(user)
@@ -268,6 +268,7 @@ def checkout(request: Request):
                 user.wallet.save()
                 order.status = "paid"
                 order.save()
+                
         elif payment_method == Payment.PaymentMethod.COD:
             order.status = "pending"
             order.save()

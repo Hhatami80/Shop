@@ -43,6 +43,7 @@
             <th>نام کاربر</th>
             <th>تاریخ</th>
             <th>جمع کل</th>
+            <th>روش پرداخت</th>
             <th>وضعیت</th>
             <th>جزئیات</th>
           </tr>
@@ -53,6 +54,7 @@
             <td>{{ order.user?.username || '---' }}</td>
             <td>{{ formatDate(order.created_at) }}</td>
             <td>{{ formatPrice(order.total_price) }} تومان</td>
+            <td>{{ order.payment.payment_method.toLocaleString() }}</td>
             <td>
               <select v-model="order.status" @change="changeStatus(order)">
                 <option value="pending">در انتظار</option>
@@ -73,11 +75,11 @@
       
       <div class="pagination">
         <button @click="prevPage" :disabled="orderStore.page === 1">
-          <fa-icon :icon="['fas', 'chevron-left']" />
+          <fa-icon :icon="['fas', 'chevron-right']" />
         </button>
         <span> صفحه {{ orderStore.page }} از {{ totalPages }} </span>
         <button @click="nextPage" :disabled="orderStore.page === totalPages">
-          <fa-icon :icon="['fas', 'chevron-right']" />
+          <fa-icon :icon="['fas', 'chevron-left']" />
         </button>
       </div>
     </div>

@@ -752,6 +752,10 @@ class OrderAdminViewSet(viewsets.ModelViewSet):
         if new_status not in valid_statuses.keys():
             return Response({'error': 'وضعیت نامعتبر است'}, status=status.HTTP_400_BAD_REQUEST)
 
+        if order.status in ["paid", "completed"] and new_status in ["canceled", "pending"]:
+            return Response({"error": "شما اجازه تغییر وضعیت سفارش پرداخت شده را ندارید."},
+                            status.HTTP_400_BAD_REQUEST)
+            
         order.status = new_status
         order.save()
         serializer = self.get_serializer(order)
