@@ -16,7 +16,7 @@ class Transaction(models.Model):
         Order = "پرداخت سفارش", "Order"
         WalletCharge = "شارژ کیف پول", "WalletCharge"
         WalletWithdraw = "برداشت از کیف پول", "WalletWithdraw"
-
+        
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="transactions")
     amount = models.DecimalField(max_digits=20, decimal_places=0)
     reference_id = models.CharField(max_length=100, null=True, blank=True, default="INTERNAL_PAYMENT")

@@ -268,7 +268,8 @@ def checkout(request: Request):
                 user.wallet.save()
                 order.status = "paid"
                 order.save()
-                
+                WalletTransaction.objects.create(
+                    wallet=user.wallet,type="order", method="card",description="پرداخت سفارش از کیف پول",amount=total_cart_value)
         elif payment_method == Payment.PaymentMethod.COD:
             order.status = "pending"
             order.save()
