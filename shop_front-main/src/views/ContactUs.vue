@@ -2,7 +2,7 @@
   <div class="contact-page">
     <section class="contact-header">
       <h1>تماس با ما</h1>
-      <p>خوشحال می‌شویم از شنیدن نظرات و پیشنهادات شما</p>
+      <p>از شنیدن نظرات و پیشنهادات شما خوشحال می‌شویم</p>
     </section>
 
     <section class="contact-container">

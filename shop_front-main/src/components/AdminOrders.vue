@@ -41,6 +41,7 @@
           <tr>
             <th>شماره سفارش</th>
             <th>نام کاربر</th>
+            <th>نام و نام خانوادگی</th>
             <th>تاریخ</th>
             <th>جمع کل</th>
             <th>روش پرداخت</th>
@@ -52,6 +53,7 @@
           <tr v-for="order in orderStore.orders" :key="order.id">
             <td>#{{ order.id }}</td>
             <td>{{ order.user?.username || '---' }}</td>
+            <td>{{ order.user?.fullname || '---' }}</td>
             <td>{{ formatDate(order.created_at) }}</td>
             <td>{{ formatPrice(order.total_price) }} تومان</td>
             <td>{{ order.payment.payment_method.toLocaleString() }}</td>

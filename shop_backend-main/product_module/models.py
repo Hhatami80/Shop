@@ -301,6 +301,7 @@ class WalletTransaction(models.Model):
     TYPE_CHOICES = [
         ("credit", "واریز"),
         ("debit", "برداشت"),
+        ("order", "سفارش")
     ]
     METHOD_CHOICES = [
         ("card", "کارت"),
