@@ -20,7 +20,7 @@
     </section>
 
     <section class="section">
-      <FeaturedProductsSlider title="محصولات ویژه" :discounted_product="discountedProducts" />
+      <FeaturedProductsSlider title="محصولات ویژه" :discounted_product="productStore.bestsellers" />
     </section>
 
     <section class="section">
@@ -47,9 +47,7 @@ import BestSellerSlider from '@/components/BestSellerSlider.vue'
 const productStore = useProductStore()
 const selectedProductId = ref(null)
 
-const discountedProducts = computed(() =>
-  productStore.products.filter((p) => p.discount > 0)
-)
+
 
 const newProducts = computed(() => productStore.new_products)
 

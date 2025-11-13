@@ -33,6 +33,9 @@
 import { onMounted, computed } from 'vue'
 import { useFeatureSectionStore } from '@/stores/FeatureSectionStore'
 import { useRouter } from 'vue-router'
+import cat1 from '@/assets/image/icons/cat1.png'
+import cat2 from '@/assets/image/icons/cat2.png'
+import cat3 from '@/assets/image/icons/cat3.png'
 const router = useRouter()
 const store = useFeatureSectionStore()
 
@@ -50,19 +53,19 @@ const staticItems = [
   {
     title: 'پیشنهادهای ویژه',
     subtitle: 'و امتیازات ویژه',
-    icon: '/src/assets/image/icons/cat1.png',
+    icon: cat1,
     route: '/special-offers',
   },
   {
     title: 'ارسال سریع و رایگان',
     subtitle: 'تمامی نقاط کشور',
-    icon: '/src/assets/image/icons/cat2.png',
+    icon: cat2,
     route: '/fast-shipping',
   },
   {
     title: 'سفارشی‌سازی',
     subtitle: 'حک پیام روی محصول',
-    icon: '/src/assets/image/icons/cat3.png',
+    icon: cat3,
     route: '/custom-products',
   },
 ]

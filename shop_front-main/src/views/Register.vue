@@ -155,7 +155,7 @@ const verifyOtp = async () => {
   background-color: #f9f9f9;
   min-height: 100vh;
   padding: 60px 20px;
-  margin-top: 10px;
+  margin-top: 50px;
   color: #333;
   display: flex;
   justify-content: center;

@@ -36,7 +36,7 @@
 
 <script setup>
 import { computed, onMounted , ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 
@@ -46,6 +46,7 @@ import TheHeader from '@/components/TheHeader.vue'
 import ConfirmLogoutModal from '@/components/ConfirmLogoutModal.vue'
 
 const router = useRouter()
+const route = useRoute()
 const loginStore = useLoginStore()
 const showLogoutConfirm = ref(false)
 
@@ -60,13 +61,22 @@ const profileMenu = [
 ]
 
 
-const menuItems = [
-  { name: 'پروفایل', path: '/user/profile/info', icon: ['fas', 'user'] }, 
-  { name: 'سبد خرید', path: '/user/shop-cart', icon: ['fas', 'shopping-cart'] },
-  { name: 'کیف پول', path: '/user/wallet', icon: ['fas', 'wallet'] },
-  { name: 'سفارش‌ها', path: '/user/orders', icon: ['fas', 'box'] },
-]
 
+
+const menuItems = computed(() => {
+  const isActiveRoute = (path) => route.path.startsWith(path)
+  const isUser = user.value.role === 'user'
+
+  if (isUser) {
+    return [
+  { name: 'پروفایل', path: '/user/profile/info',active: isActiveRoute('/user/profile/info'), icon: ['fas', 'user'] }, 
+  { name: 'سبد خرید', path: '/user/shop-cart',active: isActiveRoute('/user/shop-cart'), icon: ['fas', 'shopping-cart'] },
+  { name: 'کیف پول', path: '/user/wallet',active: isActiveRoute('/user/wallet'), icon: ['fas', 'wallet'] },
+  { name: 'سفارش‌ها', path: '/user/orders',active: isActiveRoute('/user/orders'), icon: ['fas', 'box'] },
+
+    ]
+  }
+})
 
 onMounted(() => {
   if (!isAuthenticated.value) router.push('/login')

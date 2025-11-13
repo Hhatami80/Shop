@@ -11,12 +11,17 @@
     </nav>
 
     <div class="content">
-      <div class="product-gallery">
-        <div class="gallery-grid" v-if="product.images?.length >= 3">
-          <img :src="product.image" alt="عکس اصلی" />
-          <img :src="product.images[0].image" alt="گالری ۱" />
-          <img :src="product.images[1].image" alt="گالری ۲" />
-          <img :src="product.images[2].image" alt="گالری ۳" />
+      <div class="product-gallery" v-if="product?.image">
+        <div class="gallery-grid">
+          <img :src="product.image" alt="عکس اصلی" class="main-image" />
+
+          <img
+            v-for="(img, index) in product.images || []"
+            :key="index"
+            :src="img.image"
+            :alt="`گالری ${index + 1}`"
+            class="extra-image"
+          />
         </div>
       </div>
 
@@ -283,10 +288,10 @@ watch(
 
 .content {
   display: flex;
-  flex-direction: row; 
-  gap: 0px; 
+  flex-direction: row;
+  gap: 0px;
   align-items: flex-start;
-  justify-content: flex-start; 
+  justify-content: flex-start;
 }
 
 .product-info {
@@ -419,21 +424,20 @@ watch(
 }
 
 .product-gallery {
-  flex: 1 1 auto; 
+  flex: 1 1 auto;
   margin-right: 60px;
 }
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: 250px 250px; 
-  grid-template-rows: 350px 350px;   
+  grid-template-columns: 250px 250px;
+  grid-template-rows: 350px 350px;
   gap: 12px;
 }
 
-
 .gallery-grid img:nth-child(1) {
   grid-column: 1 / 2;
-  grid-row: 1 / 2; 
+  grid-row: 1 / 2;
 }
 
 .gallery-grid img:nth-child(2) {
@@ -443,12 +447,12 @@ watch(
 
 .gallery-grid img:nth-child(3) {
   grid-column: 1 / 2;
-  grid-row: 2 / 3; 
+  grid-row: 2 / 3;
 }
 
 .gallery-grid img:nth-child(4) {
   grid-column: 2 / 3;
-  grid-row: 2 / 3; 
+  grid-row: 2 / 3;
 }
 
 .gallery-grid img {
@@ -465,13 +469,13 @@ watch(
 .related-grid {
   display: flex;
   gap: 25px;
-  justify-content: center; 
+  justify-content: center;
   flex-wrap: wrap;
 }
 
 .product-card {
-  flex: 0 0 200px; 
-  max-width: 200px; 
+  flex: 0 0 200px;
+  max-width: 200px;
   border: 1px solid #ddd;
   height: 500px;
   border-radius: 10px;

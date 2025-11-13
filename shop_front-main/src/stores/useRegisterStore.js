@@ -83,7 +83,10 @@ export const useRegisterStore = defineStore('register', {
         })
 
         if (response.status === 200) {
-          toast.success('حساب با موفقیت فعال شد')
+          toast.success('حساب با موفقیت فعال شد', {
+            autoClose: 5000,
+          })
+
           this.resetRegisterData()
           return true
         } else {

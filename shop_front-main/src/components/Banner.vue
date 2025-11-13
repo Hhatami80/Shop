@@ -30,19 +30,24 @@ import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/pagination";
 
+
+import img1 from "@/assets/image/download1.jpg";
+import img2 from "@/assets/image/download2.jpg";
+import img3 from "@/assets/image/download3.jpg";
+
 const banners = [
   {
-    image: "/src/assets/image/download1.jpg",
+    image: img1,
     title: "قهوه‌ای با عطر زندگی",
     subtitle: "لحظه‌هات رو با طعم واقعی قهوه تازه شروع کن ☕️",
   },
   {
-    image: "/src/assets/image/download2.jpg",
+    image: img2,
     title: "طعمی از آرامش و انرژی",
     subtitle: "قهوه، الهام‌بخش شروعی دوباره در هر روز توست.",
   },
   {
-    image: "/src/assets/image/download3.jpg",
+    image: img3,
     title: "از دانه تا فنجان، با عشق",
     subtitle: "با بهترین دانه‌های عربیکا، تجربه‌ای خاص از طعم ناب.",
   },
@@ -85,10 +90,11 @@ const banners = [
   border-radius: 12px;
   backdrop-filter: blur(6px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.8s ease-in-out;
 }
 
 .banner-title {
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: 900;
   margin-bottom: 8px;
   letter-spacing: -0.5px;
@@ -118,5 +124,24 @@ const banners = [
 
 :deep(.swiper-pagination-bullet-active) {
   background: #fff;
+}
+
+@media (max-width: 768px) {
+  .category-banner {
+    height: 60vh;
+  }
+  .banner-content {
+    left: 50%;
+    top: 65%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    padding: 15px 20px;
+  }
+  .banner-title {
+    font-size: 1.4rem;
+  }
+  .banner-subtitle {
+    font-size: 0.9rem;
+  }
 }
 </style>

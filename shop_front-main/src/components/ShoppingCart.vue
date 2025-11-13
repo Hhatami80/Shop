@@ -74,10 +74,29 @@
 import { onMounted } from 'vue'
 import { useCartStore } from '@/stores/useCartStore'
 import { useRouter } from 'vue-router'
-const router = useRouter()
+import { useUserStore } from '@/stores/useUserStore'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
-function goToCheckout() {
-  router.push({ name: 'checkout' })
+const router = useRouter()
+const userStore = useUserStore()
+
+async function goToCheckout() {
+  
+  await userStore.fetchProfile()
+  await userStore.fetchAddresses()
+
+  const profile = userStore.profile
+  const addresses = userStore.addresses
+
+  
+  if (!profile.first_name || !profile.last_name || !profile.phone || addresses.length === 0) {
+    toast.error('لطفاً ابتدا اطلاعات حساب کاربری و آدرس خود را تکمیل کنید.')
+    router.push('/user/profile/info') 
+    return
+  }
+
+  router.push('/checkout')
 }
 
 const cartStore = useCartStore()

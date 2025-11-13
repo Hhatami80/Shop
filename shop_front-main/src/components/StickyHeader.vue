@@ -29,7 +29,7 @@
         </template>
 
         <router-link v-else to="/login">
-          <i class="fas fa-sign-in-alt"></i>
+          <i class="fas fa-user"></i>
         </router-link>
       </div>
 

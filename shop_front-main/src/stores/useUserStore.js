@@ -30,6 +30,7 @@ export const useUserStore = defineStore("user", {
       image: null,
       previewImage: null,
     },
+    profileData : [],
     addresses: [],
     bankAccounts: [],
     provinces: [],

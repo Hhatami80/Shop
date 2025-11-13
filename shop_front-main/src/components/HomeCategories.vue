@@ -5,18 +5,32 @@
     <div v-if="loading" class="loading">در حال بارگذاری...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
 
-    <div v-else class="categories-swiper">
+    <div v-else class="categories-content">
+      <!-- ✅ حالت استاتیک وقتی تعداد کمتر از 4 است -->
+      <div
+        v-if="categories.length > 0 && categories.length < 4"
+        class="static-categories"
+      >
+        <CategoryCard
+          v-for="category in categories"
+          :key="category.id"
+          :category="category"
+          class="static-category-card"
+        />
+      </div>
+
+      <!-- ✅ حالت اسلایدر وقتی تعداد 4 یا بیشتر است -->
       <Swiper
-        v-if="categories?.length"
+        v-else-if="categories?.length"
         :modules="[Autoplay]"
         :slides-per-view="1"
         :space-between="20"
         :loop="categories.length > 1"
         :autoplay="{ delay: 2500, disableOnInteraction: false }"
         :breakpoints="{
-          480: { slidesPerView: Math.min(categories.length, 2), spaceBetween: 30 },
-          768: { slidesPerView: Math.min(categories.length, 3), spaceBetween: 50 },
-          1024: { slidesPerView: Math.min(categories.length, 4), spaceBetween: 70 },
+          480: { slidesPerView: 2, spaceBetween: 30 },
+          768: { slidesPerView: 3, spaceBetween: 50 },
+          1024: { slidesPerView: 4, spaceBetween: 70 },
         }"
         class="my-swiper"
       >
@@ -79,21 +93,26 @@ onMounted(async () => {
   text-align: center;
 }
 
-.categories-swiper {
+.categories-content {
   max-width: 1250px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
 }
 
-.loading {
-  color: #ddd;
-  font-size: 16px;
+
+.static-categories {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px;
+  margin-right: 50px;
+  flex-wrap: wrap;
 }
 
-.error {
-  color: red;
-  font-size: 16px;
+.static-category-card {
+  width: 250px;
+  max-width: 90%;
 }
 
 .my-swiper {
@@ -109,36 +128,24 @@ onMounted(async () => {
     font-size: 24px;
     margin-bottom: 20px;
   }
-  .my-swiper {
-    padding: 15px 0;
-  }
 }
-
 
 @media (max-width: 768px) {
-  .categories-section {
-    padding: 30px 10px;
+  .static-categories {
+    gap: 20px;
   }
-  .section-title {
-    font-size: 22px;
-    margin-bottom: 18px;
-  }
-  .my-swiper {
-    padding: 10px 0;
+  .static-category-card {
+    width: 200px;
   }
 }
 
-
 @media (max-width: 480px) {
-  .categories-section {
-    padding: 25px 8px;
+  .static-categories {
+    flex-direction: column;
+    gap: 15px;
   }
-  .section-title {
-    font-size: 20px;
-    margin-bottom: 15px;
-  }
-  .my-swiper {
-    padding: 8px 0;
+  .static-category-card {
+    width: 80%;
   }
 }
 </style>
