@@ -36,6 +36,8 @@ defineProps({
   transition: transform 0.3s, box-shadow 0.3s;
   height: 460px;
   min-height: 460px;
+  width: 372px;
+
 }
 .product-card:hover {
   transform: translateY(-6px);

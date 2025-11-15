@@ -55,6 +55,7 @@ const showOriginalPrice = computed(
   display: flex;
   height: 460px;
   min-height: 460px;
+  min-width: 200px;
   flex-direction: column;
   background: white;
   border-radius: 16px;
@@ -62,6 +63,7 @@ const showOriginalPrice = computed(
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.2s ease;
+  width: 372px;
 }
 .product-card:hover {
   transform: translateY(-3px);
