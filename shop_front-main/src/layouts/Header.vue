@@ -59,7 +59,11 @@ const drawerOpen = ref(false);
 const showStickyHeader = ref(false);
 const headerStore = useHeaderStore();
 const menuBtn = ref(null);
-const menuStyle = ref({ top: "0px", left: "0px" });
+const menuStyle = ref({
+  position: "fixed",
+  top: "0px",
+  left: "100%", 
+});
 
 onMounted(() => {
   headerStore.fetchHeader();
@@ -192,18 +196,30 @@ async function toggleMenu() {
   color: red;
 }
 
+
 .slide-fade-enter-active,
 .slide-fade-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.4s ease;
 }
+
+
 .slide-fade-enter-from {
-  transform: translateX(20px);
+  transform: translateX(100%);
   opacity: 0;
 }
+
+
+.slide-fade-enter-to {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+
 .slide-fade-leave-to {
-  transform: translateX(20px);
+  transform: translateX(100%);
   opacity: 0;
 }
+
 
 
 @media (max-width: 1024px) {

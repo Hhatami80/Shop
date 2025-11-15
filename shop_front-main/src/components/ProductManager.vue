@@ -480,17 +480,6 @@ async function submitForm() {
   try {
     if (isEditing.value && form.id) {
       await productStore.updateProduct(form.id, payload)
-      productStore.products[editingIndex.value] = {
-        ...productStore.products[editingIndex.value],
-        title: form.title,
-        category: categoryStore.allCategories.find((c) => c.id === form.category_id) || null,
-        price: form.price,
-        final_price: form.price * (1 - (form.discount || 0) / 100),
-        discount: form.discount,
-        description: form.description,
-        properties: [...form.properties],
-        image: form.imagePreview,
-      }
       
       toast.success('محصول با موفقیت ویرایش شد.')
     } else {
@@ -536,7 +525,7 @@ function editProduct(product, index) {
   form.title = product.title || ''
   form.category_id = product.category?.id || product.category_id || ''
   form.price = product.price || null
-  form.discount = product.discount || ''
+  form.discount = product.discount || 0
   form.description = product.description || ''
   form.imageFile = null
   form.imagePreview = product.image || null
