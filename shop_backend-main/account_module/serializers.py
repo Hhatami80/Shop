@@ -3,12 +3,14 @@ from .models import User, Address, Province, City
 
 
 class UserAdminSerializer(serializers.ModelSerializer):
+    fullname = serializers.ReadOnlyField()
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'phone', 'role']
+        fields = ['id', 'username', 'email', 'phone', 'role', 'fullname']
 
 
 class UserSerializer(serializers.ModelSerializer):
+    fullname = serializers.ReadOnlyField()
     confirm_password = serializers.CharField(write_only=True, required=True, error_messages={
         'required': 'تکرار پسوورد خالی است',
         'blank': 'تکرار پسوورد نمیتواند خالی باشد',
@@ -16,7 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'phone', 'password', 'confirm_password']
+        fields = ['username', 'phone', 'password', 'confirm_password', 'fullname']
         extra_kwargs = {
             'username': {
                 'required': True,

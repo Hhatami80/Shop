@@ -39,16 +39,21 @@ class User(AbstractUser):
         (ROLE_CHOICE_USER, 'user'),
     )
 
+    @property
+    def fullname(self):
+        return f"{self.first_name} {self.last_name}".strip()
+    
     phone = models.CharField(max_length=100, unique=True, null=False, blank=False, default=0, error_messages={
         'unique': 'این شماره تلفن در سیستم وجود دارد.'
     })
     is_active = models.BooleanField(default=True)
-    fullname = models.CharField(null=True, blank=True, verbose_name='نام کاربری', max_length=100)
     image = models.ImageField(verbose_name='پروفایل کاربر', upload_to='images/profiles',
                               null=True, blank=True, default=get_random_image)
     role = models.CharField(max_length=20, choices=ROLE_CHOICE, default=ROLE_CHOICE_USER)
     birthdate = models.DateField(blank=True, null=True)
-
+    
+    
+    
     def __str__(self):
         return f'{self.username} - {self.phone} ({self.get_role_display()})'
 

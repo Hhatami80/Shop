@@ -4,6 +4,7 @@ from account_module.models import User
 
 
 class UserSummarySerializer(serializers.ModelSerializer):
+    fullname = serializers.ReadOnlyField()
     class Meta:
         model = User
         fields = "__all__"
