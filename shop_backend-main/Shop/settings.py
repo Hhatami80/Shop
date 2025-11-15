@@ -97,22 +97,15 @@ TEMPLATES = [
 ]
 
 
-# ZARINPAL_MERCHANT_ID = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
-# ZARINPAL_STARTPAY_URL = 'https://www.zarinpal.com/pg/StartPay/'
-# ZARINPAL_REQUEST_URL = 'https://api.zarinpal.com/pg/v4/payment/request.json'
-# ZARINPAL_VERIFY_URL = 'https://api.zarinpal.com/pg/v4/payment/verify.json'
-
 # ----- Zarinpal for Orders -----
-ZARINPAL_MERCHANT_ID = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-ZARINPAL_REQUEST_URL = 'https://sandbox.zarinpal.com/pg/v4/payment/request.json'
-ZARINPAL_VERIFY_URL = 'https://sandbox.zarinpal.com/pg/v4/payment/verify.json'
-ZARINPAL_STARTPAY_URL = 'https://sandbox.zarinpal.com/pg/StartPay/'
-ZARINPAL_CALLBACK_URL = 'http://localhost:5173/payment/verify'
-# FRONTEND_SUCCESS_URL = "http://localhost:5173/user/order-success"
-# FRONTEND_FAIL_URL = "http://localhost:5173/user/order-fail"
+ZARINPAL_MERCHANT_ID = env.str('ZARINPAL_MERCHANT_ID', "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
+ZARINPAL_REQUEST_URL = env.str('ZARINPAL_REQUEST_URL', 'https://sandbox.zarinpal.com/pg/v4/payment/request.json')
+ZARINPAL_VERIFY_URL = env.str('ZARINPAL_VERIFY_URL', 'https://sandbox.zarinpal.com/pg/v4/payment/verify.json')
+ZARINPAL_STARTPAY_URL = env.str('ZARINPAL_STARTPAY_URL', 'https://sandbox.zarinpal.com/pg/StartPay/')
+ZARINPAL_CALLBACK_URL = env.str('ZARINPAL_CALLBACK_URL', 'http://localhost:5173/verify/')
 
 # ----- Zarinpal for Wallet -----
-ZARINPAL_WALLET_CALLBACK_URL = 'http://localhost:5173/wallet/verify/'
+ZARINPAL_WALLET_CALLBACK_URL = env.str('ZARINPAL_WALLET_CALLBACK_URL', 'http://localhost:5173/wallet/verify/')
 
 WSGI_APPLICATION = 'Shop.wsgi.application'
 
