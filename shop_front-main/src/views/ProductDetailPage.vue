@@ -1,4 +1,5 @@
 <template>
+  <StickyHeader />
   <div v-if="product" class="product-page">
     <nav class="breadcrumb">
       <router-link to="/">صفحه اصلی</router-link>
@@ -82,9 +83,7 @@
           <button :class="{ active: activeTab === 'details' }" @click="activeTab = 'details'">
             جزئیات
           </button>
-          <button :class="{ active: activeTab === 'comments' }" @click="activeTab = 'comments'">
-            نظرات
-          </button>
+          <button disabled style="opacity: 0.4; cursor: not-allowed">نظرات</button>
         </div>
         <div v-if="product.properties?.length" class="product-properties-list">
           <h4>ویژگی‌های محصول</h4>
@@ -153,6 +152,7 @@ import { useRoute } from 'vue-router'
 import { useProductStore } from '@/stores/useProductStore'
 import { useCategoryStore } from '@/stores/useCategoryStore'
 import { useCartStore } from '@/stores/useCartStore'
+import StickyHeader from '@/components/StickyHeader.vue'
 
 const route = useRoute()
 const productStore = useProductStore()
@@ -266,7 +266,7 @@ watch(
   background-color: white;
   padding: 20px 40px;
   direction: rtl;
-
+  margin-top: 10px;
   color: #2f3e34;
 }
 
@@ -297,7 +297,8 @@ watch(
 .product-info {
   flex: auto;
   text-align: right;
-  margin-left: 190px;
+  margin-right: 50px;
+  margin-left: 450px;
 }
 
 .title {
@@ -468,18 +469,18 @@ watch(
 }
 .related-grid {
   display: flex;
-  gap: 25px;
+  gap: 35px;
   justify-content: center;
   flex-wrap: wrap;
 }
 
 .product-card {
-  flex: 0 0 200px;
-  max-width: 200px;
+  flex: 0 0 300px;
+  max-width: 220px;
   border: 1px solid #ddd;
   height: 500px;
   border-radius: 10px;
-  padding: 10px;
+  padding: 20px;
   transition: all 0.3s ease;
   background: #fff;
 }

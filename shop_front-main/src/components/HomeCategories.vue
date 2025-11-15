@@ -6,7 +6,6 @@
     <div v-else-if="error" class="error">{{ error }}</div>
 
     <div v-else class="categories-content">
-      <!-- ✅ حالت استاتیک وقتی تعداد کمتر از 4 است -->
       <div
         v-if="categories.length > 0 && categories.length < 4"
         class="static-categories"
@@ -19,7 +18,6 @@
         />
       </div>
 
-      <!-- ✅ حالت اسلایدر وقتی تعداد 4 یا بیشتر است -->
       <Swiper
         v-else-if="categories?.length"
         :modules="[Autoplay]"

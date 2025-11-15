@@ -82,17 +82,36 @@ const router = useRouter()
 const userStore = useUserStore()
 
 async function goToCheckout() {
-  
   await userStore.fetchProfile()
   await userStore.fetchAddresses()
 
   const profile = userStore.profile
   const addresses = userStore.addresses
 
-  
-  if (!profile.first_name || !profile.last_name || !profile.phone || addresses.length === 0) {
-    toast.error('لطفاً ابتدا اطلاعات حساب کاربری و آدرس خود را تکمیل کنید.')
-    router.push('/user/profile/info') 
+  const missingProfile = !profile.first_name || !profile.last_name || !profile.phone
+  const missingAddress = addresses.length === 0
+
+  if (missingProfile && missingAddress) {
+    toast.error('لطفاً اطلاعات حساب کاربری و آدرس خود را تکمیل کنید.')
+    setTimeout(() => {
+      router.push('/user/profile/info')
+    }, 2000)
+    return
+  }
+
+  if (missingProfile) {
+    toast.error('لطفاً اطلاعات کاربری خود را تکمیل کنید.')
+    setTimeout(() => {
+      router.push('/user/profile/info')
+    }, 2000)
+    return
+  }
+
+  if (missingAddress) {
+    toast.error('لطفاً آدرس خود را تکمیل کنید.')
+    setTimeout(() => {
+      router.push('/user/profile/addresses')
+    }, 2000)
     return
   }
 
@@ -162,7 +181,6 @@ function removeItem(id) {
   color: var(--primary-gold);
   animation: bounce 1.2s infinite;
 }
-
 
 .empty-cart small {
   font-size: 0.9rem;

@@ -1,3 +1,4 @@
+from typing import Any
 from django.db import models
 from django.utils.text import slugify
 from jalali_date import date2jalali
@@ -100,6 +101,9 @@ class Product(models.Model):
 
         super().save(*args, **kwargs)
 
+    def delete(self, using: Any = ..., keep_parents: bool = ...) -> tuple[int, dict[str, int]]:
+        return super().delete(using, keep_parents)
+    
     def __str__(self):
         return self.title
 

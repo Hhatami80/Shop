@@ -2,8 +2,18 @@
   <div class="product-slider-container">
     <h2 class="section-title">پرفروش‌ترین‌ها</h2>
 
+    <div v-if="products.length > 0 && products.length < 4" class="static-products">
+      <BestSellerCard
+        v-for="product in products"
+        :key="product.id"
+        :product="product"
+        @open-modal="openModal"
+      />
+    </div>
+
+
     <Swiper
-      v-if="products?.length"
+      v-else-if="products?.length"
       :modules="[Autoplay, Pagination]"
       :slides-per-view="1"
       :space-between="20"
@@ -24,6 +34,7 @@
 
     <p v-else class="loading">در حال بارگذاری پرفروش‌ها...</p>
 
+  
     <ProductModal
       v-if="selectedProduct"
       :show="!!selectedProduct"
@@ -34,6 +45,7 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Autoplay, Pagination } from 'swiper/modules'
 import 'swiper/css'
@@ -42,20 +54,14 @@ import 'swiper/css/autoplay'
 
 import BestSellerCard from './BestSellerCard.vue'
 import ProductModal from './ProductModal.vue'
-import { useCartStore } from '@/stores/useCartStore'
-import { ref } from 'vue'
 
 defineProps({
   products: { type: Array, default: () => [] },
 })
 
-const cartStore = useCartStore()
 const selectedProduct = ref(null)
-const showModal = ref(false)
-
 const openModal = (product) => {
   selectedProduct.value = product
-  showModal.value = true
 }
 </script>
 
@@ -75,19 +81,28 @@ const openModal = (product) => {
   font-weight: bold;
 }
 
-.product-swiper {
-  padding-bottom: 40px;
+
+.static-products {
+  display: flex;
+  justify-content: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+
+.product-swiper > *{
+  width: 372px;
 }
 
 .swiper-pagination-bullet {
   background: #ccc;
   opacity: 1;
+  transition: all 0.3s ease;
 }
 
 .swiper-pagination-bullet-active {
   background: #2563eb;
   transform: scale(1.2);
-  transition: 0.3s;
 }
 
 .loading {
@@ -104,9 +119,6 @@ const openModal = (product) => {
   .product-slider-container {
     padding: 30px 15px;
   }
-  .product-swiper {
-    padding-bottom: 35px;
-  }
 }
 
 @media (max-width: 768px) {
@@ -117,20 +129,21 @@ const openModal = (product) => {
   .product-slider-container {
     padding: 25px 10px;
   }
-  .product-swiper {
-    padding-bottom: 30px;
+  .static-products {
+    gap: 15px;
   }
 }
+
 @media (max-width: 480px) {
   .section-title {
     font-size: 18px;
     margin-bottom: 15px;
   }
-  .product-slider-container {
-    padding: 20px 5px;
+  .static-products {
+    gap: 10px;
   }
-  .product-swiper {
-    padding-bottom: 25px;
+  .product-slider-container {
+    padding: 20px 8px;
   }
 }
 </style>

@@ -48,6 +48,8 @@ const formatPrice = (price) => (price ? price.toLocaleString('fa-IR').replace(/Ù
   transition: transform 0.3s, box-shadow 0.3s;
   height: 460px;
   min-height: 460px;
+  width: 372px;
+
 }
 .bestseller-card:hover {
   transform: translateY(-6px);

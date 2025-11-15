@@ -123,8 +123,14 @@ class ProductSerializer(serializers.ModelSerializer):
         return product
 
     def update(self, instance, validated_data):
+        request = self.context.get('request')
         properties_data = validated_data.pop('properties', None)
         category = validated_data.pop('category_id', None)
+        
+        uploaded_images = request.FILES.getlist('uploaded_images')
+        if uploaded_images:
+            for image in uploaded_images:
+                ProductGallery.objects.create(product=instance, image=image)
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)

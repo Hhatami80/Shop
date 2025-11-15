@@ -55,7 +55,7 @@ class AddProductView(APIView):
 
 
 class DeleteProductView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def get_object(self, category_id: int):
         try:
@@ -71,7 +71,7 @@ class DeleteProductView(APIView):
 
 
 class UpdateProductView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def get_object(self, product_id):
         try:
@@ -82,7 +82,7 @@ class UpdateProductView(APIView):
 
     def put(self, request: Request, product_id):
         product = self.get_object(product_id)
-        product_serializer = ProductSerializer(product, data=request.data, partial=True)
+        product_serializer = ProductSerializer(product, data=request.data, context={'request': request}, partial=True)
         if product_serializer.is_valid():
             product_serializer.save()
             return Response({'data': 'اطلاعات ویرایش شد'}, status.HTTP_201_CREATED)
@@ -95,7 +95,7 @@ class UpdateProductView(APIView):
 # region Product Property
 
 class AddPropertyView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def post(self, request: Request):
         property_serializer = ProductPropertySerializer(data=request.data)
@@ -107,7 +107,7 @@ class AddPropertyView(APIView):
 
 
 class DeletePropertyView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def get_object(self, property_id):
         try:
@@ -123,7 +123,7 @@ class DeletePropertyView(APIView):
 
 
 class UpdatePropertyView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def get_object(self, property_id):
         try:
@@ -146,7 +146,7 @@ class UpdatePropertyView(APIView):
 # region Category
 
 class AddCategoryView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def post(self, request: Request):
         category_serializer = CategorySerializer(data=request.data)
@@ -175,7 +175,7 @@ class DeleteCategoryView(APIView):
 
 
 class UpdateCategoryView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def get_object(self, category_id: int):
         try:
@@ -202,7 +202,7 @@ class UpdateCategoryView(APIView):
 
 # region Brand
 class AddBrandView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def post(self, request: Request):
         brand_serializer = BrandSerializer(data=request.data)
@@ -213,7 +213,7 @@ class AddBrandView(APIView):
 
 
 class DeleteBrandView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def get_object(self, brand_id):
         try:
