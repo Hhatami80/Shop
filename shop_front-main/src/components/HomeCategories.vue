@@ -105,6 +105,7 @@ onMounted(async () => {
   align-items: center;
   gap: 60px;
   margin-right: 50px;
+  margin-left: 50px;
   flex-wrap: wrap;
 }
 

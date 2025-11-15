@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
             name='TrustSymbol',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField()),
+                ('title', models.CharField(max_length=255)),
                 ('image', models.ImageField(upload_to='images/trust_symbol', verbose_name='عکس نماد اعتماد')),
             ],
             options={
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='footerlink',
             name='url',
-            field=models.CharField(verbose_name='لینک'),
+            field=models.CharField(verbose_name='لینک', max_length=40),
         ),
         migrations.AlterField(
             model_name='footerlinkbox',

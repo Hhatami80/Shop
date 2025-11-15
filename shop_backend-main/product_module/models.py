@@ -78,7 +78,7 @@ class Product(models.Model):
     is_done = models.BooleanField(default=False, verbose_name='تمام شده / نشده')
     created_date = models.DateTimeField(verbose_name='تاریخ ثبت محصول', editable=False, auto_now_add=True)
     jalali_created_date = models.CharField(max_length=20, blank=True, null=True)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False, null=False, blank=False)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title, allow_unicode=True)

@@ -23,10 +23,9 @@ class ExpiringToken(Token):
         return expiration - now()
 
 
-def get_random_image():
+def get_image():
     images_dir = os.path.join(settings.MEDIA_ROOT, 'images', 'profiles', 'defaults')
-    images = [img for img in os.listdir(images_dir) if not img.startswith('.')]
-    image = random.choice(images)
+    image = os.listdir(images_dir)[0]
     return f'images/profiles/defaults/{image}'
 
 
@@ -48,7 +47,7 @@ class User(AbstractUser):
     })
     is_active = models.BooleanField(default=True)
     image = models.ImageField(verbose_name='پروفایل کاربر', upload_to='images/profiles',
-                              null=True, blank=True, default=get_random_image)
+                              null=True, blank=True, default=get_image)
     role = models.CharField(max_length=20, choices=ROLE_CHOICE, default=ROLE_CHOICE_USER)
     birthdate = models.DateField(blank=True, null=True)
     

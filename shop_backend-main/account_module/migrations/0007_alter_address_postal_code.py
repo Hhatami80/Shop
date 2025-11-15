@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="address",
             name="postal_code",
-            field=models.CharField(default="")
+            field=models.CharField(default="", max_length=255)
         ),
     ]
