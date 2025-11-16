@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('site_name', models.CharField(max_length=100, verbose_name='نام سایت')),
-                ('site_logo', models.ImageField(upload_to='images/site-setting', verbose_name='لوگوی سایت')),
+                ('site_logo', models.ImageField(upload_to='images/site-setting', verbose_name='لوگوی سایت', max_length=100)),
                 ('about_us_text', models.TextField(verbose_name='متن درباره ما صفحه اصلی')),
                 ('about_us_logo', models.ImageField(upload_to='images/site-setting', verbose_name='عکس درباره ما صفحه اصلی')),
                 ('phone', models.CharField(max_length=20, verbose_name='تلفن')),
@@ -35,6 +35,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='footerlink',
             name='url',
-            field=models.CharField(blank=True, null=True, verbose_name='لینک'),
+            field=models.CharField(blank=True, null=True, verbose_name='لینک', max_length=40),
         ),
     ]

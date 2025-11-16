@@ -43,13 +43,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name="user",
-            name="fullname",
-            field=models.CharField(
-                blank=True, max_length=100, null=True, verbose_name="نام کاربری"
-            ),
-        ),
-        migrations.AlterField(
-            model_name="user",
             name="phone",
             field=models.CharField(
                 default=0,

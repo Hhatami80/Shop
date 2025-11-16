@@ -1,3 +1,4 @@
+from typing import Any
 from django.db import models
 from django.utils.text import slugify
 from jalali_date import date2jalali
@@ -77,7 +78,7 @@ class Product(models.Model):
     is_done = models.BooleanField(default=False, verbose_name='تمام شده / نشده')
     created_date = models.DateTimeField(verbose_name='تاریخ ثبت محصول', editable=False, auto_now_add=True)
     jalali_created_date = models.CharField(max_length=20, blank=True, null=True)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False, null=False, blank=False)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title, allow_unicode=True)
@@ -100,6 +101,9 @@ class Product(models.Model):
 
         super().save(*args, **kwargs)
 
+    def delete(self, using: Any = ..., keep_parents: bool = ...) -> tuple[int, dict[str, int]]:
+        return super().delete(using, keep_parents)
+    
     def __str__(self):
         return self.title
 

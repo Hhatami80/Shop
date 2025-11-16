@@ -31,9 +31,8 @@ class RegisterView(APIView):
             if user is not None:
                 return Response({'errors': 'این نام کاربری قابل استفاده نیست.'}, status.HTTP_400_BAD_REQUEST)
             otp_obj, _ = PhoneOTP.objects.update_or_create(phone=user_phone, username=username, password=user_pass)
-            sms = sms_manager.OTPService()
-            sms.send_otp(user_phone, otp_obj.code)
-            return Response({'detail': 'کد تایید ارسال شد.'}, status.HTTP_200_OK)
+            if sms_manager.send_otp(user_phone, otp_obj.code):
+                return Response({'detail': 'کد تایید ارسال شد.'}, status.HTTP_200_OK)
 
         return Response({'errors': user_serializer.errors}, status.HTTP_422_UNPROCESSABLE_ENTITY)
 

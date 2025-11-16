@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='bannerimages',
             name='price',
-            field=models.CharField(default=0, verbose_name='قیمت محصولات'),
+            field=models.CharField(default='', verbose_name='قیمت محصولات', max_length=100),
         ),
         migrations.AddField(
             model_name='bannerimages',

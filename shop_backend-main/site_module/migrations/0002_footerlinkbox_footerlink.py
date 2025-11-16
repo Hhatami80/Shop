@@ -26,8 +26,8 @@ class Migration(migrations.Migration):
             name='FooterLink',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField()),
-                ('url', models.CharField()),
+                ('title', models.CharField(null=False, blank=False, max_length=255)),
+                ('url', models.CharField(null=False, blank=False, max_length=255)),
                 ('footer_link_box', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='site_module.footerlinkbox', verbose_name='دسته بندی')),
             ],
             options={

@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name="image",
             field=models.ImageField(
                 blank=True,
-                default=account_module.models.get_random_image,
+                default=account_module.models.get_image,
                 null=True,
                 upload_to="images/profiles",
                 verbose_name="پروفایل کاربر",

@@ -298,7 +298,7 @@ watch(
   flex: auto;
   text-align: right;
   margin-right: 50px;
-  margin-left: 50px;
+  margin-left: 450px;
 }
 
 .title {

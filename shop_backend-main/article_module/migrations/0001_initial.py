@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=100, verbose_name='عنوان مقاله')),
                 ('image', models.ImageField(blank=True, null=True, upload_to='images/articles', verbose_name='تصویر مقاله')),
-                ('short_description', models.CharField(verbose_name='توضیحات کوتاه مقاله')),
+                ('short_description', models.CharField(verbose_name='توضیحات کوتاه مقاله', max_length=255)),
                 ('full_description', models.TextField(verbose_name='توضیحات تکمیلی مقاله')),
                 ('created_date', models.DateTimeField(auto_now_add=True)),
             ],
