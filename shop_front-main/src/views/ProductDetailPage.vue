@@ -478,7 +478,7 @@ watch(
   flex: 0 0 300px;
   max-width: 220px;
   border: 1px solid #ddd;
-  height: 500px;
+  height: 0px;
   border-radius: 10px;
   padding: 20px;
   transition: all 0.3s ease;
@@ -494,7 +494,7 @@ watch(
   width: 100%;
   border-radius: 8px;
   height: 60%;
-  object-fit: fill;
+  object-fit: cover;
 }
 
 .product-card .name {

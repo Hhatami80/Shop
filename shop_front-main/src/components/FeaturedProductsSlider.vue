@@ -116,7 +116,7 @@ const openModal = (product) => {
 }
 .product-grid {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 20px;
   flex-wrap: wrap;
 }

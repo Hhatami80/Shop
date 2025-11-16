@@ -2,11 +2,7 @@
   <div class="product-slider-container">
     <h2 class="section-title">{{ title }}</h2>
 
-    
-    <div
-      v-if="new_products?.length && new_products.length < 4"
-      class="product-grid"
-    >
+    <div v-if="new_products?.length && new_products.length < 4" class="product-grid">
       <ProductCard
         v-for="product in new_products"
         :key="product.id"
@@ -15,7 +11,6 @@
       />
     </div>
 
-    
     <Swiper
       v-else-if="new_products?.length"
       :modules="[Autoplay, Pagination]"
@@ -46,7 +41,6 @@
     />
   </div>
 </template>
-
 
 <script setup>
 import { ref } from 'vue'
@@ -110,15 +104,16 @@ const openModal = (product) => {
   color: #666;
   padding: 20px 0;
 }
+
 .product-grid {
   display: flex;
-  justify-content: flex-start;
-  gap: 20px;
+  justify-content: center;
   flex-wrap: wrap;
+  gap: 20px;
 }
 
 .product-grid > * {
-  width: 372px; 
+  flex: 0 0 372px;
 }
 
 @media (max-width: 1024px) {
@@ -128,6 +123,9 @@ const openModal = (product) => {
   }
   .product-slider-container {
     padding: 30px 15px;
+  }
+  .product-grid > * {
+    flex: 0 0 calc(33.33% - 20px);
   }
 }
 
@@ -146,6 +144,9 @@ const openModal = (product) => {
     width: 10px;
     height: 10px;
   }
+  .product-grid > * {
+    flex: 0 0 calc(50% - 16px);
+  }
 }
 
 @media (max-width: 480px) {
@@ -163,6 +164,10 @@ const openModal = (product) => {
     width: 12px;
     height: 12px;
     margin: 0 6px !important;
+  }
+  .product-grid > * {
+    flex: 0 0 100%;
+    margin: 0 auto;
   }
 }
 </style>

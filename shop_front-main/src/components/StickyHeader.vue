@@ -4,31 +4,27 @@
       <div class="icons">
         <router-link to="/"><i class="fas fa-home"></i></router-link>
 
-        <template v-if="loginStore.isAuthenticated">
-          <router-link to="/user/shop-cart" class="cart-icon">
-            <i class="fas fa-shopping-cart"></i>
-            <transition name="badge-pop" mode="out-in">
-              <span
-                v-if="cartStore.totalQuantity > 0"
-                class="cart-badge"
-                :key="cartStore.totalQuantity"
-              >
-                {{ cartStore.totalQuantity }}
-              </span>
-            </transition>
-          </router-link>
+        <i class="fas fa-shopping-cart" @click="handleCartClick" title="سبد خرید"></i>
 
-          <i class="fas fa-heart"></i>
+        <i v-if="loginStore.isAuthenticated" class="fas fa-heart" title="علاقه‌مندی‌ها"></i>
 
-          <router-link v-if="loginStore.isAdmin" to="/admin" class="user-icon" title="پنل ادمین">
-            <i class="fas fa-crown"></i>
-          </router-link>
-          <router-link v-else to="/user" class="user-icon" title="پروفایل کاربری">
-            <i class="fas fa-user-circle"></i>
-          </router-link>
-        </template>
-
-        <router-link v-else to="/login">
+        <router-link
+          v-if="loginStore.isAuthenticated && loginStore.isAdmin"
+          to="/admin"
+          class="user-icon"
+          title="پنل ادمین"
+        >
+          <i class="fas fa-user"></i>
+        </router-link>
+        <router-link
+          v-else-if="loginStore.isAuthenticated"
+          to="/user"
+          class="user-icon"
+          title="پروفایل کاربری"
+        >
+          <i class="fas fa-user"></i>
+        </router-link>
+        <router-link v-else to="/login" class="user-icon" title="ورود به حساب کاربری">
           <i class="fas fa-user"></i>
         </router-link>
       </div>
@@ -37,7 +33,6 @@
     </div>
   </transition>
 
-  
   <transition name="drawer-slide">
     <div v-if="drawerOpen" class="sticky-menu-box" @click.self="drawerOpen = false">
       <button class="sticky-close-btn" @click="drawerOpen = false">×</button>
@@ -60,6 +55,9 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useHeaderStore } from '@/stores/useHeaderStore'
 import { useLoginStore } from '@/stores/useLoginStore'
 import { useCartStore } from '@/stores/useCartStore'
+import router from '@/router'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 const props = defineProps({
   visible: { type: Boolean, default: true },
@@ -86,6 +84,17 @@ function scrollToSection(selector) {
   }
 }
 
+function handleCartClick() {
+  if (!loginStore.isAuthenticated) {
+    toast.warn('لطفاً وارد حساب کاربری خود شوید');
+    setTimeout(() => {
+      router.push('/login');
+    }, 2000);
+  } else {
+    router.push('/user/shop-cart');
+  }
+}
+
 const handleScroll = () => {
   if (props.useScrollBlur) isBlurred.value = window.scrollY > 50
   if (props.showOnScroll && window.scrollY > 50) isVisible.value = true
@@ -103,7 +112,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-
 .header-sticky {
   position: fixed;
   top: 0;
@@ -121,7 +129,6 @@ onUnmounted(() => {
   backdrop-filter: blur(10px);
   background: rgba(255, 255, 255, 0.7);
 }
-
 
 .icons {
   position: absolute;
@@ -197,7 +204,6 @@ onUnmounted(() => {
   color: #f9c710;
 }
 
-
 .sticky-close-btn {
   position: absolute;
   top: 8px;
@@ -212,9 +218,6 @@ onUnmounted(() => {
   color: #e63946;
 }
 
-.cart-icon {
-  position: relative;
-}
 .cart-badge {
   position: absolute;
   top: -6px;
@@ -226,7 +229,6 @@ onUnmounted(() => {
   padding: 2px 6px;
   border-radius: 50%;
 }
-
 
 .fade-enter-active,
 .fade-leave-active {
@@ -255,7 +257,6 @@ onUnmounted(() => {
   .sticky-menu-box {
     top: 0;
     right: 0;
-    
     height: 100dvh;
     width: 40%;
     border-radius: 0;

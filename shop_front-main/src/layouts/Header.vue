@@ -2,6 +2,21 @@
   <div>
     <header v-if="!onlySticky" class="header-main">
       <button ref="menuBtn" class="menu-btn" @click="toggleMenu">☰</button>
+
+      <div class="header-icons">
+        <router-link to="/"><i class="fas fa-home"></i></router-link>
+
+        <i class="fas fa-shopping-cart" @click="handleCartClick"></i>
+
+        <router-link v-if="loginStore.isAuthenticated" to="/user" class="user-icon">
+          <i class="fas fa-user"></i>
+        </router-link>
+
+        <router-link v-else to="/login" class="user-icon">
+          <i class="fas fa-user"></i>
+        </router-link>
+      </div>
+
       <img
         v-if="headerStore.site_logo"
         :src="headerStore.site_logo"
@@ -16,6 +31,7 @@
       :compact="compactSticky"
       @toggle-menu="toggleMenu"
     />
+
     <transition name="slide-fade">
       <div
         v-if="drawerOpen"
@@ -38,6 +54,7 @@
         </ul>
       </div>
     </transition>
+
     <div v-if="!onlySticky" class="search-wrapper">
       <SearchBox />
     </div>
@@ -47,8 +64,13 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick } from "vue";
 import { useHeaderStore } from "@/stores/useHeaderStore";
+import { useLoginStore } from "@/stores/useLoginStore";
+import { useCartStore } from "@/stores/useCartStore";
+import { useRouter } from "vue-router";
 import SearchBox from "@/components/SearchBox.vue";
 import StickyHeader from "@/components/StickyHeader.vue";
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 
 const props = defineProps({
   onlySticky: { type: Boolean, default: false },
@@ -58,6 +80,10 @@ const props = defineProps({
 const drawerOpen = ref(false);
 const showStickyHeader = ref(false);
 const headerStore = useHeaderStore();
+const loginStore = useLoginStore();
+const cartStore = useCartStore();
+const router = useRouter();
+
 const menuBtn = ref(null);
 const menuStyle = ref({
   position: "fixed",
@@ -77,6 +103,7 @@ onUnmounted(() => {
 function handleScroll() {
   showStickyHeader.value = window.scrollY > 200;
 }
+
 function scrollToSection(selector) {
   const el = document.querySelector(selector);
   if (el) {
@@ -110,6 +137,18 @@ async function toggleMenu() {
     }
   }
 }
+
+
+function handleCartClick() {
+  if (!loginStore.isAuthenticated) {
+    toast.warn('لطفاً وارد حساب کاربری خود شوید');
+    setTimeout(() => {
+      router.push('/login');
+    }, 2000);
+  } else {
+    router.push('/user/shop-cart');
+  }
+}
 </script>
 
 <style scoped>
@@ -135,11 +174,36 @@ async function toggleMenu() {
 .menu-btn {
   position: absolute;
   right: 20px;
-  top: 50px;
+  top: 25%;
+  transform: translateY(-50%);
   font-size: 30px;
   background: none;
   border: none;
   cursor: pointer;
+  z-index: 1000;
+}
+
+.header-icons {
+  position: absolute;
+  left: 20px;
+  top: 25%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+
+.header-icons i,
+.header-icons a {
+  font-size: 1.5rem;
+  color: #222;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.header-icons i:hover,
+.header-icons a:hover {
+  color: gold;
 }
 
 .search-wrapper {
@@ -196,31 +260,25 @@ async function toggleMenu() {
   color: red;
 }
 
-
 .slide-fade-enter-active,
 .slide-fade-leave-active {
   transition: all 0.4s ease;
 }
-
 
 .slide-fade-enter-from {
   transform: translateX(100%);
   opacity: 0;
 }
 
-
 .slide-fade-enter-to {
   transform: translateX(0);
   opacity: 1;
 }
 
-
 .slide-fade-leave-to {
   transform: translateX(100%);
   opacity: 0;
 }
-
-
 
 @media (max-width: 1024px) {
   .header-main {
@@ -289,5 +347,4 @@ async function toggleMenu() {
     padding: 10px 15px;
   }
 }
-
 </style>

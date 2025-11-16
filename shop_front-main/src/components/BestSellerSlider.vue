@@ -2,7 +2,7 @@
   <div class="product-slider-container">
     <h2 class="section-title">پرفروش‌ترین‌ها</h2>
 
-    <!-- حالت استاتیک برای کمتر از ۴ محصول -->
+    
     <div v-if="products.length > 0 && products.length < 4" class="static-products">
       <BestSellerCard
         v-for="product in products"
@@ -12,7 +12,7 @@
       />
     </div>
 
-    <!-- حالت اسلایدر -->
+    
     <Swiper
       v-else-if="products?.length"
       :modules="[Autoplay, Pagination]"
@@ -35,7 +35,7 @@
 
     <p v-else class="loading">در حال بارگذاری پرفروش‌ها...</p>
 
-    <!-- مودال محصول -->
+   
     <ProductModal
       v-if="selectedProduct"
       :show="!!selectedProduct"
@@ -85,7 +85,7 @@ const openModal = (product) => {
 
 .static-products {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 20px;
   flex-wrap: wrap;
 }
