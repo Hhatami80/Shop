@@ -58,7 +58,7 @@
               <td>{{ address.postal_code || "-" }}</td>
             </tr>
             <tr v-if="!selectedUser.address.length">
-              <td colspan="4" style="text-align: center">هیچ آدرسی برای این کاربر موجود نیست.</td>
+              <td colspan="7" style="text-align: center">هیچ آدرسی برای این کاربر موجود نیست.</td>
             </tr>
           </tbody>
         </table>

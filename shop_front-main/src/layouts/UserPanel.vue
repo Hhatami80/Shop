@@ -24,7 +24,7 @@
   </div>
 
   <div v-else class="unauthorized">
-    <p>برای مشاهده‌ی این صفحه باید وارد شوید.</p>
+    <p>برای مشاهده‌ی این صفحه باید وارد شوید</p>
     <button @click="goToLogin">ورود</button>
   </div>
     <ConfirmLogoutModal
@@ -69,6 +69,7 @@ const menuItems = computed(() => {
 
   if (isUser) {
     return [
+  { name: 'داشبورد', path: '/user/dashboard' ,active: isActiveRoute('/user/dashboard'), icon: ['fas' ,'tachometer-alt']},
   { name: 'پروفایل', path: '/user/profile/info',active: isActiveRoute('/user/profile/info'), icon: ['fas', 'user'] }, 
   { name: 'سبد خرید', path: '/user/shop-cart',active: isActiveRoute('/user/shop-cart'), icon: ['fas', 'shopping-cart'] },
   { name: 'کیف پول', path: '/user/wallet',active: isActiveRoute('/user/wallet'), icon: ['fas', 'wallet'] },

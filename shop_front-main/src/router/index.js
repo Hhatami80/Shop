@@ -29,6 +29,7 @@ import ShoppingCart from '@/components/ShoppingCart.vue'
 import AdminOrders from '@/components/AdminOrders.vue'
 import CommetsManager from '@/components/CommetsManager.vue'
 import CategoryDetail from '@/views/CategoryDetail.vue'
+import Dashboard from '@/components/Dashboard.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -105,6 +106,7 @@ const router = createRouter({
         },
         { path: 'wallet', component: () => import('@/components/Wallet.vue') },
         { path: 'shop-cart', component: ShoppingCart },
+        { path: 'dashboard' , component:Dashboard},
         { path: 'orders', component: () => import('@/components/UserOrders.vue') },
         { path: 'wallet/verify', component: () => import('@/views/WalletVerify.vue') },
         { path: 'order-success', component: () => import('@/views/OrderSuccessPage.vue') },
