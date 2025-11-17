@@ -31,9 +31,9 @@ import "swiper/css/effect-fade";
 import "swiper/css/pagination";
 
 
-import img1 from "@/assets/image/download1.jpg";
-import img2 from "@/assets/image/download2.jpg";
-import img3 from "@/assets/image/download3.jpg";
+import img1 from "@/assets/image/coffee.jpg";
+import img2 from "@/assets/image/coffee.jpg";
+import img3 from "@/assets/image/coffee2.jpg";
 
 const banners = [
   {

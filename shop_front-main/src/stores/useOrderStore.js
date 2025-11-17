@@ -15,26 +15,29 @@ export const useOrderStore = defineStore('orderStore', {
   }),
 
   actions: {
-    async fetchOrders({ page = 1, perPage = 5, status = 'all', forUser = false } = {}) {
+    async fetchOrders({ page = 1, perPage = 5, status, forUser = false, startDate, endDate } = {}) {
       this.loading = true
       try {
-        const params = { page, perPage, status }
-        const response = forUser
-          ? await orderService.getAllOrders({ page, perPage, status, user: 'current' })
-          : await orderService.getAllOrders({ page, perPage, status })
-
-        this.orders = response?.data?.results || []
-        this.totalOrders = response?.data?.count || 0
+        const { data } = await orderService.getAllOrders({
+          page,
+          perPage,
+          status,
+          user: forUser ? 'current' : null,
+          startDate,
+          endDate,
+        })
+        this.orders = data?.results || []
+        this.totalOrders = data?.count || 0
         this.page = page
         this.perPage = perPage
-      } catch (err) {
-        console.error('Fetch orders error:', err)
-        toast.error('خطا در دریافت سفارش‌ها')
-        this.orders = []
-        this.totalOrders = 0
+      } catch (error) {
+        console.error('Error fetching orders:', error)
       } finally {
         this.loading = false
       }
+    },
+    async createOrder(payload) {
+      return orderService.createOrder(payload)
     },
 
     async fetchOrderById(orderId) {
@@ -116,12 +119,14 @@ export const useOrderStore = defineStore('orderStore', {
 
     async cancelUserOrder(orderId) {
       try {
-        await orderService.updateOrder(orderId, { status: 'canceled' })
-        await this.fetchOrders({ page: this.page, perPage: this.perPage, forUser: true })
-        toast.success('سفارش با موفقیت لغو شد')
-      } catch (err) {
-        console.error('Cancel order error:', err)
-        toast.error('لغو سفارش موفقیت‌آمیز نبود')
+        const response = await orderService.deleteOrder(orderId)
+        if (response.status === 204) {
+          this.orders = this.orders.filter((order) => order.id !== orderId)
+        }
+        return true
+      } catch (error) {
+        console.error('Error canceling order:', error)
+        return false
       }
     },
 

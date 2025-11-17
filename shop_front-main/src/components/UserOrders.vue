@@ -5,6 +5,32 @@
       سفارش‌های من
     </h2>
 
+    <div class="filters">
+      <label>
+        وضعیت سفارش:
+        <select v-model="filterStatus">
+          <option value="">همه</option>
+          <option value="pending">در انتظار پرداخت</option>
+          <option value="paid">پرداخت شده</option>
+          <option value="completed">ارسال شده</option>
+          <option value="canceled">لغو شده</option>
+        </select>
+      </label>
+
+      <label>
+        از تاریخ:
+        <input type="date" v-model="filterStartDate" />
+      </label>
+
+      <label>
+        تا تاریخ:
+        <input type="date" v-model="filterEndDate" />
+      </label>
+
+      <button class="btn btn-filter" @click="applyFilters">اعمال فیلتر</button>
+      <button class="btn btn-reset" @click="resetFilters">پاک‌سازی</button>
+    </div>
+
     <div v-if="orderStore.loading" class="loading">
       <fa-icon :icon="['fas', 'spinner']" pulse /> در حال دریافت سفارش‌ها...
     </div>
@@ -21,7 +47,7 @@
             <th>تاریخ</th>
             <th>جمع کل</th>
             <th>وضعیت</th>
-            <th>جزییات</th>
+            <th>جزئیات</th>
             <th>عملیات</th>
           </tr>
         </thead>
@@ -51,8 +77,7 @@
         </tbody>
       </table>
 
-      
-      <div class="pagination" style="direction: ltr;" v-if="orderStore.totalOrders > orderStore.perPage">
+      <div class="pagination" v-if="orderStore.totalOrders > orderStore.perPage">
         <button @click="prevPage" :disabled="orderStore.page === 1">
           <fa-icon :icon="['fas', 'chevron-right']" />
         </button>
@@ -63,7 +88,6 @@
       </div>
     </div>
 
- 
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal">
         <div class="modal-header">
@@ -78,14 +102,14 @@
                 <th>تعداد</th>
                 <th>قیمت واحد</th>
                 <th>جمع</th>
-                <th>نحوه پرداخت</th>
+                <th>روش پرداخت</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="item in selectedOrder.items" :key="item.id">
                 <td>{{ item.product_detail.title }}</td>
                 <td>{{ item.quantity }}</td>
-                <td>{{ formatPrice(item.price) }} تومان</td>
+                <td>{{ formatPrice(item.price) }}</td>
                 <td>{{ formatPrice(item.price * item.quantity) }} تومان</td>
                 <td>{{ selectedOrder.payment.payment_method }}</td>
               </tr>
@@ -101,92 +125,87 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useOrderStore } from "@/stores/useOrderStore";
-import { toast } from "vue3-toastify";
+import { ref, computed, onMounted } from 'vue'
+import { useOrderStore } from '@/stores/useOrderStore'
+import { toast } from 'vue3-toastify'
 
-const orderStore = useOrderStore();
-const showModal = ref(false);
-const selectedOrder = ref({});
+const orderStore = useOrderStore()
+const showModal = ref(false)
+const selectedOrder = ref({})
 
+const filterStatus = ref('')
+const filterStartDate = ref('')
+const filterEndDate = ref('')
 
-const totalPages = computed(() =>
-  Math.ceil(orderStore.totalOrders / orderStore.perPage)
-);
-
+const totalPages = computed(() => Math.ceil(orderStore.totalOrders / orderStore.perPage))
 
 const fetchOrders = async (page = 1) => {
-  try {
-    await orderStore.fetchOrders({ forUser: true, page, perPage: orderStore.perPage });
-  } catch (err) {
-    console.error(err);
-    toast.error("خطا در دریافت سفارش‌ها");
-  }
-};
+  await orderStore.fetchOrders({
+    page,
+    perPage: orderStore.perPage,
+    status: filterStatus.value || 'all',
+    forUser: true,
+    startDate: filterStartDate.value || undefined,
+    endDate: filterEndDate.value || undefined,
+  })
+}
 
+const applyFilters = async () => fetchOrders(1)
+
+const resetFilters = async () => {
+  filterStatus.value = ''
+  filterStartDate.value = ''
+  filterEndDate.value = ''
+  await fetchOrders(1)
+}
 
 const nextPage = () => {
-  if (orderStore.page < totalPages.value) fetchOrders(orderStore.page + 1);
-};
+  if (orderStore.page < totalPages.value) fetchOrders(orderStore.page + 1)
+}
 const prevPage = () => {
-  if (orderStore.page > 1) fetchOrders(orderStore.page - 1);
-};
-
+  if (orderStore.page > 1) fetchOrders(orderStore.page - 1)
+}
 
 const openModal = (order) => {
-  selectedOrder.value = order;
-  showModal.value = true;
-};
+  selectedOrder.value = order
+  showModal.value = true
+}
 const closeModal = () => {
-  showModal.value = false;
-};
-
-
+  showModal.value = false
+}
 const cancelOrder = async (order) => {
-  if (!confirm("آیا مطمئن هستید می‌خواهید این سفارش را لغو کنید؟")) return;
-  await orderStore.cancelUserOrder(order.id);
-  await fetchOrders(orderStore.page); 
-};
+  if (!confirm('آیا مطمئن هستید می‌خواهید این سفارش را لغو کنید؟')) return
+  await orderStore.cancelUserOrder(order.id)
+  await fetchOrders(orderStore.page)
+}
 
-
-const formatDate = (dateStr) => {
-  if (!dateStr) return "";
-  return new Intl.DateTimeFormat("fa-IR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(dateStr));
-};
-const formatPrice = (price) => Number(price)?.toLocaleString("fa-IR") || "0";
-
+const formatDate = (dateStr) => new Intl.DateTimeFormat('fa-IR').format(new Date(dateStr))
+const formatPrice = (price) => Number(price)?.toLocaleString('fa-IR') || '0'
 const getStatusText = (status) =>
   ({
-    pending: "در انتظار پرداخت",
-    paid: "پرداخت‌شده",
-    completed: "ارسال‌شده",
-    canceled: "لغو‌شده",
-  }[status] || "نامشخص");
+    pending: 'در انتظار پرداخت',
+    paid: 'پرداخت‌شده',
+    completed: 'ارسال‌شده',
+    canceled: 'لغو‌شده',
+  })[status] || ''
 const getStatusClass = (status) =>
   ({
-    pending: "status-pending",
-    paid: "status-paid",
-    completed: "status-completed",
-    canceled: "status-canceled",
-  }[status] || "");
+    pending: 'status-pending',
+    paid: 'status-paid',
+    completed: 'status-completed',
+    canceled: 'status-canceled',
+  })[status] || ''
 
 onMounted(() => {
-  fetchOrders();
-});
+  fetchOrders()
+})
 </script>
-
-
-
 
 <style scoped>
 .user-orders {
   max-width: 900px;
   margin: 40px auto;
-  
+
   background: #fff;
   padding: 25px;
   border-radius: 16px;
@@ -352,5 +371,27 @@ h2 {
 }
 .pagination span {
   font-weight: bold;
+}
+.filters {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.filters label {
+  font-weight: bold;
+}
+.filters input[type='date'],
+.filters select {
+  margin-right: 5px;
+}
+.btn-filter {
+  background: #28a745;
+  color: white;
+}
+.btn-reset {
+  background: #dc3545;
+  color: white;
 }
 </style>

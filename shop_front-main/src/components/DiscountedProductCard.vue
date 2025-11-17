@@ -1,5 +1,5 @@
 <template>
-  <div class="product-card">
+  <div class="product-card" @click="$emit('click')">
     <div class="product-image">
       <img :src="product?.image || defaultImage" :alt="product.title" />
     </div>
@@ -8,9 +8,7 @@
       <p class="product-description">{{ product?.description }}</p>
 
       <div class="product-price">
-        <span class="original" v-if="showOriginalPrice">
-          {{ formattedOriginalPrice }}
-        </span>
+        <span class="original" v-if="showOriginalPrice">{{ formattedOriginalPrice }}</span>
         <span class="discounted">{{ formattedDiscountedPrice }}</span>
       </div>
 
@@ -36,121 +34,123 @@ const formattedOriginalPrice = computed(
 )
 const formattedDiscountedPrice = computed(
   () =>
-    (discountedPrice.value > 0 ? discountedPrice.value : originalPrice.value).toLocaleString(
-      'fa-IR'
-    ) + ' تومان'
+    (discountedPrice.value > 0 ? discountedPrice.value : originalPrice.value).toLocaleString('fa-IR') +
+    ' تومان'
 )
-
 const showOriginalPrice = computed(
   () => discountedPrice.value > 0 && discountedPrice.value < originalPrice.value
 )
 </script>
 
 <style scoped>
-* {
-  font-family: 'IRANSansX';
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  font-family: 'IRANSansX', sans-serif;
 }
 
 .product-card {
   display: flex;
-  height: 460px;
-  min-height: 460px;
-  min-width: 200px;
   flex-direction: column;
-  background: white;
+  width: 100%;
+  max-width: 372px;
+  min-width: 220px;
+  background: #fff;
   border-radius: 16px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
   transition: transform 0.2s ease;
-  width: 372px;
+  cursor: pointer;
 }
+
 .product-card:hover {
   transform: translateY(-3px);
 }
 
+.product-image {
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+}
+
 .product-image img {
   width: 100%;
-  height: 200px;
+  height: 100%;
   object-fit: cover;
 }
 
 .product-content {
   padding: 12px;
-  text-align: right;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .product-title {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #222;
+  line-height: 1.4em;
+  margin-bottom: 8px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 10px;
-  line-height: 1.5em;
-  font-size: 16px;
-  font-weight: bold;
-  color: #222;
 }
 
 .product-description {
+  font-size: 0.875rem;
+  color: #555;
+  line-height: 1.4em;
+  margin-bottom: 12px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  position: relative;
-  margin-bottom: 10px;
-  line-height: 1.5em;
-  max-height: 4.5em;
-  word-break: break-word;
-  min-height: 72px;
+  min-height: 60px;
 }
 
 .product-price {
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
   justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
   gap: 6px;
-  margin-bottom: 14px;
-  margin-top: 10px;
 }
 
 .discounted {
-  font-size: 18px;
+  font-size: 1rem;
   font-weight: bold;
   color: #f9c710;
 }
 
 .original {
-  font-size: 14px;
+  font-size: 0.875rem;
   text-decoration: line-through;
   color: #888;
-  opacity: 0.8;
 }
 
 .add-button {
+  margin-top: auto;
+  padding: 10px;
   font-weight: bold;
+  border-radius: 10px;
+  border: none;
+  width: 100%;
   background: #f9c710;
   color: #222;
-  border: none;
-  border-radius: 10px;
-  padding: 10px 14px;
-  width: 100%;
-  font-size: 15px;
   cursor: pointer;
-  transition: background 0.2s ease;
-  margin-top: auto;
+  transition: background 0.2s;
+}
+
+.add-button:hover {
+  background: #e5b809;
 }
 
 .add-button:disabled {
   background: #ccc;
   cursor: not-allowed;
 }
-
-.add-button:hover:not(:disabled) {
-  background: #e5b809;
-}
 </style>
-

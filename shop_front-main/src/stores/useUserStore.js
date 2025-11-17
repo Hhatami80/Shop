@@ -27,6 +27,7 @@ export const useUserStore = defineStore("user", {
       email: "",
       phone: "",
       birthdate: "",
+      address:'',
       image: null,
       previewImage: null,
     },

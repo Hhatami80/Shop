@@ -1,10 +1,12 @@
 import api from './AxiosService'
 
 export const orderService = {
-  getAllOrders({ page = 1, perPage = 5, status = 'all', user = null } = {}) {
+  getAllOrders({ page = 1, perPage = 5, status = 'all', user = null, startDate, endDate } = {}) {
     const params = { page, per_page: perPage }
     if (status && status !== 'all') params.status = status
     if (user === 'current') params.user = 'current'
+    if (startDate) params.start_date = startDate
+    if (endDate) params.end_date = endDate
     return api.get('/orders/', { params })
   },
 

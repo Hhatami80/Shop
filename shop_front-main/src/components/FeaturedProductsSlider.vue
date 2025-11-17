@@ -2,11 +2,7 @@
   <div class="product-slider-container">
     <h2 class="section-title">{{ title }}</h2>
 
-
-    <div
-      v-if="discounted_product?.length && discounted_product.length < 4"
-      class="product-grid"
-    >
+    <div v-if="discounted_product?.length && discounted_product.length < 4" class="product-grid">
       <DiscountedProductCard
         v-for="product in discounted_product"
         :key="product.id"
@@ -15,12 +11,12 @@
       />
     </div>
 
-    
     <Swiper
       v-else-if="discounted_product?.length"
       :modules="[Autoplay, Pagination]"
       :slides-per-view="1"
-      :space-between="20"
+      :centered-slides="true"
+      :centeredSlidesBounds="true"
       :loop="discounted_product.length > 1"
       :autoplay="{ delay: 4500, disableOnInteraction: false }"
       :pagination="{ clickable: discounted_product.length > 1 }"
@@ -47,7 +43,6 @@
   </div>
 </template>
 
-
 <script setup>
 import { ref } from 'vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
@@ -56,7 +51,7 @@ import 'swiper/css'
 import 'swiper/css/pagination'
 import 'swiper/css/autoplay'
 
-import DiscountedProductCard from '@/components/DiscountedProductCard.vue'
+import DiscountedProductCard from './DiscountedProductCard.vue'
 import ProductModal from './ProductModal.vue'
 
 defineProps({
@@ -65,35 +60,49 @@ defineProps({
 })
 
 const selectedProduct = ref(null)
-const openModal = (product) => {
-  selectedProduct.value = product
-}
+const openModal = (product) => (selectedProduct.value = product)
 </script>
 
 <style scoped>
 .product-slider-container {
-  padding: 50px 20px;
+  padding: 50px 5%;
   background: linear-gradient(to bottom, #000 45%, #fff 55%);
   direction: rtl;
-  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
 }
 
 .section-title {
+  font-size: 1.5rem;
   text-align: center;
-  font-size: 26px;
-  margin-bottom: 35px;
+  margin-bottom: 2rem;
   color: #fff;
   font-weight: bold;
-  position: relative;
-  z-index: 1;
+}
+
+.product-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2%;
+}
+
+.product-grid > * {
+  flex: 1 1 calc(25% - 2%);
+  max-width: 372px;
+  min-width: 220px;
 }
 
 .product-swiper {
   padding-bottom: 45px;
-  position: relative;
-  z-index: 1;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+.swiper-slide {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
 }
 
 .swiper-pagination-bullet {
@@ -109,62 +118,31 @@ const openModal = (product) => {
 
 .loading {
   text-align: center;
-  font-size: 18px;
   color: #ddd;
-  position: relative;
-  z-index: 1;
+  font-size: 1rem;
+  padding: 1rem 0;
 }
-.product-grid {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.product-grid > * {
-  width: 372px; 
-}
-
 
 @media (max-width: 1024px) {
-  .product-slider-container {
-    padding: 40px 15px;
-    background: linear-gradient(to bottom, #111 50%, #fff 50%);
-  }
-  .section-title {
-    font-size: 22px;
-    margin-bottom: 25px;
-  }
-  .product-swiper {
-    padding-bottom: 35px;
+  .product-grid > * {
+    flex: 1 1 calc(33% - 2%);
   }
 }
 
 @media (max-width: 768px) {
-  .product-slider-container {
-    padding: 30px 10px;
-    background: linear-gradient(to bottom, #111 55%, #fff 45%);
-  }
-  .section-title {
-    font-size: 20px;
-    margin-bottom: 20px;
-  }
-  .product-swiper {
-    padding-bottom: 30px;
+  .product-grid > * {
+    flex: 1 1 calc(50% - 2%);
   }
 }
 
 @media (max-width: 480px) {
-  .product-slider-container {
-    padding: 25px 5px;
-    background: linear-gradient(to bottom, #000 60%, #fff 40%);
+  .product-grid > * {
+    flex: 1 1 100%;
+    margin: 0 auto;
   }
-  .section-title {
-    font-size: 18px;
-    margin-bottom: 15px;
-  }
-  .product-swiper {
-    padding-bottom: 25px;
+  .swiper-slide > * {
+    width: 100% !important;
+    max-width: 90% !important;
   }
 }
 </style>

@@ -6,9 +6,8 @@
     <div v-else-if="error" class="error">{{ error }}</div>
 
     <div v-else class="categories-content">
-      
       <div
-        v-if="categories.length > 0 && categories.length < 4"
+        v-if="categories.length > 0 && categories.length < 4 && !isMobile"
         class="static-categories"
       >
         <CategoryCard
@@ -19,7 +18,6 @@
         />
       </div>
 
-     
       <Swiper
         v-else-if="categories?.length"
         :modules="[Autoplay]"
@@ -28,9 +26,9 @@
         :loop="categories.length > 1"
         :autoplay="{ delay: 2500, disableOnInteraction: false }"
         :breakpoints="{
-          480: { slidesPerView: 2, spaceBetween: 30 },
-          768: { slidesPerView: 3, spaceBetween: 50 },
-          1024: { slidesPerView: 4, spaceBetween: 70 },
+          480: { slidesPerView: 2, spaceBetween: 20 },
+          768: { slidesPerView: 3, spaceBetween: 30 },
+          1024: { slidesPerView: categories.length < 4 ? categories.length : 4, spaceBetween: 40 },
         }"
         class="my-swiper"
       >
@@ -58,10 +56,17 @@ const store = useCategoryStore()
 const loading = ref(false)
 const error = ref(null)
 const categories = computed(() => store.allCategories)
+const isMobile = ref(false)
 
-const goToCategory = () => router.push(`/categories/`)
+const goToCategory = () => router.push('/categories')
+
+const updateSize = () => {
+  isMobile.value = window.innerWidth < 768
+}
 
 onMounted(async () => {
+  updateSize()
+  window.addEventListener('resize', updateSize)
   try {
     loading.value = true
     await store.getAllCategories()
@@ -100,7 +105,6 @@ onMounted(async () => {
   z-index: 1;
 }
 
-
 .static-categories {
   display: flex;
   justify-content: center;
@@ -117,9 +121,20 @@ onMounted(async () => {
 }
 
 .my-swiper {
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 20px 0;
 }
 
+.swiper-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.swiper-slide {
+  display: flex;
+  justify-content: center;
+}
 
 @media (max-width: 1024px) {
   .categories-section {

@@ -1,7 +1,5 @@
 <template>
   <div class="main-banner">
-    <!-- <div v-else-if="loading" class="loading">در حال بارگذاری...</div>
-    <div v-else="error" class="loading error">خطا در بارگذاری: {{ error }}</div> -->
     <div class="left-section">
       <div v-for="(item, idx) in staticItems" :key="idx" class="static-box">
         <div class="side-icon">
@@ -18,6 +16,7 @@
         </div>
       </div>
     </div>
+
     <div class="right-section" v-if="!loading && banner">
       <img :src="banner.image" alt="banner" class="banner-img" />
       <div class="banner-content">
@@ -36,6 +35,7 @@ import { useRouter } from 'vue-router'
 import cat1 from '@/assets/image/icons/cat1.png'
 import cat2 from '@/assets/image/icons/cat2.png'
 import cat3 from '@/assets/image/icons/cat3.png'
+
 const router = useRouter()
 const store = useFeatureSectionStore()
 
@@ -45,10 +45,10 @@ const banner = computed(() => {
 })
 
 const loading = computed(() => store.loading)
-const error = computed(() => store.error)
 const goTo = (route) => {
   router.push(route)
 }
+
 const staticItems = [
   {
     title: 'پیشنهادهای ویژه',
@@ -86,37 +86,41 @@ onMounted(() => {
   margin: 0 3px;
   min-height: 400px;
 }
-
 .left-section {
   background: #ffe7b3;
   width: 40%;
   display: flex;
   flex-direction: column;
-  justify-content: center; 
+  justify-content: center;
   padding: 20px;
   box-sizing: border-box;
+  gap: 12px;
 }
 
 .static-box {
   display: flex;
   align-items: center;
-  justify-content: flex-start; 
+  justify-content: flex-start;
   padding: 12px 20px;
   border-bottom: 1px solid #ddd;
-  gap: 12px; 
+  gap: 12px;
   flex: 1;
   transition: all 0.3s;
+  border-radius: 10px;
+  background: #fff4d6;
 }
 
 .side-icon img {
   width: 50px;
   height: 50px;
-  margin-right: 10px; 
+  margin-right: 10px;
+  flex-shrink: 0;
 }
 
 .info {
   flex: 1;
   margin: 0;
+  text-align: right;
 }
 
 .icon-btn {
@@ -128,6 +132,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .icon-btn i {
@@ -158,10 +163,11 @@ onMounted(() => {
   position: absolute;
   right: 10%;
   top: 50%;
-  transform: translateY(-50%); 
+  transform: translateY(-50%);
   text-align: right;
   color: white;
   max-width: 80%;
+  z-index: 1;
 }
 
 .banner-content h2 {
@@ -189,16 +195,6 @@ onMounted(() => {
   background: #e5b809;
 }
 
-.loading {
-  width: 70%;
-  text-align: center;
-  padding: 40px;
-}
-
-.error {
-  color: red;
-}
-
 
 @media (max-width: 1024px) {
   .main-banner {
@@ -212,46 +208,65 @@ onMounted(() => {
     min-height: auto;
   }
 
-  .left-section, .right-section {
+  .left-section,
+  .right-section {
     width: 100%;
     padding: 12px;
   }
 
-  .banner-content {
-    position: static;
-    transform: none;
-    text-align: center;
-    max-width: 100%;
-    margin-top: -50px;
+  .right-section {
+    height: 300px;
   }
 
-  .shop-btn {
-    width: 100%;
+  .banner-img {
+    height: 100%;
+  }
+
+  .banner-content {
+    right: 5%;
+    bottom: 10%;
+    top: auto;
+    transform: none;
+    text-align: center;
+    max-width: 90%;
   }
 
   .static-box {
-    justify-content: center;
-    gap: 10px;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
+    padding: 10px;
+    gap: 8px;
   }
 
   .side-icon img {
     width: 40px;
     height: 40px;
+    margin: 0;
   }
 
-  .banner-content h2 {
-    font-size: 22px;
-  }
-
-  .banner-content p {
-    font-size: 14px;
+  .icon-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 
 @media (max-width: 480px) {
   .main-banner {
     border-radius: 8px;
+  }
+
+  .right-section {
+    height: 220px;
+    position: relative;
+  }
+  .right-section img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   .banner-content h2 {
@@ -270,13 +285,13 @@ onMounted(() => {
     width: 35px;
     height: 35px;
   }
+  .icon-btn{
+    width: 40px;
+  }
 
   .static-box {
-    flex-direction: column;
     gap: 6px;
-    padding: 10px;
+    padding: 8px;
   }
 }
-
-
 </style>

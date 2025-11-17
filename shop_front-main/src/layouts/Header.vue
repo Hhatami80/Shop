@@ -335,16 +335,23 @@ function handleCartClick() {
   }
   .menu-btn {
     font-size: 24px;
-    top: 5px;
-    right: 5px;
+    top: 30px;
+    right: 20px;
   }
   .search-wrapper {
     margin-top: 10px;
     height: auto;
   }
   .menu-box {
-    min-width: 95%;
+    min-width: 35%;
     padding: 10px 15px;
+    top: 60px !important;
+    right: 2.5% !important; 
+    left: auto !important; 
+  }
+  .header-icons i{
+    font-size: 24px;
+   
   }
 }
 </style>

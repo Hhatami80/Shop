@@ -11,6 +11,7 @@
           <th>نام کاربری</th>
           <th>ایمیل</th>
           <th>شماره تلفن</th>
+          <th>ادرس</th>
           <th>عملیات</th>
         </tr>
       </thead>
@@ -20,6 +21,7 @@
           <td>{{ user.username }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.phone }}</td>
+          <td>{{ user.address || '-' }}</td>
           <td>
             <button class="btn btn-delete" @click="handleDelete(user.id)">حذف</button>
           </td>

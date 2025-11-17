@@ -16,14 +16,16 @@
       :modules="[Autoplay, Pagination]"
       :slides-per-view="1"
       :space-between="20"
+      :centered-slides="true"
+      :centeredSlidesBounds="true"
+      :loop="new_products.length > 1"
+      :autoplay="{ delay: 4500, disableOnInteraction: false }"
+      :pagination="{ clickable: new_products.length > 1 }"
       :breakpoints="{
         480: { slidesPerView: Math.min(new_products.length, 2), spaceBetween: 16 },
         768: { slidesPerView: Math.min(new_products.length, 3), spaceBetween: 18 },
         1024: { slidesPerView: Math.min(new_products.length, 4), spaceBetween: 20 },
       }"
-      :loop="new_products.length > 1"
-      :autoplay="{ delay: 4500, disableOnInteraction: false }"
-      :pagination="{ clickable: new_products.length > 1 }"
       class="product-swiper"
     >
       <SwiperSlide v-for="product in new_products" :key="product.id">
@@ -46,128 +48,100 @@
 import { ref } from 'vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Autoplay, Pagination } from 'swiper/modules'
+
 import 'swiper/css'
 import 'swiper/css/pagination'
 import 'swiper/css/autoplay'
 
 import ProductModal from './ProductModal.vue'
 import ProductCard from './ProductCard.vue'
-import { useCartStore } from '@/stores/useCartStore'
 
 defineProps({
   title: { type: String, default: 'محصولات' },
   new_products: { type: Array, default: () => [] },
 })
 
-const cartStore = useCartStore()
 const selectedProduct = ref(null)
-
-const openModal = (product) => {
-  selectedProduct.value = product
-}
+const openModal = (product) => (selectedProduct.value = product)
 </script>
 
 <style scoped>
 .product-slider-container {
-  padding: 40px 20px;
+  padding: 40px 5%;
   background-color: #f8f8f8;
   direction: rtl;
-  transition: all 0.3s ease;
+  overflow: hidden;
 }
 
 .section-title {
+  font-size: 1.6rem;
   text-align: center;
-  font-size: 26px;
-  margin-bottom: 30px;
-  color: #222;
+  margin-bottom: 2rem;
   font-weight: 800;
-}
-
-.product-swiper {
-  padding-bottom: 45px;
-}
-
-.swiper-pagination-bullet {
-  background: #ccc;
-  opacity: 1;
-  transition: all 0.3s ease;
-}
-
-.swiper-pagination-bullet-active {
-  background: #facc15;
-  transform: scale(1.3);
-}
-
-.loading {
-  text-align: center;
-  font-size: 18px;
-  color: #666;
-  padding: 20px 0;
+  color: #222;
 }
 
 .product-grid {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 2%;
 }
 
 .product-grid > * {
-  flex: 0 0 372px;
+  flex: 0 0 calc(25% - 2%);
+  max-width: 372px;
+  min-width: 220px;
+}
+
+.product-swiper {
+  padding-bottom: 45px;
+}
+
+.product-swiper .swiper-slide {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.product-swiper .swiper-slide > * {
+  max-width: 372px;
+  width: 100%;
+}
+
+.swiper-pagination-bullet {
+  background: #ccc;
+  opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+  background: #facc15;
+  transform: scale(1.3);
+  transition: 0.3s;
+}
+
+.loading {
+  text-align: center;
+  color: #666;
+  font-size: 1rem;
+  padding: 1rem 0;
 }
 
 @media (max-width: 1024px) {
-  .section-title {
-    font-size: 22px;
-    margin-bottom: 25px;
-  }
-  .product-slider-container {
-    padding: 30px 15px;
-  }
   .product-grid > * {
-    flex: 0 0 calc(33.33% - 20px);
+    flex: 0 0 calc(33% - 2%);
   }
 }
 
 @media (max-width: 768px) {
-  .section-title {
-    font-size: 20px;
-    margin-bottom: 20px;
-  }
-  .product-slider-container {
-    padding: 25px 10px;
-  }
-  .product-swiper {
-    padding-bottom: 35px;
-  }
-  .swiper-pagination-bullet {
-    width: 10px;
-    height: 10px;
-  }
   .product-grid > * {
-    flex: 0 0 calc(50% - 16px);
+    flex: 0 0 calc(50% - 2%);
   }
 }
 
 @media (max-width: 480px) {
-  .section-title {
-    font-size: 18px;
-    margin-bottom: 15px;
-  }
-  .product-slider-container {
-    padding: 20px 8px;
-  }
-  .product-swiper {
-    padding-bottom: 25px;
-  }
-  .swiper-pagination-bullet {
-    width: 12px;
-    height: 12px;
-    margin: 0 6px !important;
-  }
   .product-grid > * {
     flex: 0 0 100%;
-    margin: 0 auto;
   }
 }
 </style>
