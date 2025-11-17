@@ -107,7 +107,7 @@ onMounted(() => {
   flex: 1;
   transition: all 0.3s;
   border-radius: 10px;
-  background: #fff4d6;
+  
 }
 
 .side-icon img {
@@ -293,5 +293,9 @@ onMounted(() => {
     gap: 6px;
     padding: 8px;
   }
+  .info{
+    text-align: center;
+  }
+  
 }
 </style>
