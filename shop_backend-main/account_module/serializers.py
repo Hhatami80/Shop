@@ -2,11 +2,43 @@ from rest_framework import serializers
 from .models import User, Address, Province, City
 
 
+class ProvinceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Province
+        fields = ['id', 'name']
+
+
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = ['id', 'name', 'province']
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    city = CitySerializer(read_only=True)
+    province = ProvinceSerializer(read_only=True)
+
+    city_id = serializers.PrimaryKeyRelatedField(
+        queryset=City.objects.all(), source='city', write_only=True
+    )
+
+    province_id = serializers.PrimaryKeyRelatedField(
+        queryset=Province.objects.all(), source='province', write_only=True
+    )
+
+    class Meta:
+        model = Address
+        fields = ['id', 'user', 'full_address', 'plate', 'city', 'city_id', 'province',
+                  'province_id', 'postal_code','street', 'neighborhood']
+
+
+
 class UserAdminSerializer(serializers.ModelSerializer):
     fullname = serializers.ReadOnlyField()
+    address = AddressSerializer(many=True, read_only=True)
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'phone', 'role', 'fullname']
+        fields = ['id', 'username', 'email', 'phone', 'role', 'fullname', 'address']
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -94,34 +126,3 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
         instance.set_password(validated_data['password'])
         instance.save()
         return instance
-
-
-class ProvinceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Province
-        fields = ['id', 'name']
-
-
-class CitySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = City
-        fields = ['id', 'name', 'province']
-
-
-class AddressSerializer(serializers.ModelSerializer):
-    city = CitySerializer(read_only=True)
-    province = ProvinceSerializer(read_only=True)
-
-    city_id = serializers.PrimaryKeyRelatedField(
-        queryset=City.objects.all(), source='city', write_only=True
-    )
-
-    province_id = serializers.PrimaryKeyRelatedField(
-        queryset=Province.objects.all(), source='province', write_only=True
-    )
-
-    class Meta:
-        model = Address
-        fields = ['id', 'user', 'full_address', 'plate', 'city', 'city_id', 'province',
-                  'province_id', 'postal_code','street', 'neighborhood']
-

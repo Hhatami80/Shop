@@ -21,22 +21,64 @@
           <td>{{ user.username }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.phone }}</td>
-          <td>{{ user.address || '-' }}</td>
+          <!-- <td>{{ user.address || '-' }}</td> -->
+          <td>
+              <button class="btn-details" @click="openModal(user)">
+                <fa-icon :icon="['fas', 'eye']" /> مشاهده
+              </button>
+            </td>
           <td>
             <button class="btn btn-delete" @click="handleDelete(user.id)">حذف</button>
           </td>
         </tr>
       </tbody>
     </table>
+    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
+      <div class="modal">
+        <h3>جزئیات آدرس{{ selectedUser.usrename }}</h3>
+        <table class="modal-table">
+          <thead>
+            <tr>
+              <th>استان</th>
+              <th>شهر</th>
+              <th>محله</th>
+              <th>خیابان</th>
+              <th>پلاک</th>
+              <th>کد پستی</th>
+              <th>آدرس کامل</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="address in selectedUser.address" :key="address.id">
+              <td>{{ address.province.name || "-" }}</td>
+              <td>{{ address.city.name || "-" }}</td>
+              <td>{{ address.neighborhood || "-" }}</td>
+              <td>{{ address.street || "-" }}</td>
+              <td>{{ address.plate || "-" }}</td>
+              <td>{{ address.postal_code || "-" }}</td>
+            </tr>
+            <tr v-if="!selectedUser.address.length">
+              <td colspan="4" style="text-align: center">هیچ آدرسی برای این کاربر موجود نیست.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="modal-actions">
+          <button class="btn-close" @click="closeModal">بستن</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useUserStore } from "@/stores/useUserStore";
 import Swal from "sweetalert2";
 
 const store = useUserStore();
+const showModal = ref(false)
+const selectedUser = ref({})
 
 onMounted(() => {
   store.fetchUsers();
@@ -75,6 +117,15 @@ const handleDelete = (id) => {
     }
   });
 };
+
+const openModal = (user) => {
+  selectedUser.value = user
+  showModal.value = true
+}
+const closeModal = () => {
+  showModal.value = false
+}
+
 </script>
 
 <style scoped>
@@ -180,6 +231,76 @@ const handleDelete = (id) => {
   background: #b91c1c;
   box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
   transform: translateY(-1px);
+}
+
+.btn-details {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-details:hover {
+  background: #0056b3;
+}
+
+
+/* modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 600px;
+  width: 90%;
+}
+
+.modal h3 {
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.modal-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 15px;
+}
+.modal-table th,
+.modal-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.btn-close {
+  background: #6c757d;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-close:hover {
+  background: #5a6268;
 }
 
 :global(.my-swal-popup) {

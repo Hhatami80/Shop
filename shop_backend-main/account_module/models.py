@@ -114,9 +114,11 @@ class PhoneOTP(models.Model):
         return now() > expiration
 
     def save(self, *args, **kwargs):
-        if not self.code:
+        if not self.code or self.is_expired():
             self.code = str(random.randint(100000, 999999))
         super().save(*args, **kwargs)
 
+    
+    
     def __str__(self):
         return f'{self.phone} - {self.code}'

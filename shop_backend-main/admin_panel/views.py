@@ -627,10 +627,10 @@ class UpdateAboutUsMainView(APIView):
 # region Users
 
 class ListUserView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = []
 
     def get(self, request: Request):
-        users = User.objects.all()
+        users = User.objects.prefetch_related('address').all()
         user_serializer = UserAdminSerializer(users, many=True, context={'request': request})
         return Response({'data': user_serializer.data}, status.HTTP_200_OK)
 
@@ -752,11 +752,14 @@ class OrderAdminViewSet(viewsets.ModelViewSet):
         if new_status not in valid_statuses.keys():
             return Response({'error': 'وضعیت نامعتبر است'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if order.status in ["paid", "completed"] and new_status in ["canceled", "pending"]:
-            return Response({"error": "شما اجازه تغییر وضعیت سفارش پرداخت شده را ندارید."},
-                            status.HTTP_400_BAD_REQUEST)
-            
-        order.status = new_status
-        order.save()
-        serializer = self.get_serializer(order)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # status change can not happen from 
+        # completed or paid to canceled or pending
+        # or from canceled to anything else
+        if order.status in ["canceled", "completed"]:
+            return Response({"message": "این وضعیت قابل تغییر نیست."}, status.HTTP_400_BAD_REQUEST)
+        if (order.status == "pending" and new_status in ["canceled", "paid", "completed"] or 
+        order.status == "paid" and new_status == "completed"):
+            order.status = new_status
+            order.save()
+            serializer = self.get_serializer(order)
+            return Response(serializer.data, status=status.HTTP_200_OK)

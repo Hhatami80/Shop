@@ -23,14 +23,19 @@ class RegisterView(APIView):
             username = user_serializer.validated_data.get('username')
             user_phone = user_serializer.validated_data.get('phone')
             user_pass = user_serializer.validated_data.get('password')
+            if (username or user_phone or user_pass) is None:
+                return Response({"messages": "مقادیر ورودی نامعتبر است"}, status.HTTP_400_BAD_REQUEST)
             strong, message = is_strong_password(user_pass)
             if not strong:
                 return Response({'errors': message}, status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-            user: User = User.objects.filter(username=username).first()
+            user = User.objects.filter(username=username).first()
             if user is not None:
                 return Response({'errors': 'این نام کاربری قابل استفاده نیست.'}, status.HTTP_400_BAD_REQUEST)
-            otp_obj, _ = PhoneOTP.objects.update_or_create(phone=user_phone, username=username, password=user_pass)
+            otp_obj, _ = PhoneOTP.objects.get_or_create(phone=user_phone, username=username, password=user_pass)
+        
+            if otp_obj.is_expired():
+                otp_obj.save()
             if sms_manager.send_otp(user_phone, otp_obj.code):
                 return Response({'detail': 'کد تایید ارسال شد.'}, status.HTTP_200_OK)
 
