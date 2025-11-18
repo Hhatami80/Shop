@@ -105,7 +105,6 @@
 import { ref, computed, watch } from 'vue'
 import { useCartStore } from '@/stores/useCartStore'
 import { useProductCommentStore } from '@/stores/useProductCommentStore'
-
 const props = defineProps({
   show: Boolean,
   product: Object,
@@ -114,6 +113,7 @@ const emit = defineEmits(['close'])
 
 const cartStore = useCartStore()
 const commentStore = useProductCommentStore()
+
 
 const count = ref(1)
 const activeTab = ref('details')
@@ -168,7 +168,7 @@ async function addToCart() {
 async function submitComment() {
   if (!newComment.value || userRating.value === 0 || !props.product?.id) return
   try {
-    await commentStore.submitComment(props.product.id, newComment.value, userRating.value)
+    await commentStore.submitComment(props.product.id, newComment.value, '')
     newComment.value = ''
     userRating.value = 0
     alert('نظر شما با موفقیت ارسال شد و بعد از تایید ادمین نمایش داده می‌شود.')

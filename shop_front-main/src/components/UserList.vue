@@ -56,6 +56,7 @@
               <td>{{ address.street || "-" }}</td>
               <td>{{ address.plate || "-" }}</td>
               <td>{{ address.postal_code || "-" }}</td>
+              <td>{{ address.full_address || "-" }}</td>
             </tr>
             <tr v-if="!selectedUser.address.length">
               <td colspan="7" style="text-align: center">هیچ آدرسی برای این کاربر موجود نیست.</td>

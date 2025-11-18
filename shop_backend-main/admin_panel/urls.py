@@ -29,8 +29,6 @@ urlpatterns = [
     # path('banner-edit/<int:banner_id>', views.UpdateBannerView.as_view(), name='update-banner'),
     # Comment CRUD Api
     path('admin/comments', views.CommentsAllDisplay.as_view(), name='display-comment'),
-    # path('admin/comments-approved', views.CommentsApprovedDisplay.as_view(), name='display-comments-approved'),
-    # path('admin/comments-unapproved', ),
     path('admin/comments/<int:comment_id>', views.DeleteCommentView.as_view(), name='delete-comment'),
     path('admin/comments/bulk-delete', views.DeleteCommentBulkView.as_view(), name='delete-bulk-comment'),
     path('admin/comments/<int:comment_id>/approve', views.ApproveCommentView.as_view(), name='approve-comment'),

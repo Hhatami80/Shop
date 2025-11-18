@@ -52,14 +52,9 @@ class ApprovedCommentsView(APIView):
 class AddComment(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request: Request, product_id):
-        comments = ProductComment.objects.filter(product_id=product_id, is_approved=True)
-        comment_serializer = ProductCommentSerializer(comments, many=True)
-        return Response({'comments': comment_serializer.data}, status.HTTP_200_OK)
-
     def post(self, request: Request, product_id):
         product = get_object_or_404(Product, id=product_id)
-        parent_id = request.data.get('parent')
+        parent_id = request.data.get('parent_id')
         parent = None
 
         if parent_id:

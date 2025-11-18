@@ -5,3 +5,4 @@ shop_front-main/.env
 __pycache__/
 shop_backend-main/db.sqlite3
 shop_backend-main/*/__pycache__/*.*
+shop_backend-main/shop_backend-main.rar
