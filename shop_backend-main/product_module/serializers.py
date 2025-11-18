@@ -8,7 +8,7 @@ from django.utils import timezone
 import json
 from django.http import QueryDict
 import jdatetime
-from account_module.serializers import UserAdminSerializer
+from account_module.serializers import UserAdminSerializer, UserSerializer
 
 
 class ProductMiniSerializer(serializers.ModelSerializer):
@@ -165,6 +165,10 @@ class BrandSerializer(serializers.ModelSerializer):
 
 
 class ProductCommentSerializer(serializers.ModelSerializer):
+
+    product = ProductMiniSerializer()
+    user = UserSerializer()
+    
     class Meta:
         model = ProductComment
         fields = '__all__'

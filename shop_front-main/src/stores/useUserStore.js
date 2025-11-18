@@ -79,6 +79,7 @@ export const useUserStore = defineStore("user", {
         }
 
         this.profile = {
+          id: data.id || "",
           username: data.username || "",
           email: data.email || "",
           phone: data.phone || "",

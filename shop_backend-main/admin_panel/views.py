@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from rest_framework import status, viewsets
 from product_module.models import Product, ProductProperty, ProductCategory, Brand, ProductComment, CategoryBanner, Order
 from product_module.serializers import ProductSerializer, ProductPropertySerializer, CategorySerializer, \
@@ -20,7 +21,9 @@ from article_module.serializers import ArticleSerializer
 from rest_framework.decorators import action
 from rest_framework.permissions import BasePermission
 from django.core.exceptions import ObjectDoesNotExist
-
+from django_filters.rest_framework import DjangoFilterBackend
+from .pagination import AdminCommentPaginator
+from .filters import AdminCommentFilter
 # permissions
 class IsAdmin(BasePermission):
     def has_permission(self, request, view):
@@ -276,62 +279,22 @@ def search_comments(query):
     return ProductComment.objects.filter(q)
 
 
-class CommentsAllDisplay(APIView):
-    permission_classes = [IsAuthenticated]
+class CommentsAllDisplay(ListAPIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+    filter_backends = [DjangoFilterBackend]
+    serializer_class = ProductCommentSerializer
+    pagination_class = AdminCommentPaginator
+    filterset_class = AdminCommentFilter
+    def get_queryset(self):
+        return ProductComment.objects.select_related("product").select_related("user").all()
+    
+    
 
-    def get(self, request: Request):
-
-        comment_status = request.query_params.get('status')
-        search_query = request.query_params.get('search', '').strip()
-
-        try:
-            page = int(request.query_params.get('page', 1))
-            _ = request.query_params.get('totalPages')
-            per_page = int(request.query_params.get('per_page', 5))
-        except ValueError:
-            return Response({'errors': 'page یا perpage باید عدد باشند'}, status=status.HTTP_400_BAD_REQUEST)
-
-        comments = ProductComment.objects.all()
-
-        if comment_status == 'approved':
-            comments = comments.filter(is_approved=True)
-        elif comment_status == 'unapproved':
-            comments = comments.filter(is_approved=False)
-        elif comment_status == 'all':
-            pass
-        elif comment_status:
-            return Response({'errors': 'مقدار وضعیت نامعتبر است.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # if search_query:
-        #     comments = comments.filter(
-        #         Q(text__icontains=search_query)
-        #     )
-        words = search_query.split()
-        q = Q()
-        for word in words:
-            q &= Q(text__icontains=word)  # AND condition
-        comments = comments.filter(q)
-
-        total_comments = comments.count()
-        total_pages = math.ceil(total_comments / per_page)
-
-        start = (page - 1) * per_page
-        end = start + per_page
-        paginated_comments = comments[start:end]
-
-        serializer = ProductCommentSerializer(paginated_comments, many=True)
-
-        return Response({
-            'comments': serializer.data,
-            'comment_count': total_comments,
-            'totalPages': total_pages,
-            'page': page,
-            'perPage': per_page
-        }, status=status.HTTP_200_OK)
-
+    
+    
 
 class DeleteCommentView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def get_object(self, comment_id):
         try:
@@ -347,7 +310,7 @@ class DeleteCommentView(APIView):
 
 
 class DeleteCommentBulkView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def post(self, request: Request):
         comment_ids = request.data.get('ids', [])
@@ -366,7 +329,7 @@ class DeleteCommentBulkView(APIView):
 
 
 class ApproveCommentView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def post(self, request: Request, comment_id):
         try:
@@ -379,7 +342,7 @@ class ApproveCommentView(APIView):
 
 
 class ApproveCommentBulkView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def post(self, request: Request):
         comment_ids = request.data.get('ids', [])

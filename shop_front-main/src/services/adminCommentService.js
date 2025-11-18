@@ -1,8 +1,10 @@
 import api from './AxiosService'
 
 export const adminCommentService = {
-  getAll(params = {}) {
-    return api.get('/admin/comments', { params }) 
+  getAll({status="all", per_page=30, page=1, q} = {}) {
+    const params = { status, per_page, page }
+    if (q) params.q = q
+    return api.get('/admin/comments', {params}) 
   },
 
   approve(id) {

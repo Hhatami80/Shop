@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { adminCommentService } from '@/services/adminCommentService'
+import { userCommentService } from "@/services/userCommentService"
 
 export const useProductCommentStore = defineStore('productComments', {
   state: () => ({
@@ -8,24 +8,23 @@ export const useProductCommentStore = defineStore('productComments', {
     error: null,
   }),
   actions: {
-    async fetchApprovedComments(productId) {
-      this.loading = true
+    // async fetchApprovedComments(productId) {
+    //   this.loading = true
+    //   try {
+    //     const res = await productCommentService.getApproved(productId)
+    //     this.comments = res.data.comment
+    //   } catch (err) {
+    //     this.error = err
+    //   } finally {
+    //     this.loading = false
+    //   }
+    // },
+    async submitComment(productId, text, parent_id) {
       try {
-        const res = await productCommentService.getApproved(productId)
-        this.comments = res.data.comment
-      } catch (err) {
-        this.error = err
-      } finally {
-        this.loading = false
-      }
-    },
-    async submitComment(productId, text, rating) {
-      try {
-        await productCommentService.create({
-          product_id: productId,
-          text,
-          rating
-        })
+        await userCommentService.addProductComment(
+          productId,
+          parent_id,
+          text)
       } catch (err) {
         console.error(err)
       }

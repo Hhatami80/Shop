@@ -11,7 +11,7 @@
             <div class="filter-group">
               <label class="form-label fw-bold mb-1">جستجو</label>
               <input
-                v-model="commentStore.search"
+                v-model="commentStore.q"
                 @input="handleSearch"
                 type="text"
                 class="form-control-comment"
@@ -40,7 +40,7 @@
             <div class="filter-group">
               <label class="form-label fw-bold mb-1">تعداد در صفحه</label>
               <select
-                v-model="commentStore.perPage"
+                v-model="commentStore.per_page"
                 @change="
                   () => {
                     commentStore.page = 1
@@ -94,6 +94,8 @@
               <th scope="col">
                 <input type="checkbox" @change="toggleAll" />
               </th>
+              <th>نام کاربر</th>
+              <th>نام محصول</th>
               <th scope="col">متن نظر</th>
               <th scope="col">وضعیت</th>
               <th scope="col" class="text-center">عملیات</th>
@@ -108,6 +110,8 @@
                   v-model="commentStore.selectedComments"
                 />
               </td>
+              <td>{{ comment.user.username }}</td>
+              <td>{{  comment.product.title }}</td>
               <td>{{ comment.text }}</td>
               <td>
                 <span

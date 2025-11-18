@@ -11,34 +11,25 @@ export const useAdminCommentStore = defineStore('adminComments', {
     selectedComments: [],
 
     page: 1,
-    totalPages: 1,
-    search: '',
-    status: 'all',
-    perPage: 5,
+    totalPages: 10,
+    q: '',
+    status: "all",
+    per_page: 5,
   }),
 
   actions: {
-    async fetchAllComments() {
+    async fetchAllComments({status=this.status, q=this.q, page=this.page, per_page=this.per_page} = {}) {
      
       try {
         const res = await adminCommentService.getAll({
-          page: this.page,
-          search: this.search,
-          status: this.status,
-          per_page: this.perPage,
+          status,
+          per_page,
+          page,
+          q
         })
 
-        this.comments = res.data.comments
+        this.comments = res.data.results
 
-      
-        if (res.data.total) {
-          this.totalPages = Math.ceil(res.data.total / this.perPage)
-        } else if (res.data.total_pages) {
-          
-          this.totalPages = res.data.total_pages
-        } else {
-          this.totalPages = 1
-        }
       } catch (err) {
         console.error('خطا در دریافت نظرات:', err)
         this.error = 'خطا در دریافت نظرات'
