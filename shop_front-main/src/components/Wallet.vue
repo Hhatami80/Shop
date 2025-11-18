@@ -22,9 +22,9 @@
           <button class="btn-charge" @click="goToPayment">
             <fa-icon :icon="['fas', 'plus-circle']" /> شارژ
           </button>
-          <button class="btn-withdraw" @click="withdraw">
+          <!-- <button class="btn-withdraw" @click="withdraw">
             <fa-icon :icon="['fas', 'minus-circle']" /> برداشت
-          </button>
+          </button> -->
         </div>
       </div>
     </div>

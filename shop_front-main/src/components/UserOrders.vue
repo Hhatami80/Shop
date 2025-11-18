@@ -19,12 +19,30 @@
 
       <label>
         از تاریخ:
-        <input type="date" v-model="filterStartDate" />
+        <component
+          :is="DatePicker"
+          v-if="datePickerLoaded"
+          v-model="filterStartDate"
+          format="jYYYY/jMM/jDD"
+          display-format="jYYYY/jMM/jDD"
+          placeholder="انتخاب تاریخ"
+          color="#f9c710"
+          position="bottom"
+        />
       </label>
 
       <label>
         تا تاریخ:
-        <input type="date" v-model="filterEndDate" />
+        <component
+          :is="DatePicker"
+          v-if="datePickerLoaded"
+          v-model="filterEndDate"
+          format="jYYYY/jMM/jDD"
+          display-format="jYYYY/jMM/jDD"
+          placeholder="انتخاب تاریخ"
+          color="#f9c710"
+          position="bottom"
+        />
       </label>
 
       <button class="btn btn-filter" @click="applyFilters">اعمال فیلتر</button>
@@ -127,11 +145,15 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useOrderStore } from '@/stores/useOrderStore'
+import jalaali from 'jalaali-js'
 import { toast } from 'vue3-toastify'
 
 const orderStore = useOrderStore()
 const showModal = ref(false)
 const selectedOrder = ref({})
+
+const DatePicker = ref(null)
+const datePickerLoaded = ref(false)
 
 const filterStatus = ref('')
 const filterStartDate = ref('')
@@ -196,7 +218,10 @@ const getStatusClass = (status) =>
     canceled: 'status-canceled',
   })[status] || ''
 
-onMounted(() => {
+onMounted(async () => {
+  const dp = await import('vue3-persian-datetime-picker')
+  DatePicker.value = dp.default
+  datePickerLoaded.value = true
   fetchOrders()
 })
 </script>
@@ -374,24 +399,85 @@ h2 {
 }
 .filters {
   display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
-  align-items: center;
   flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+  align-items: center;
+  background: #fff7cc;
+  padding: 12px 16px;
+  border: 1px solid #ffe28a;
+  border-radius: 8px;
 }
+
 .filters label {
-  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  gap: 4px;
+  color: #333;
 }
+
 .filters input[type='date'],
 .filters select {
-  margin-right: 5px;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 14px;
+  width: 180px;
+  outline: none;
+  transition: all 0.2s ease;
 }
+
+.filters input[type='date']:focus,
+.filters select:focus {
+  border-color: #f9c710;
+}
+
+.filters button {
+  margin-top: 22px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
 .btn-filter {
   background: #28a745;
   color: white;
 }
+
+.btn-filter:hover {
+  background: #218838;
+}
+
 .btn-reset {
   background: #dc3545;
   color: white;
+}
+
+.btn-reset:hover {
+  background: #c82333;
+}
+
+@media (max-width: 600px) {
+  .filters {
+    flex-direction: column;
+  }
+
+  .filters label {
+    width: 100%;
+  }
+
+  .filters input[type='date'],
+  .filters select {
+    width: 100%;
+  }
+
+  .filters button {
+    width: 100%;
+  }
 }
 </style>
