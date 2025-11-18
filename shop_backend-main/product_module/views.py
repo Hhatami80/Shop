@@ -19,7 +19,7 @@ from account_module.models import User
 from payments.models import Transaction
 from .models import Product, ProductGallery, ProductComment, Cart, CartItem, ProductRating, OrderItem, Order, \
     CategoryBanner, ProductCategory, Payment, Wallet, WalletTransaction, WalletPayment
-from .serializers import ProductSerializer, ProductGallerySerializer, ProductCommentSerializer, \
+from .serializers import ProductCommentReadSerializer, ProductCommentWriteSerializer, ProductSerializer, ProductGallerySerializer, \
     ProductDescriptionSerializer, ProductPropertySerializer, CartItemSerializer, CartSerializer, \
     ProductRatingSerializer, OrderSerializer, CategoryBannerSerializer, CategorySerializer, WalletSerializer, \
     TransactionSerializer
@@ -35,7 +35,7 @@ class ProductDetailView(APIView):
         product = Product.objects.prefetch_related('images').filter(is_active=True).get(pk=product_id)
         comment = ProductComment.objects.filter(product=product, is_approved=True)
         product_serializer = ProductSerializer(product, context={'request': request})
-        comment_serializer = ProductCommentSerializer(comment, many=True)
+        comment_serializer = ProductCommentReadSerializer(comment, many=True)
         product_gallery = ProductGallery.objects.filter(product_id=product_id)
         gallery_serializer = ProductGallerySerializer(product_gallery, many=True, context={'request': request})
         return Response({'product': product_serializer.data, 'gallery': gallery_serializer.data,
@@ -45,7 +45,7 @@ class ProductDetailView(APIView):
 class ApprovedCommentsView(APIView):
     def get(self, request: Request, product_id):
         comments = ProductComment.objects.filter(product_id=product_id, is_approved=True)
-        comment_serializer = ProductCommentSerializer(comments, many=True)
+        comment_serializer = ProductCommentReadSerializer(comments, many=True)
         return Response({'comment': comment_serializer.data}, status.HTTP_200_OK)
 
 
@@ -60,7 +60,7 @@ class AddComment(APIView):
         if parent_id:
             parent = get_object_or_404(ProductComment, id=parent_id)
 
-        comment_serializer = ProductCommentSerializer(data=request.data)
+        comment_serializer = ProductCommentWriteSerializer(data=request.data)
 
         if comment_serializer.is_valid():
             # Save instance
@@ -69,7 +69,7 @@ class AddComment(APIView):
                 product=product,
                 parent=parent,
             )
-            new_serializer = ProductCommentSerializer(comment)
+            new_serializer = ProductCommentReadSerializer(comment)
 
             return Response({'data': new_serializer.data}, status.HTTP_200_OK)
 

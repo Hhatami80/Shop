@@ -5,8 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework import status, viewsets
 from product_module.models import Product, ProductProperty, ProductCategory, Brand, ProductComment, CategoryBanner, Order
-from product_module.serializers import ProductSerializer, ProductPropertySerializer, CategorySerializer, \
-    BrandSerializer, ProductCommentSerializer, CategoryBannerSerializer, OrderSerializer
+from product_module.serializers import ProductCommentReadSerializer, ProductSerializer, ProductPropertySerializer, CategorySerializer, \
+    BrandSerializer, CategoryBannerSerializer, OrderSerializer
 from site_module.serializers import BannerImageSerializer, FooterLinkSerializer, TrustSymbolSerializer, \
     HeaderSerializer, SiteSettingSerializer, SiteLogoSerializer, SiteAboutUsSerializer
 from site_module.models import BannerImages, FooterLinkBox, TrustSymbols, FooterLink, Header, SiteSetting
@@ -282,7 +282,7 @@ def search_comments(query):
 class CommentsAllDisplay(ListAPIView):
     permission_classes = [IsAuthenticated, IsAdmin]
     filter_backends = [DjangoFilterBackend]
-    serializer_class = ProductCommentSerializer
+    serializer_class = ProductCommentReadSerializer
     pagination_class = AdminCommentPaginator
     filterset_class = AdminCommentFilter
     def get_queryset(self):

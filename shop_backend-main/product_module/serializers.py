@@ -164,15 +164,20 @@ class BrandSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'image', 'price', 'sub_title']
 
 
-class ProductCommentSerializer(serializers.ModelSerializer):
-
+class ProductCommentReadSerializer(serializers.ModelSerializer):
     product = ProductMiniSerializer()
     user = UserSerializer()
-    
+
     class Meta:
         model = ProductComment
         fields = '__all__'
-        read_only_fields = ['user', 'product', 'parent']
+
+
+
+class ProductCommentWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductComment
+        fields = ['text', 'parent']
 
     def create(self, validated_data):
         now = timezone.now()
