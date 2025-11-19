@@ -271,24 +271,25 @@ class AddBannerView(APIView):
 
 # region Comment
 
-def search_comments(query):
-    words = query.split()
-    q = Q()
-    for word in words:
-        q &= Q(text__icontains=word)  # AND condition
-    return ProductComment.objects.filter(q)
-
-
 class CommentsAllDisplay(ListAPIView):
     permission_classes = [IsAuthenticated, IsAdmin]
     filter_backends = [DjangoFilterBackend]
     serializer_class = ProductCommentReadSerializer
     pagination_class = AdminCommentPaginator
     filterset_class = AdminCommentFilter
-    def get_queryset(self):
+    
+    def get_queryset(self):    
         return ProductComment.objects.select_related("product").select_related("user").all()
     
-    
+    def list(self, request, *args, **kwargs):
+        
+        response = super().list(request, *args, **kwargs)
+        unapproved_count = ProductComment.objects.filter(is_approved=False).count()
+
+        return Response({
+            "unapproved_count": unapproved_count,
+            "results": response.data
+        }, status.HTTP_200_OK)
 
     
     

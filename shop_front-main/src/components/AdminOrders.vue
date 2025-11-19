@@ -173,6 +173,8 @@ const changeStatus = async (order) => {
     await orderStore.updateOrderStatus(order.id, order.status)
   } catch {
     toast.error('خطا در تغییر وضعیت سفارش')
+  } finally {
+    await orderStore.fetchOrders()
   }
 }
 const openModal = (order) => {

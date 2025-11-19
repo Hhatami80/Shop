@@ -167,7 +167,7 @@ class BrandSerializer(serializers.ModelSerializer):
 class ProductCommentReadSerializer(serializers.ModelSerializer):
     product = ProductMiniSerializer()
     user = UserSerializer()
-
+    
     class Meta:
         model = ProductComment
         fields = '__all__'
