@@ -8,7 +8,11 @@
 
         <i class="fas fa-shopping-cart" @click="handleCartClick"></i>
 
-        <router-link v-if="loginStore.isAuthenticated" to="/user" class="user-icon">
+        <router-link
+          v-if="loginStore.isAuthenticated"
+          :to="loginStore.user?.role === 'admin' ? '/admin/dashboard' : '/user/dashboard'"
+          class="user-icon"
+        >
           <i class="fas fa-user"></i>
         </router-link>
 
@@ -17,12 +21,7 @@
         </router-link>
       </div>
 
-      <img
-        v-if="headerStore.site_logo"
-        :src="headerStore.site_logo"
-        alt="لوگو"
-        class="logo"
-      />
+      <img v-if="headerStore.site_logo" :src="headerStore.site_logo" alt="لوگو" class="logo" />
       <img v-else src="" alt="لوگو" class="logo" />
     </header>
 
@@ -33,12 +32,7 @@
     />
 
     <transition name="slide-fade">
-      <div
-        v-if="drawerOpen"
-        class="menu-box"
-        :style="menuStyle"
-        @click.self="drawerOpen = false"
-      >
+      <div v-if="drawerOpen" class="menu-box" :style="menuStyle" @click.self="drawerOpen = false">
         <button class="close-btn" @click="drawerOpen = false">×</button>
         <ul>
           <li v-for="item in headerStore.menuItems" :key="item.id">
@@ -62,91 +56,90 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from "vue";
-import { useHeaderStore } from "@/stores/useHeaderStore";
-import { useLoginStore } from "@/stores/useLoginStore";
-import { useCartStore } from "@/stores/useCartStore";
-import { useRouter } from "vue-router";
-import SearchBox from "@/components/SearchBox.vue";
-import StickyHeader from "@/components/StickyHeader.vue";
-import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { useHeaderStore } from '@/stores/useHeaderStore'
+import { useLoginStore } from '@/stores/useLoginStore'
+import { useCartStore } from '@/stores/useCartStore'
+import { useRouter } from 'vue-router'
+import SearchBox from '@/components/SearchBox.vue'
+import StickyHeader from '@/components/StickyHeader.vue'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 const props = defineProps({
   onlySticky: { type: Boolean, default: false },
   compactSticky: { type: Boolean, default: false },
-});
+})
 
-const drawerOpen = ref(false);
-const showStickyHeader = ref(false);
-const headerStore = useHeaderStore();
-const loginStore = useLoginStore();
-const cartStore = useCartStore();
-const router = useRouter();
+const drawerOpen = ref(false)
+const showStickyHeader = ref(false)
+const headerStore = useHeaderStore()
+const loginStore = useLoginStore()
+const cartStore = useCartStore()
+const router = useRouter()
 
-const menuBtn = ref(null);
+const menuBtn = ref(null)
 const menuStyle = ref({
-  position: "fixed",
-  top: "0px",
-  left: "100%", 
-});
+  position: 'fixed',
+  top: '0px',
+  left: '100%',
+})
 
 onMounted(() => {
-  headerStore.fetchHeader();
-  headerStore.fetchlogo();
-  window.addEventListener("scroll", handleScroll);
-});
+  headerStore.fetchHeader()
+  headerStore.fetchlogo()
+  window.addEventListener('scroll', handleScroll)
+})
 onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll);
-});
+  window.removeEventListener('scroll', handleScroll)
+})
 
 function handleScroll() {
-  showStickyHeader.value = window.scrollY > 200;
+  showStickyHeader.value = window.scrollY > 200
 }
 
 function scrollToSection(selector) {
-  const el = document.querySelector(selector);
+  const el = document.querySelector(selector)
   if (el) {
-    el.scrollIntoView({ behavior: "smooth" });
-    drawerOpen.value = false;
+    el.scrollIntoView({ behavior: 'smooth' })
+    drawerOpen.value = false
   }
 }
 
 async function toggleMenu() {
-  drawerOpen.value = !drawerOpen.value;
+  drawerOpen.value = !drawerOpen.value
   if (drawerOpen.value) {
-    await nextTick();
-    const rect = menuBtn.value?.getBoundingClientRect();
+    await nextTick()
+    const rect = menuBtn.value?.getBoundingClientRect()
     if (rect) {
-      const menuWidth = 230;
-      const topOffset = 10;
+      const menuWidth = 230
+      const topOffset = 10
 
       if (rect.right + menuWidth > window.innerWidth) {
         menuStyle.value = {
-          position: "fixed",
+          position: 'fixed',
           top: `${rect.bottom + topOffset}px`,
           left: `${rect.left - menuWidth}px`,
-        };
+        }
       } else {
         menuStyle.value = {
-          position: "fixed",
+          position: 'fixed',
           top: `${rect.bottom + topOffset}px`,
           left: `${rect.right + 10}px`,
-        };
+        }
       }
     }
   }
 }
 
-
 function handleCartClick() {
   if (!loginStore.isAuthenticated) {
-    toast.warn('لطفاً وارد حساب کاربری خود شوید');
+    toast.warn('لطفاً وارد حساب کاربری خود شوید')
     setTimeout(() => {
-      router.push('/login');
-    }, 2000);
+      router.push('/login')
+    }, 2000)
   } else {
-    router.push('/user/shop-cart');
+    router.push('/user/shop-cart')
   }
 }
 </script>
@@ -192,7 +185,6 @@ function handleCartClick() {
   gap: 18px;
   align-items: center;
 }
-
 
 .header-icons i,
 .header-icons a {
@@ -346,12 +338,11 @@ function handleCartClick() {
     min-width: 35%;
     padding: 10px 15px;
     top: 60px !important;
-    right: 2.5% !important; 
-    left: auto !important; 
+    right: 2.5% !important;
+    left: auto !important;
   }
-  .header-icons i{
+  .header-icons i {
     font-size: 24px;
-   
   }
 }
 </style>

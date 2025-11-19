@@ -10,7 +10,7 @@
 
         <router-link
           v-if="loginStore.isAuthenticated && loginStore.isAdmin"
-          to="/admin"
+          to="/admin/dashboard"
           class="user-icon"
           title="پنل ادمین"
         >
@@ -18,7 +18,7 @@
         </router-link>
         <router-link
           v-else-if="loginStore.isAuthenticated"
-          to="/user"
+          to="/user/dashboard"
           class="user-icon"
           title="پروفایل کاربری"
         >

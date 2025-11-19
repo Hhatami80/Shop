@@ -39,7 +39,7 @@ export const useAdminCommentStore = defineStore('adminComments', {
     },
     async approveComment(id) {
       await adminCommentService.approve(id)
-      await this.fetchAllComments()
+      await this.fetchAllComments({ status: 'pending' })
     },
 
     async deleteComment(id) {
@@ -51,7 +51,7 @@ export const useAdminCommentStore = defineStore('adminComments', {
       if (this.selectedComments.length === 0) return
       await adminCommentService.approveBulk(this.selectedComments)
       this.selectedComments = []
-      await this.fetchAllComments()
+      await this.fetchAllComments({ status: 'pending' })
     },
 
     async deleteSelectedComments() {

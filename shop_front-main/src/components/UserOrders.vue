@@ -143,23 +143,26 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, markRaw } from 'vue'
 import { useOrderStore } from '@/stores/useOrderStore'
-import jalaali from 'jalaali-js'
 import { toast } from 'vue3-toastify'
 
 const orderStore = useOrderStore()
+
 const showModal = ref(false)
 const selectedOrder = ref({})
+
 
 const DatePicker = ref(null)
 const datePickerLoaded = ref(false)
 
 const filterStatus = ref('')
-const filterStartDate = ref('')
-const filterEndDate = ref('')
+const filterStartDate = ref(null)  
+const filterEndDate = ref(null)     
 
-const totalPages = computed(() => Math.ceil(orderStore.totalOrders / orderStore.perPage))
+const totalPages = computed(() =>
+  Math.ceil(orderStore.totalOrders / orderStore.perPage)
+)
 
 const fetchOrders = async (page = 1) => {
   await orderStore.fetchOrders({
@@ -176,33 +179,42 @@ const applyFilters = async () => fetchOrders(1)
 
 const resetFilters = async () => {
   filterStatus.value = ''
-  filterStartDate.value = ''
-  filterEndDate.value = ''
+  filterStartDate.value = null   
+  filterEndDate.value = null    
   await fetchOrders(1)
 }
 
 const nextPage = () => {
-  if (orderStore.page < totalPages.value) fetchOrders(orderStore.page + 1)
+  if (orderStore.page < totalPages.value)
+    fetchOrders(orderStore.page + 1)
 }
+
 const prevPage = () => {
-  if (orderStore.page > 1) fetchOrders(orderStore.page - 1)
+  if (orderStore.page > 1)
+    fetchOrders(orderStore.page - 1)
 }
 
 const openModal = (order) => {
   selectedOrder.value = order
   showModal.value = true
 }
+
 const closeModal = () => {
   showModal.value = false
 }
+
 const cancelOrder = async (order) => {
   if (!confirm('آیا مطمئن هستید می‌خواهید این سفارش را لغو کنید؟')) return
   await orderStore.cancelUserOrder(order.id)
   await fetchOrders(orderStore.page)
 }
 
-const formatDate = (dateStr) => new Intl.DateTimeFormat('fa-IR').format(new Date(dateStr))
-const formatPrice = (price) => Number(price)?.toLocaleString('fa-IR') || '0'
+const formatDate = (dateStr) =>
+  new Intl.DateTimeFormat('fa-IR').format(new Date(dateStr))
+
+const formatPrice = (price) =>
+  Number(price)?.toLocaleString('fa-IR') || '0'
+
 const getStatusText = (status) =>
   ({
     pending: 'در انتظار پرداخت',
@@ -210,6 +222,7 @@ const getStatusText = (status) =>
     completed: 'ارسال‌شده',
     canceled: 'لغو‌شده',
   })[status] || ''
+
 const getStatusClass = (status) =>
   ({
     pending: 'status-pending',
@@ -220,13 +233,15 @@ const getStatusClass = (status) =>
 
 onMounted(async () => {
   const dp = await import('vue3-persian-datetime-picker')
-  DatePicker.value = dp.default
+  DatePicker.value = markRaw(dp.default)   
   datePickerLoaded.value = true
   fetchOrders()
 })
 </script>
 
+
 <style scoped>
+
 .user-orders {
   max-width: 900px;
   margin: 40px auto;

@@ -83,10 +83,10 @@
           <div class="reviews-list">
             <div v-if="productComments.length">
               <div v-for="(comment, index) in productComments" :key="index" class="review">
-                <!-- <p class="review-author">{{ comment.author_name }}</p> -->
-                <!-- <div class="review-rating">
-                  <span v-for="i in 5" :key="i" :class="{ filled: i <= comment.rating }">★</span>
-                </div> -->
+                <p class="review-author">
+                  <strong>{{ comment.user.username }}</strong>
+                </p>
+                <p class="review-date">{{ comment.jalali_created_date }}</p>
                 <p class="review-text">{{ comment.text }}</p>
                 <hr />
               </div>
@@ -103,6 +103,8 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 import { useCartStore } from '@/stores/useCartStore'
 import { useProductCommentStore } from '@/stores/useProductCommentStore'
 const props = defineProps({
@@ -114,13 +116,11 @@ const emit = defineEmits(['close'])
 const cartStore = useCartStore()
 const commentStore = useProductCommentStore()
 
-
 const count = ref(1)
 const activeTab = ref('details')
 const userRating = ref(0)
 const hoverRating = ref(0)
 const newComment = ref('')
-
 
 const alreadyInCart = computed(() => {
   if (!props.product?.id) return false
@@ -130,16 +130,17 @@ const alreadyInCart = computed(() => {
 watch(
   () => props.product,
   async (newVal) => {
-    count.value = 1
     if (newVal?.id) {
+      console.log('Fetching comments for product', newVal.id)
       await commentStore.fetchApprovedComments(newVal.id)
     }
   },
+  { immediate: true }
 )
 
 const productComments = computed(() => {
   if (!props.product?.id) return []
-  return commentStore.comments
+  return commentStore.comments.filter((c) => c.product.id === props.product.id && c.is_approved)
 })
 
 function close() {
@@ -153,6 +154,7 @@ function increase() {
 function decrease() {
   if (count.value > 1) count.value--
 }
+
 
 async function addToCart() {
   if (!props.product?.id) return
@@ -171,7 +173,7 @@ async function submitComment() {
     await commentStore.submitComment(props.product.id, newComment.value, '')
     newComment.value = ''
     userRating.value = 0
-    alert('نظر شما با موفقیت ارسال شد و بعد از تایید ادمین نمایش داده می‌شود.')
+    toast.success('نظر شما با موفقیت ارسال شد و بعد از تایید ادمین نمایش داده می‌شود.')
   } catch (err) {
     console.error(err)
   }
@@ -460,6 +462,16 @@ async function submitComment() {
 .new-price {
   color: #e11d48;
 }
+.review-author {
+  color: #333;
+  font-weight: bold;
+}
+
+.review-date {
+  color: #888;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
 
 @media (max-width: 768px) {
   .modal-content {
@@ -530,5 +542,4 @@ async function submitComment() {
     font-size: 16px;
   }
 }
-
 </style>

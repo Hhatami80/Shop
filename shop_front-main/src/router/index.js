@@ -30,6 +30,7 @@ import AdminOrders from '@/components/AdminOrders.vue'
 import CommetsManager from '@/components/CommetsManager.vue'
 import CategoryDetail from '@/views/CategoryDetail.vue'
 import Dashboard from '@/components/Dashboard.vue'
+import AdminDashboard from '@/components/AdminDashboard.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -131,6 +132,7 @@ const router = createRouter({
         { path: 'orderList', component: AdminOrders },
         { path: 'comments', component: CommetsManager },
         { path: 'transactions', component: AdminTransactions, meta: { requiresAdmin: true } },
+        { path: 'dashboard', component: AdminDashboard},
       ],
     },
   ],
