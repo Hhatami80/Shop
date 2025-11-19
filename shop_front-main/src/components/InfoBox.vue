@@ -86,8 +86,8 @@ export default {
   font-size: 1.6rem;
   font-weight: bold;
   color: #ffd700;
-  white-space: pre-wrap; /* بهتر از pre-line در این حالت */
-  word-break: break-word; /* اگر کلمات خیلی طولانی بودن */
+  white-space: pre-wrap;
+  word-break: break-word; 
 }
 
 @media (max-width: 1024px) {

@@ -176,9 +176,6 @@ textarea.form-control:focus {
   display: block;
 }
 
-/* .article-editor {
-  min-height: 400px; 
-} */
 
 .form-submit {
   text-align: center;

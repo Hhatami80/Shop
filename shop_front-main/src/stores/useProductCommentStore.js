@@ -8,17 +8,17 @@ export const useProductCommentStore = defineStore('productComments', {
     error: null,
   }),
   actions: {
-    // async fetchApprovedComments(productId) {
-    //   this.loading = true
-    //   try {
-    //     const res = await productCommentService.getApproved(productId)
-    //     this.comments = res.data.comment
-    //   } catch (err) {
-    //     this.error = err
-    //   } finally {
-    //     this.loading = false
-    //   }
-    // },
+    async fetchApprovedComments(productId) {
+      this.loading = true
+      try {
+        const res = await productCommentService.getApproved(productId)
+        this.comments = res.data.comment
+      } catch (err) {
+        this.error = err
+      } finally {
+        this.loading = false
+      }
+    },
     async submitComment(productId, text, parent_id) {
       try {
         await userCommentService.addProductComment(

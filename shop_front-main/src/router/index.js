@@ -122,7 +122,10 @@ const router = createRouter({
         { path: 'footer', component: FooterManager },
         { path: 'changepass', component: ChangePass },
         { path: 'articles', component: ArticleList },
-        { path: 'articles/create', component: ArticleForm },
+        {
+          path: 'articles/create',
+          component: ArticleForm,
+        },
         { path: 'articles/edit/:id', component: ArticleForm, props: true },
         { path: 'productmanager', component: ProductManager },
         { path: 'aboutusmanager', component: AboutUsManager },

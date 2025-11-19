@@ -2,7 +2,7 @@
   <div class="article-list-container">
     <div class="article-list-header">
       <h2>مقالات</h2>
-      <button class="btn" @click="$router.push({ name: 'ArticleCreate' })">ایجاد مقاله</button>
+      <button class="btn" @click="$router.push('articles/create')">ایجاد مقاله</button>
     </div>
 
     <ul class="article-list">
@@ -15,7 +15,7 @@
         <div class="article-card-actions">
           <button
             class="btn btn-edit"
-            @click="$router.push({ name: 'ArticleEdit', params: { id: a.id } })"
+            @click="$router.push(`articles/edit/${a.id}`)"
           >
             ویرایش
           </button>

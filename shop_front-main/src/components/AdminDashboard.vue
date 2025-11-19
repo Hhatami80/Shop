@@ -6,21 +6,25 @@
         label="نظرات تایید نشده"
         :value="unapprovedCommentsCount"
         iconClass="fas fa-comments"
+        route="/admin/comments"
       />
       <InfoBox
         label="تعداد کاربران"
         :value="usersCount"
         iconClass="fas fa-users"
+        route="/admin/userslist"
       />
       <InfoBox
         label="تعداد سفارشات"
         :value="ordersCount"
         iconClass="fas fa-shopping-cart"
+        route="/admin/orderlist"
       />
       <InfoBox
-        label="درآمد کلی"
+        label="تعداد تراکنش ها"
         :value="totalRevenue"
         iconClass="fas fa-money-bill-wave"
+        route="/admin/transactions"
       />
     </div>
   </div>
@@ -50,9 +54,7 @@ onMounted(async () => {
 })
 
 
-const unapprovedCommentsCount = computed(
-  () => commentStore.comments.length || 0
-)
+const unapprovedCommentsCount = commentStore.unapproved_count
 
 
 const usersCount = computed(() => userStore.users.length || 0)
@@ -60,7 +62,7 @@ const usersCount = computed(() => userStore.users.length || 0)
 
 const ordersCount = computed(() => orderStore.orders.length || 0)
 
-const totalRevenue = computed(() => transactionStore.totalRevenue)
+const totalRevenue = computed(() => transactionStore.transactions.length)
 </script>
 
 <style scoped>

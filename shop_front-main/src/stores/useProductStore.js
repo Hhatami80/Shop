@@ -152,6 +152,7 @@ export const useProductStore = defineStore('product', {
           created_date: p.created_date || '',
           jalali_created_date: p.jalali_created_date || '',
         }
+        this.comments = response.data.comment
       } catch (error) {
         this.error = 'محصول یافت نشد'
       } finally {

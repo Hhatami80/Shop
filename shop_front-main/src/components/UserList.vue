@@ -247,7 +247,6 @@ const closeModal = () => {
 }
 
 
-/* modal styles */
 .modal-overlay {
   position: fixed;
   top: 0;

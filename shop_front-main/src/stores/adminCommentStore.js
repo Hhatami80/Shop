@@ -9,6 +9,7 @@ export const useAdminCommentStore = defineStore('adminComments', {
     loading: false,
     error: null,
     selectedComments: [],
+    unapproved_count: 0,
 
     page: 1,
     totalPages: 10,
@@ -28,7 +29,8 @@ export const useAdminCommentStore = defineStore('adminComments', {
           q
         })
 
-        this.comments = res.data.results
+        this.comments = res.data.results.results
+        this.unapproved_count = res.data.unapproved_count
 
       } catch (err) {
         console.error('خطا در دریافت نظرات:', err)

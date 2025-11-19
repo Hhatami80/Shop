@@ -81,8 +81,8 @@
           </div>
 
           <div class="reviews-list">
-            <div v-if="productComments.length">
-              <div v-for="(comment, index) in productComments" :key="index" class="review">
+            <div v-if="productStore.comments.length">
+              <div v-for="(comment, index) in productStore.comments" :key="index" class="review">
                 <p class="review-author">
                   <strong>{{ comment.user.username }}</strong>
                 </p>
@@ -107,12 +107,14 @@ import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 import { useCartStore } from '@/stores/useCartStore'
 import { useProductCommentStore } from '@/stores/useProductCommentStore'
+import { useProductStore } from '@/stores/useProductStore'
 const props = defineProps({
   show: Boolean,
   product: Object,
 })
 const emit = defineEmits(['close'])
 
+const productStore = useProductStore()
 const cartStore = useCartStore()
 const commentStore = useProductCommentStore()
 
@@ -140,7 +142,7 @@ watch(
 
 const productComments = computed(() => {
   if (!props.product?.id) return []
-  return commentStore.comments.filter((c) => c.product.id === props.product.id && c.is_approved)
+  return commentStore.comments
 })
 
 function close() {

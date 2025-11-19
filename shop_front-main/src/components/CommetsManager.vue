@@ -107,11 +107,11 @@
                 <input
                   type="checkbox"
                   :value="comment.id"
-                  v-model="commentStore.selectedComments"
+                  v-model="commentStore.comments"
                 />
               </td>
-              <td>{{ comment.user.username }}</td>
-              <td>{{  comment.product.title }}</td>
+              <td>{{ comment.user?.username }}</td>
+              <td>{{  comment.product?.title }}</td>
               <td>{{ comment.text }}</td>
               <td>
                 <span
