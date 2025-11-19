@@ -51,7 +51,11 @@ import {
   faUser,
   faBox,
   faShoppingCart,
-  faClipboardList
+  faClipboardList,
+  faColumns,
+  faBars,
+  faInbox
+
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -86,7 +90,11 @@ library.add(
   faUser,
   faBox,
   faShoppingCart,
-  faClipboardList
+  faClipboardList,
+  faColumns,
+  faBars,
+  faInbox
+  
 )
 
 const app = createApp(App)

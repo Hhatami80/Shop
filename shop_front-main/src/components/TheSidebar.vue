@@ -64,7 +64,7 @@
 <script setup>
 import { computed, watch, ref, onMounted } from 'vue'
 import { useLoginStore } from '@/stores/useLoginStore'
-import defaultAvatar from '@/assets/image/icons/avatar1.jpg'
+// import defaultAvatar from '@/assets/image/icons/avatar1.jpg'
 import { useUserStore } from '@/stores/useUserStore'
 
 const userStore = useUserStore()
@@ -215,13 +215,13 @@ function goTo(path) {
 
 .main-menu {
   list-style: none;
-  padding: 15px 0;
+  padding: 0;
   flex-grow: 1;
 }
 .sidebar-menu-nav {
   flex-grow: 1;
   overflow-y: auto;
-  padding: 15px 0;
+  padding: 0;
 }
 .sidebar-menu-nav::-webkit-scrollbar {
   width: 6px;

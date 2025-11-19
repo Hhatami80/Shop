@@ -79,10 +79,10 @@ async function loginUser() {
 
       if (role === "admin") {
         toast.success("خوش آمدید مدیر محترم 🌟");
-        router.push("/admin");
+        router.push("/admin/dashboard");
       } else {
         toast.success("ورود با موفقیت انجام شد ");
-        router.push("/user");
+        router.push("/user/dashboard");
       }
 
    

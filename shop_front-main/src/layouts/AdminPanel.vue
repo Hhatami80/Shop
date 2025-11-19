@@ -74,14 +74,21 @@ const sidebarMenuItems = computed(() => {
     return [
       {
         name: 'داشبورد',
-        icon: ['fas', 'tachometer-alt'],
         path: '/admin/dashboard',
-        submenuOpen: menuStatus.value['/admin/dashboard'],
-        submenu: [
-          { name: 'مدیریت هدر', path: '/admin/header' },
-          { name: 'مدیریت فوتر', path: '/admin/footer' },
-        ],
-        active: isActiveRoute('/admin/header') || isActiveRoute('/admin/footer'),
+        icon: ['fas', 'tachometer-alt'],
+        active: isActiveRoute('/admin/dashboard'),
+      },
+      {
+        name: 'مدیریت هدر',
+        icon: ['fas', 'fa-bars'],
+        path: '/admin/header',
+        active: isActiveRoute('/admin/header'),
+      },
+      {
+        name: 'مدیریت فوتر',
+        icon: ['fas', 'columns'],
+        path: '/admin/footer',
+        active: isActiveRoute('/admin/footer'),
       },
       {
         name: 'مدیریت مقالات',
@@ -180,7 +187,6 @@ function handleProfileAction(action) {
 }
 
 function logout() {
-  
   showLogoutConfirm.value = true
 }
 function confirmLogout() {
