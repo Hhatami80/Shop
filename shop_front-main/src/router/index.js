@@ -107,7 +107,7 @@ const router = createRouter({
         },
         { path: 'wallet', component: () => import('@/components/Wallet.vue') },
         { path: 'shop-cart', component: ShoppingCart },
-        { path: 'dashboard' , component:Dashboard},
+        { path: 'dashboard', component: Dashboard },
         { path: 'orders', component: () => import('@/components/UserOrders.vue') },
         { path: 'wallet/verify', component: () => import('@/views/WalletVerify.vue') },
         { path: 'order-success', component: () => import('@/views/OrderSuccessPage.vue') },
@@ -135,10 +135,13 @@ const router = createRouter({
         { path: 'orderList', component: AdminOrders },
         { path: 'comments', component: CommetsManager },
         { path: 'transactions', component: AdminTransactions, meta: { requiresAdmin: true } },
-        { path: 'dashboard', component: AdminDashboard},
+        { path: 'dashboard', component: AdminDashboard },
       ],
     },
   ],
+  scrollBehavior() {
+    return { top: 0 }
+  },
 })
 
 router.beforeEach((to) => {

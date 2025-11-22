@@ -1,53 +1,120 @@
 <template>
-  <div class="search-container">
+  <div class="search-wrapper">
     <div class="search-box">
       <input
         v-model="query"
-        @keyup.enter="submitSearch"
+        @input="onInput"
+        @focus="showResults = true"
+        @blur="onBlur"
         type="text"
         placeholder="جستجوی محصول..."
       />
       <button @click="submitSearch" class="search-button">
         <i class="fas fa-search"></i>
       </button>
+      
+      <div v-if="isLoading" class="spinner"></div>
+    </div>
+
+  
+    <div v-if="showResults && results.length" class="search-results">
+      <div
+        v-for="product in results"
+        :key="product.id"
+        class="search-result-card"
+        @mousedown.prevent="$router.push(`/product/${product.id}`)"
+      >
+        <img :src="product.image" alt="product" />
+        <div class="info">
+          <p class="title">{{ product.title }}</p>
+          <p class="price">{{ formatPrice(product.price) }} تومان</p>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showResults && !results.length && query && !isLoading" class="no-results">
+      محصولی یافت نشد
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue'
+import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { productService } from '@/services/ProductService'
+import debounce from 'lodash/debounce'
 
-const emit = defineEmits(['search'])
 const query = ref('')
+const results = ref([])
+const showResults = ref(false)
+const router = useRouter()
 
-function submitSearch() {
-  emit('search', query.value)
+const isLoading = ref(false)
+
+function goToProduct(productId) {
+  router.push(`/product/${productId}`)
+}
+
+function formatPrice(price) {
+  if (!price) return '0'
+  return price.toLocaleString('fa-IR')
+}
+
+
+async function submitSearch() {
+  if (!query.value) return
+  await searchProducts(query.value)
+}
+
+
+const searchProducts = debounce(async (text) => {
+  if (!text) {
+    results.value = []
+    isLoading.value = false
+    return
+  }
+  isLoading.value = true
+  try {
+    const response = await productService.get()
+    results.value = response.data.products.filter((p) =>
+      p.title.toLowerCase().includes(text.toLowerCase()),
+    )
+  } catch (err) {
+    console.error(err)
+  } finally {
+    isLoading.value = false
+  }
+}, 300)
+
+
+function onInput() {
+  searchProducts(query.value)
+}
+
+
+function onBlur() {
+  setTimeout(() => (showResults.value = false), 200)
 }
 </script>
 
 <style scoped>
-
-.search-container {
+.search-wrapper {
+  position: relative;
   width: 100%;
-  display: flex;
-  justify-content: center;
-  padding: 10px;
+  max-width: 700px;
+  margin: auto;
+  direction: rtl;
 }
 
 .search-box {
-  direction: rtl;
   display: flex;
-  align-items: center;
+  width: 100%;
   background: white;
   border-radius: 8px;
   overflow: hidden;
-  width: 100%;
-  max-width: 800px;
-  height: 44px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  height: 44px;
 }
-
 
 .search-box input {
   flex: 1;
@@ -55,77 +122,158 @@ function submitSearch() {
   border: none;
   outline: none;
   font-size: 15px;
-  height: 100%;
-  color: #000;
-  background: transparent;
 }
-
-:deep(input::placeholder) {
-  color: #000;
-  font-weight: 500;
-  font-size: 14px;
-}
-
 
 .search-button {
+  width: 50px;
+  border: none;
+  background: white;
+  cursor: pointer;
+  font-size: 18px;
+  border-right: 2px solid #000;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 16px;
-  height: 100%;
-  background-color: white;
-  border: none;
-  border-right: 3px solid #000;
-  cursor: pointer;
-  font-size: 18px;
-  transition: all 0.3s ease;
+}
+
+.search-button i {
+  transition: color 0.3s;
 }
 
 .search-button:hover i {
   color: #facc15;
 }
 
-.search-button i {
-  color: #000;
-  transition: color 0.3s ease;
+.search-results {
+  position: absolute;
+  top: 80px;
+  width: 100%;
+  max-height: 400px;
+  overflow-y: auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  z-index: 2000;
 }
 
-@media (max-width: 480px) {
-  .search-box {
-    height: 38px;
-    max-width: 95%;
-  }
+.search-result-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
 
-  .search-box input {
-    font-size: 13px;
-    padding: 8px 10px;
-  }
+.search-result-card:hover {
+  background: #f9f9f9;
+}
 
-  .search-button {
-    padding: 0 10px;
-    font-size: 16px;
-    border-right: 2px solid #000;
-  }
+.search-result-card img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.search-result-card .info .title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.search-result-card .info .price {
+  font-size: 13px;
+  color: #facc15;
+}
+
+.no-results {
+  position: absolute;
+  top: 80px;
+  width: 100%;
+  background: white;
+  padding: 3px;
+  text-align: center;
+  color: #888;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #facc15;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+}
+
+@keyframes spin {
+  0% { transform: translateY(-50%) rotate(0deg); }
+  100% { transform: translateY(-50%) rotate(360deg); }
 }
 
 @media (max-width: 768px) {
+  .search-wrapper {
+    max-width: 95%;
+  }
+
   .search-box {
-    max-width: 600px;
     height: 40px;
   }
 
   .search-box input {
     font-size: 14px;
+    padding: 8px 10px;
   }
 
   .search-button {
-    font-size: 17px;
+    width: 45px;
+    font-size: 16px;
+  }
+
+  .search-result-card img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .search-result-card .info .title {
+    font-size: 13px;
+  }
+
+  .search-result-card .info .price {
+    font-size: 12px;
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 480px) {
   .search-box {
-    max-width: 700px;
+    height: 38px;
+  }
+
+  .search-box input {
+    font-size: 13px;
+    padding: 6px 8px;
+  }
+
+  .search-button {
+    width: 40px;
+    font-size: 15px;
+  }
+
+  .search-result-card img {
+    width: 35px;
+    height: 35px;
+  }
+
+  .search-result-card .info .title {
+    font-size: 12px;
+  }
+
+  .search-result-card .info .price {
+    font-size: 11px;
   }
 }
 </style>

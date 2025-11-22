@@ -104,14 +104,10 @@
           <tbody>
             <tr v-for="comment in commentStore.comments" :key="comment.id">
               <td>
-                <input
-                  type="checkbox"
-                  :value="comment.id"
-                  v-model="commentStore.comments"
-                />
+                <input type="checkbox" :value="comment.id" v-model="commentStore.selectedComments" />
               </td>
               <td>{{ comment.user?.username }}</td>
-              <td>{{  comment.product?.title }}</td>
+              <td>{{ comment.product?.title }}</td>
               <td>{{ comment.text }}</td>
               <td>
                 <span
@@ -121,7 +117,11 @@
                 </span>
               </td>
               <td class="text-center">
-                <button v-if="!comment.is_approved" class="btn btn-sm btn-success me-2" @click="handleApprove(comment.id)">
+                <button
+                  v-if="!comment.is_approved"
+                  class="btn btn-sm btn-success me-2"
+                  @click="handleApprove(comment.id)"
+                >
                   تایید
                 </button>
                 <button class="btn btn-sm btn-danger" @click="handleDelete(comment.id)">حذف</button>
@@ -140,7 +140,6 @@
     </div>
   </div>
 </template>
-
 
 <script setup>
 import { onMounted } from 'vue'
@@ -205,7 +204,7 @@ const handleApprove = async (id) => {
 
 const handleApproveSelected = async () => {
   await commentStore.approveSelected()
-  const comment = commentStore.comments.find(c => c.id === id)
+  const comment = commentStore.comments.find((c) => c.id === id)
   if (comment) comment.is_approved = true
   toast.success('نظرات انتخاب شده تایید شدند')
 }
@@ -249,7 +248,6 @@ function changePage(p) {
   commentStore.fetchAllComments()
 }
 
-
 let debounceTimeout
 function handleSearch() {
   clearTimeout(debounceTimeout)
@@ -281,7 +279,7 @@ h4,
   max-width: 1200px;
   margin: 0 auto;
   padding: 2.5rem 1.5rem;
-  background-color: #f8f9fa; 
+  background-color: #f8f9fa;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
@@ -292,13 +290,13 @@ h4 {
   color: #212529;
   margin-bottom: 2rem !important;
   padding-bottom: 0.75rem;
-  border-bottom: 4px solid #4CAF50; 
+  border-bottom: 4px solid #ffc107;
   text-align: right;
 }
 
 .d-flex.flex-wrap.gap-4 {
-    padding-bottom: 1.5rem; 
-    border-bottom: 1px solid #e9ecef;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
 }
 
 .filters-row {
@@ -337,17 +335,15 @@ h4 {
 
 .form-select-comment:focus,
 .form-control-comment:focus {
-  border-color: #4CAF50;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.25);
   background-color: #fff;
 }
 
 .text-center.mt-3.d-flex {
-    justify-content: center !important;
-    gap: 1rem !important;
-    margin-top: 1.5rem !important;
-    padding-bottom: 1rem;
+  justify-content: center !important;
+  gap: 1rem !important;
+  margin-top: 1.5rem !important;
+  padding-bottom: 1rem;
 }
 
 .btn {
@@ -357,7 +353,10 @@ h4 {
   font-weight: 600 !important;
   border: none !important;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease, opacity 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease,
+    opacity 0.3s ease;
   white-space: nowrap;
 }
 
@@ -375,7 +374,8 @@ h4 {
   box-shadow: none !important;
 }
 
-.accept-btn, .delete-btn {
+.accept-btn,
+.delete-btn {
   padding: 0.6rem 1.5rem !important;
   font-size: 1rem !important;
   border-radius: 10px !important;
@@ -383,12 +383,12 @@ h4 {
 }
 
 .accept-btn {
-  background-color: #4CAF50 !important;
+  background-color: #4caf50 !important;
   color: white !important;
 }
 
 .accept-btn:hover:not(:disabled) {
-  background-color: #43A047 !important;
+  background-color: #43a047 !important;
 }
 
 .delete-btn {
@@ -416,7 +416,7 @@ h4 {
 }
 
 .table thead.table-light {
-  background-color: #FFC300 !important; 
+  background-color: #ffc300 !important;
 }
 
 .table thead th {
@@ -424,7 +424,7 @@ h4 {
   font-size: 0.95rem;
   color: #212529 !important;
   padding: 1rem 1.2rem;
-  border-bottom: 3px solid #ffaa00 !important; 
+  border-bottom: 3px solid #ffaa00 !important;
 }
 
 .table th,
@@ -439,10 +439,9 @@ h4 {
   background-color: #f0f4f7 !important;
 }
 
-
-input[type="checkbox"] {
+input[type='checkbox'] {
   transform: scale(1.2);
-  accent-color: #4CAF50;
+  accent-color: #4caf50;
 }
 
 .badge {
@@ -455,39 +454,39 @@ input[type="checkbox"] {
 }
 
 .bg-success {
-  background-color: #4CAF50 !important;
+  background-color: #4caf50 !important;
   color: #fff !important;
 }
 
 .bg-warning {
-  background-color: #FFC107 !important;
+  background-color: #ffc107 !important;
   color: #333 !important;
 }
 .text-center .btn-sm {
-    padding: 0.4rem 0.75rem !important;
-    font-size: 0.8rem !important;
-    font-weight: 600 !important;
-    border-radius: 50px !important;
-    margin: 0 0.3rem !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  padding: 0.4rem 0.75rem !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  border-radius: 50px !important;
+  margin: 0 0.3rem !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
 
 .text-center .btn-sm.btn-success {
-  background-color: #388E3C !important; 
+  background-color: #388e3c !important;
   color: #fff !important;
 }
 
 .text-center .btn-sm.btn-success:hover {
-  background-color: #2E7D32 !important;
+  background-color: #2e7d32 !important;
 }
 
 .text-center .btn-sm.btn-danger {
-  background-color: #D32F2F !important; 
+  background-color: #d32f2f !important;
   color: #fff !important;
 }
 
 .text-center .btn-sm.btn-danger:hover {
-  background-color: #C62828 !important;
+  background-color: #c62828 !important;
 }
 
 @media (max-width: 768px) {
@@ -536,7 +535,7 @@ input[type="checkbox"] {
   }
   .actions-cell {
     display: flex;
-    flex-direction: row; 
+    flex-direction: row;
     justify-content: flex-end;
     gap: 0.5rem;
     padding-top: 0.5rem;

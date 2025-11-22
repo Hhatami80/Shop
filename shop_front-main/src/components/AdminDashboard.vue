@@ -79,7 +79,34 @@ const totalRevenue = computed(() => transactionStore.transactions.length)
 .info-boxes {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
-  justify-content: space-between;
+  gap: 20px; 
+  justify-content: flex-start; 
 }
+
+.info-boxes > * {
+  flex: 1 1 220px;
+  max-width: 250px;
+  min-width: 180px; 
+  box-sizing: border-box;
+}
+
+@media (min-width: 1200px) {
+  .info-boxes > * {
+    flex: 1 1 calc(25% - 15px); 
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .info-boxes > * {
+    flex: 1 1 calc(50% - 10px);
+  }
+}
+
+@media (max-width: 767px) {
+  .info-boxes > * {
+    flex: 1 1 100%;
+  }
+}
+
+
 </style>

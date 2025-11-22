@@ -14,24 +14,27 @@ export const useAdminCommentStore = defineStore('adminComments', {
     page: 1,
     totalPages: 10,
     q: '',
-    status: "all",
+    status: 'all',
     per_page: 5,
   }),
 
   actions: {
-    async fetchAllComments({status=this.status, q=this.q, page=this.page, per_page=this.per_page} = {}) {
-     
+    async fetchAllComments({
+      status = this.status,
+      q = this.q,
+      page = this.page,
+      per_page = this.per_page,
+    } = {}) {
       try {
         const res = await adminCommentService.getAll({
-          status,
+          status: status === 'all' ? '' : status,
           per_page,
           page,
-          q
+          q,
         })
 
         this.comments = res.data.results.results
         this.unapproved_count = res.data.unapproved_count
-
       } catch (err) {
         console.error('خطا در دریافت نظرات:', err)
         this.error = 'خطا در دریافت نظرات'
@@ -41,7 +44,7 @@ export const useAdminCommentStore = defineStore('adminComments', {
     },
     async approveComment(id) {
       await adminCommentService.approve(id)
-      await this.fetchAllComments({ status: 'pending' })
+      await this.fetchAllComments({ status: 'unapproved' })
     },
 
     async deleteComment(id) {
@@ -53,7 +56,7 @@ export const useAdminCommentStore = defineStore('adminComments', {
       if (this.selectedComments.length === 0) return
       await adminCommentService.approveBulk(this.selectedComments)
       this.selectedComments = []
-      await this.fetchAllComments({ status: 'pending' })
+      await this.fetchAllComments({ status: 'unapproved' })
     },
 
     async deleteSelectedComments() {

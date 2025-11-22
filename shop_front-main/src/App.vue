@@ -1,6 +1,6 @@
 <template>
   <Header v-if="!isAdminRoute && !isUserPanel && !isCategoryRoute && !isProductRoute && !isLoginRoute && !isRegisterRoute" />
-  <Loading :logo="logoImage " />
+  
   <router-view></router-view>
 
   <Footer class="footer" v-if="!isAdminRoute && !isLoginRoute && !isRegisterRoute && !isUserPanel" />
@@ -11,14 +11,8 @@ import { useRoute } from 'vue-router'
 import { computed , ref, onMounted } from 'vue'
 import Header from './layouts/Header.vue'
 import Footer from './layouts/Footer.vue'
-import Loading from '@/components/Loading.vue'
-import logoImage from '@/assets/image/logo.png'
-const isLoading = ref(true)
-onMounted(() => {
-  setTimeout(() => {
-    isLoading.value = false
-  }, 3000) 
-}) 
+
+
 const route = useRoute()
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 const isUserPanel = computed(() => route.path.startsWith('/user'))

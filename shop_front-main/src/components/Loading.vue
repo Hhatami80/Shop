@@ -1,22 +1,15 @@
 <template>
-  <div class="loader-overlay" v-if="isVisible">
-    <img class="loader-logo" :src="logo" alt="Loading..." />
-  </div>
+  <transition name="fade-loader">
+    <div class="loader-overlay" v-if="modelValue">
+      <img class="loader-logo" :src="logo" alt="Loading..." />
+    </div>
+  </transition>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-
 defineProps({
-  logo: String, 
-})
-
-const isVisible = ref(true)
-
-onMounted(() => {
-  setTimeout(() => {
-    isVisible.value = false
-  }, 2000) 
+  modelValue: Boolean,
+  logo: String,
 })
 </script>
 
@@ -52,5 +45,15 @@ onMounted(() => {
     opacity: 0.6;
     transform: scale(0.9);
   }
+}
+
+.fade-loader-enter-active,
+.fade-loader-leave-active {
+  transition: opacity 0.6s ease;
+}
+
+.fade-loader-enter-from,
+.fade-loader-leave-to {
+  opacity: 0;
 }
 </style>

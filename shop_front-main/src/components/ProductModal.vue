@@ -81,19 +81,53 @@
           </div>
 
           <div class="reviews-list">
-            <div v-if="productStore.comments.length">
-              <div v-for="(comment, index) in productStore.comments" :key="index" class="review">
-                <p class="review-author">
-                  <strong>{{ comment.user.username }}</strong>
-                </p>
-                <p class="review-date">{{ comment.jalali_created_date }}</p>
+            <transition-group name="fade-comment">
+              <div v-for="comment in productStore.comments" :key="comment.id" class="review">
+                <div class="review-header">
+                  <p class="review-author">
+                    <strong>{{ comment.user.username }}</strong>
+                  </p>
+                  <p class="review-date">{{ comment.jalali_created_date }}</p>
+                </div>
+
+               
+                <div class="review-rating">
+                  <span
+                    v-for="star in 5"
+                    :key="star"
+                    class="star"
+                    :class="{ filled: star <= comment.rating }"
+                    >★</span
+                  >
+                </div>
+
                 <p class="review-text">{{ comment.text }}</p>
-                <hr />
+
+                
+                <div class="review-actions">
+                  <button @click="likeComment(comment.id)">👍 {{ comment.likes }}</button>
+                  <button @click="dislikeComment(comment.id)">👎 {{ comment.dislikes }}</button>
+                  <button @click="startReply(comment.id)">پاسخ</button>
+                </div>
+
+                
+                <div v-if="replyTo === comment.id" class="reply-box">
+                  <textarea v-model="replyText" placeholder="پاسخ خود را بنویسید..."></textarea>
+                  <button @click="sendReply(comment.id)">ارسال پاسخ</button>
+                </div>
+
+                
+                <div v-if="comment.replies?.length" class="replies">
+                  <div class="reply" v-for="reply in comment.replies" :key="reply.id">
+                    <p class="reply-author">
+                      <strong>{{ reply.user.username }}</strong>
+                    </p>
+                    <p class="reply-date">{{ reply.jalali_created_date }}</p>
+                    <p class="reply-text">{{ reply.text }}</p>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div v-else>
-              <p>هیچ نظری ثبت نشده است.</p>
-            </div>
+            </transition-group>
           </div>
         </div>
       </div>
@@ -102,7 +136,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch  } from 'vue'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 import { useCartStore } from '@/stores/useCartStore'
@@ -124,6 +158,31 @@ const userRating = ref(0)
 const hoverRating = ref(0)
 const newComment = ref('')
 
+const replyTo = ref(null)
+const replyText = ref('')
+
+function startReply(id) {
+  replyTo.value = id
+}
+
+async function sendReply(parentId) {
+  if (!replyText.value) return
+
+  await commentStore.submitComment(props.product.id, replyText.value, parentId)
+
+  replyText.value = ''
+  replyTo.value = null
+}
+
+function likeComment(id) {
+  console.log("Liked", id)
+}
+
+function dislikeComment(id) {
+  console.log("Disliked", id)
+}
+
+
 const alreadyInCart = computed(() => {
   if (!props.product?.id) return false
   return cartStore.items.some((item) => item.product.id === props.product.id)
@@ -137,8 +196,10 @@ watch(
       await commentStore.fetchApprovedComments(newVal.id)
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
+
+
 
 const productComments = computed(() => {
   if (!props.product?.id) return []
@@ -156,7 +217,6 @@ function increase() {
 function decrease() {
   if (count.value > 1) count.value--
 }
-
 
 async function addToCart() {
   if (!props.product?.id) return
@@ -180,9 +240,20 @@ async function submitComment() {
     console.error(err)
   }
 }
+
 </script>
 
 <style scoped>
+
+* {
+  box-sizing: border-box !important;
+  min-width: 0 !important;
+}
+html {
+  font-size: 14px;
+}
+
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -194,15 +265,17 @@ async function submitComment() {
   align-items: center;
   justify-content: center;
   z-index: 2000;
+  padding: 1rem;
 }
 
 .modal-content {
   background: white;
   border-radius: 16px;
   max-width: 900px;
-  width: 90%;
+  width: 100%;
+  max-height: 90vh;
   overflow-y: auto;
-  padding: 20px;
+  padding: clamp(12px, 2vw, 20px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   position: relative;
   animation: scaleIn 0.3s ease forwards;
@@ -210,7 +283,7 @@ async function submitComment() {
 
 @keyframes scaleIn {
   0% {
-    transform: scale(0.9);
+    transform: scale(0.96);
     opacity: 0;
   }
   100% {
@@ -228,114 +301,122 @@ async function submitComment() {
   opacity: 0;
 }
 
+
 .close-btn {
   position: absolute;
-  top: 15px;
-  left: 15px;
+  top: 12px;
+  left: 12px;
   background: #f9f9f9;
   border: none;
-  font-size: 26px;
+  font-size: 22px;
   cursor: pointer;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   color: #333;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: 0.3s;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  transition: 0.18s;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
 }
 .close-btn:hover {
   background: gold;
   color: #000;
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
+
 
 .tabs {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
   flex-wrap: wrap;
+  justify-content: flex-start;
 }
 .tabs button {
-  padding: 10px 20px;
+  padding: 0.55rem 0.9rem;
   border: none;
   border-radius: 8px;
   background: #eee;
   cursor: pointer;
-  transition: 0.3s;
+  transition: 0.18s;
   font-weight: 600;
+  font-size: 0.95rem;
 }
 .tabs button.active {
   background: #facc15;
   color: #fff;
 }
 
-.description {
-  text-align: justify;
-}
 
 .tab-content {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 1rem;
 }
+
 
 .product-card {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 30px;
+  gap: clamp(12px, 2vw, 30px);
   background: #fff;
-  padding: 25px;
+  padding: clamp(12px, 2vw, 25px);
   border-radius: 16px;
   direction: rtl;
+  align-items: start;
+  width: 100%;
 }
+
 
 .product-image img {
   width: 100%;
-  height: 280px;
+  height: auto;
+  max-height: 320px;
   border-radius: 12px;
   border: 1px solid #ddd;
   object-fit: cover;
 }
 
+
 .product-details h2 {
-  font-size: 22px;
-  margin: 0;
+  font-size: clamp(1rem, 2.1vw, 1.3rem);
+  margin: 0 0 0.4rem 0;
 }
 
 .meta {
   display: flex;
-  gap: 20px;
-  margin-top: 6px;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 0.4rem;
 }
-
 .meta hr {
   flex-grow: 1;
   border: 0;
   border-top: 1px solid #ddd;
-  margin-top: 5px;
+  margin-top: 4px;
 }
 
 .price {
-  font-size: 20px;
+  font-size: 1.05rem;
   color: #000;
-  font-weight: bold;
-  margin: 20px 0;
+  font-weight: 700;
+  margin: 0.9rem 0;
 }
 
 .rating-display span {
   color: #facc15;
-  font-size: 18px;
-  margin-right: 2px;
+  font-size: 1.05rem;
+  margin-right: 6px;
 }
+
 
 .actions {
   display: flex;
   align-items: center;
-  gap: 15px;
-  margin: 15px 0;
+  gap: 0.75rem;
+  margin: 0.9rem 0;
   flex-wrap: wrap;
 }
 
@@ -347,34 +428,35 @@ async function submitComment() {
   overflow: hidden;
   background: rgb(231, 228, 228);
 }
-
 .quantity-control button {
   background: rgb(231, 228, 228);
   color: #000;
   border: none;
   width: 40px;
-  height: 40px;
+  height: 36px;
   cursor: pointer;
   font-size: 18px;
   font-weight: bold;
+  padding: 0;
 }
 .quantity-control span {
-  width: 50px;
+  min-width: 42px;
   text-align: center;
   font-weight: bold;
-  font-size: 16px;
+  font-size: 1rem;
   background: rgb(231, 228, 228);
 }
 
 .add-to-cart {
   background: #facc15;
   border: none;
-  padding: 10px 20px;
+  padding: 0.6rem 1rem;
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
-  transition: 0.3s;
-  width: 180px;
+  transition: 0.18s;
+  width: 100%;
+  max-width: 220px;
   color: #000;
 }
 .add-to-cart:hover {
@@ -382,18 +464,18 @@ async function submitComment() {
 }
 
 .share {
-  margin-top: 20px;
+  margin-top: 0.8rem;
   display: flex;
-  gap: 12px;
+  gap: 0.6rem;
   flex-wrap: wrap;
 }
 .share button {
   width: 40px;
-  height: 40px;
+  height: 36px;
   border: none;
   cursor: pointer;
-  font-size: 18px;
-  transition: 0.3s;
+  font-size: 16px;
+  transition: 0.18s;
   border-radius: 6px;
   color: #facc15;
   background: #000;
@@ -401,60 +483,221 @@ async function submitComment() {
   align-items: center;
   justify-content: center;
 }
-.share button:hover {
-  background: #facc15;
-  color: #222;
-}
 
 .add-review {
-  border: 1px solid #ddd;
-  padding: 15px;
+  border: 1px solid #eee;
+  padding: clamp(10px, 1.6vw, 18px);
   border-radius: 12px;
+  background: #fafafa;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0.6rem;
 }
+
 .review-stars span {
-  font-size: 24px;
-  color: #ccc;
+  font-size: 1.45rem;
+  color: #ddd;
   cursor: pointer;
-  margin-right: 5px;
-  transition: 0.3s;
+  transition: 0.18s;
 }
 .review-stars span.filled {
-  color: gold;
+  color: #facc15;
 }
+
 .add-review textarea {
   width: 100%;
-  height: 80px;
-  padding: 8px;
-  border-radius: 8px;
+  height: 90px;
+  padding: 10px;
+  border-radius: 10px;
   border: 1px solid #ccc;
   resize: none;
+  font-size: 0.95rem;
 }
+
 .add-review button {
   align-self: flex-start;
-  padding: 8px 16px;
+  padding: 0.45rem 1rem;
   border: none;
   background: #facc15;
-  color: #fff;
+  color: #000;
   border-radius: 8px;
   cursor: pointer;
-  transition: 0.3s;
+  font-weight: 600;
+  transition: 0.18s;
 }
 .add-review button:hover {
   background: #eab308;
 }
 
 .reviews-list {
+  max-height: 45vh;
+  overflow-y: auto;
+  padding-right: 6px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0.9rem;
+}
+
+.reviews-list::-webkit-scrollbar {
+  width: 7px;
+}
+.reviews-list::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 6px;
+}
+
+.review {
+  background: #fff;
+  border: 1px solid #eee;
+  padding: clamp(10px, 1.6vw, 16px);
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.92rem;
+}
+
+.review-author {
+  color: #222;
+  font-weight: 700;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.review-date {
+  color: #888;
+  font-size: 0.78rem;
+  margin: 0;
+}
+
+.review-rating .star {
+  font-size: 1.05rem;
+  color: #ddd;
+  margin-right: 6px;
+}
+.review-rating .star.filled {
+  color: #facc15;
 }
 
 .review-text {
   color: #444;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  text-align: justify;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
+
+
+.review-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+  flex-wrap: wrap;
+}
+.review-actions button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #666;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+.review-actions button:hover {
+  color: #000;
+  background: rgba(0,0,0,0.03);
+}
+
+
+.reply-box {
+  margin-top: 0.6rem;
+  border-right: 3px solid gold;
+  padding-right: 0.6rem;
+}
+.reply-box textarea {
+  width: 100%;
+  height: 70px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 0.92rem;
+}
+.reply-box button {
+  margin-top: 8px;
+  background: #facc15;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.replies {
+  border-right: 3px solid #eee;
+  margin-top: 0.6rem;
+  padding-right: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.reply {
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.reply-author {
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+.reply-text {
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.fade-comment-enter-active,
+.fade-comment-leave-active {
+  transition: all 0.22s ease;
+}
+.fade-comment-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.fade-comment-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+@media (max-width: 1100px) {
+  .product-card {
+    grid-template-columns: 1fr !important;
+  }
+  .product-image img {
+    max-height: 260px;
+  }
+}
+
+@media (max-width: 720px) {
+  .reviews-list {
+    max-height: 38vh;
+  }
+  .modal-content {
+    padding: clamp(10px, 3vw, 14px);
+  }
+}
+
 
 .old-price {
   text-decoration: line-through;
@@ -463,85 +706,5 @@ async function submitComment() {
 }
 .new-price {
   color: #e11d48;
-}
-.review-author {
-  color: #333;
-  font-weight: bold;
-}
-
-.review-date {
-  color: #888;
-  font-size: 12px;
-  margin-bottom: 4px;
-}
-
-@media (max-width: 768px) {
-  .modal-content {
-    width: 95%;
-    padding: 15px;
-  }
-
-  .product-card {
-    grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 15px;
-  }
-
-  .product-image img {
-    height: 220px;
-  }
-
-  .product-details h2 {
-    font-size: 18px;
-  }
-
-  .price {
-    font-size: 18px;
-  }
-
-  .add-to-cart {
-    width: 100%;
-  }
-
-  .tabs {
-    justify-content: center;
-  }
-
-  .close-btn {
-    top: 10px;
-    left: 10px;
-    width: 35px;
-    height: 35px;
-    font-size: 22px;
-  }
-}
-
-@media (max-width: 480px) {
-  .modal-content {
-    padding: 10px;
-  }
-
-  .product-details h2 {
-    font-size: 16px;
-  }
-
-  .price {
-    font-size: 16px;
-  }
-
-  .quantity-control button {
-    width: 35px;
-    height: 35px;
-  }
-
-  .quantity-control span {
-    width: 40px;
-  }
-
-  .share button {
-    width: 36px;
-    height: 36px;
-    font-size: 16px;
-  }
 }
 </style>

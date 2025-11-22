@@ -4,9 +4,14 @@
       <div class="icons">
         <router-link to="/"><i class="fas fa-home"></i></router-link>
 
-        <i class="fas fa-shopping-cart" @click="handleCartClick" title="سبد خرید"></i>
+        <div class="cart-icon-wrapper">
+          <i class="fas fa-shopping-cart" @click="handleCartClick"></i>
+          <span v-if="cartStore.totalQuantity > 0" class="cart-badge">
+            {{ cartStore.totalQuantity }}
+          </span>
+        </div>
 
-        <i v-if="loginStore.isAuthenticated" class="fas fa-heart" title="علاقه‌مندی‌ها"></i>
+        <i v-if="loginStore.isAuthenticated" class="fas fa-heart"></i>
 
         <router-link
           v-if="loginStore.isAuthenticated && loginStore.isAdmin"
@@ -24,7 +29,7 @@
         >
           <i class="fas fa-user"></i>
         </router-link>
-        <router-link v-else to="/login" class="user-icon" title="ورود به حساب کاربری">
+        <router-link v-else to="/login" class="user-icon">
           <i class="fas fa-user"></i>
         </router-link>
       </div>
@@ -86,12 +91,12 @@ function scrollToSection(selector) {
 
 function handleCartClick() {
   if (!loginStore.isAuthenticated) {
-    toast.warn('لطفاً وارد حساب کاربری خود شوید');
+    toast.warn('لطفاً وارد حساب کاربری خود شوید')
     setTimeout(() => {
-      router.push('/login');
-    }, 2000);
+      router.push('/login')
+    }, 2000)
   } else {
-    router.push('/user/shop-cart');
+    router.push('/user/shop-cart')
   }
 }
 
@@ -251,6 +256,39 @@ onUnmounted(() => {
 .drawer-slide-leave-to {
   transform: translateX(100%);
   opacity: 0;
+}
+.cart-icon-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-badge {
+  position: absolute;
+  bottom: 0; 
+  left: 0; 
+
+  background: #ff3547;
+  color: #fff;
+
+  font-size: 8px;
+  font-weight: 700;
+
+  padding: 1px 3px;
+  border-radius: 50%; 
+
+  min-width: 12px;
+  height: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  line-height: 1;
+  pointer-events: none;
+
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 768px) {

@@ -145,6 +145,7 @@ function toPersianNumber(number) {
 onMounted(async () => {
   await categoryStore.getAllCategories();
   await categoryStore.getAllProducts();
+  
 });
 
 watch(

@@ -83,7 +83,8 @@
           <button :class="{ active: activeTab === 'details' }" @click="activeTab = 'details'">
             جزئیات
           </button>
-          <button disabled style="opacity: 0.4; cursor: not-allowed">نظرات</button>
+          <button :class="{ active: activeTab === 'comments' }" @click="activeTab = 'comments'">نظرات</button>
+
         </div>
         <div v-if="product.properties?.length" class="product-properties-list">
           <h4>ویژگی‌های محصول</h4>
@@ -107,16 +108,21 @@
       </div>
     </div>
 
-    <div class="related-products" v-if="relatedProducts.length">
+    <section class="related-products" v-if="relatedProducts.length">
       <h3>محصولات مشابه</h3>
       <div class="related-grid">
-        <div v-for="(item, index) in relatedProducts" :key="index" class="product-card">
+        <router-link
+          v-for="item in relatedProducts"
+          :key="item.id"
+          :to="`/product/${item.id}`"
+          class="product-card"
+        >
           <img :src="item.image" :alt="item.title" />
           <p class="name">{{ item.title }}</p>
           <p class="price">{{ toPersianNumber(item.price) }} تومان</p>
-        </div>
+        </router-link>
       </div>
-    </div>
+    </section>
 
     <div v-if="isCommentModalOpen" class="modal-overlay" @click.self="closeCommentModal">
       <div class="modal">
@@ -246,19 +252,25 @@ function submitComment() {
 }
 
 onMounted(async () => {
+  productStore.selectedProduct = null 
   await categoryStore.getAllCategories()
   await productStore.getAllProducts()
   await loadProduct()
 })
 
+
+
 watch(
   () => route.params.id,
   async () => {
+    productStore.selectedProduct = null  
     quantity.value = 1
     selectedSize.value = null
     await loadProduct()
   },
 )
+
+
 </script>
 
 <style scoped>
@@ -478,11 +490,12 @@ watch(
   flex: 0 0 300px;
   max-width: 220px;
   border: 1px solid #ddd;
-  height: 0px;
+  height: auto;
   border-radius: 10px;
   padding: 20px;
   transition: all 0.3s ease;
   background: #fff;
+  text-decoration: none;
 }
 
 .product-card:hover {

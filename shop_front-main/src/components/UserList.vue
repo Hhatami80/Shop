@@ -35,7 +35,7 @@
     </table>
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal">
-        <h3>جزئیات آدرس{{ selectedUser.usrename }}</h3>
+        <h3>جزئیات آدرس{{ selectedUser.username }}</h3>
         <table class="modal-table">
           <thead>
             <tr>
@@ -49,7 +49,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="address in selectedUser.address" :key="address.id">
+            <tr v-for="address in selectedUser.address || []" :key="address.id">
+
               <td>{{ address.province.name || "-" }}</td>
               <td>{{ address.city.name || "-" }}</td>
               <td>{{ address.neighborhood || "-" }}</td>
@@ -59,7 +60,7 @@
               <td>{{ address.full_address || "-" }}</td>
             </tr>
             <tr v-if="!selectedUser.address.length">
-              <td colspan="7" style="text-align: center">هیچ آدرسی برای این کاربر موجود نیست.</td>
+              <td colspan="7" style="text-align: center">هیچ آدرسی برای این کاربر موجود نیست</td>
             </tr>
           </tbody>
         </table>

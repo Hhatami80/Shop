@@ -1,4 +1,5 @@
 <template>
+  <Loading v-model="isLoading" :logo="logoImage " />
   <div class="page-container">
     <section class="section">
       <search-box />
@@ -43,7 +44,10 @@ import FeatureSection from '@/components/FeatureSection.vue'
 import HomeCategories from '@/components/HomeCategories.vue'
 import ProductSlider from '@/components/ProductSlider.vue'
 import BestSellerSlider from '@/components/BestSellerSlider.vue'
+import Loading from '@/components/Loading.vue'
+import logoImage from '@/assets/image/logo.png'
 
+const isLoading = ref(true)
 const productStore = useProductStore()
 const selectedProductId = ref(null)
 
@@ -53,12 +57,16 @@ const newProducts = computed(() => productStore.new_products)
 
 
 onMounted(async () => {
-  await productStore.getAllProducts()
-  await productStore.getBestSellers()
+  try {
+    await productStore.getAllProducts()
+    await productStore.getBestSellers()
 
-  if (productStore.products.length > 0) {
-    selectedProductId.value = productStore.products[0].id
-    await productStore.getProductById(selectedProductId.value)
+    if (productStore.products.length > 0) {
+      const firstId = productStore.products[0].id
+      await productStore.getProductById(firstId)
+    }
+  } finally {
+    isLoading.value = false 
   }
 })
 </script>
