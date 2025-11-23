@@ -17,7 +17,7 @@
           v-if="loginStore.isAuthenticated && loginStore.isAdmin"
           to="/admin/dashboard"
           class="user-icon"
-          title="پنل ادمین"
+          
         >
           <i class="fas fa-user"></i>
         </router-link>
@@ -25,7 +25,7 @@
           v-else-if="loginStore.isAuthenticated"
           to="/user/dashboard"
           class="user-icon"
-          title="پروفایل کاربری"
+          
         >
           <i class="fas fa-user"></i>
         </router-link>

@@ -15,7 +15,6 @@
       <div class="product-gallery" v-if="product?.image">
         <div class="gallery-grid">
           <img :src="product.image" alt="عکس اصلی" class="main-image" />
-
           <img
             v-for="(img, index) in product.images || []"
             :key="index"
@@ -25,7 +24,6 @@
           />
         </div>
       </div>
-
       <div class="product-info">
         <h2 class="title">{{ product.title }}</h2>
         <p class="code">کد محصول: {{ product.id }}</p>
@@ -70,7 +68,6 @@
           >
             {{ alreadyInCart ? 'افزوده شد' : 'افزودن به سبد خرید' }}
           </button>
-
           <p class="stock" v-if="product.stock <= 2">
             تنها {{ toPersianNumber(product.stock) }} عدد در انبار موجود است
           </p>
@@ -83,9 +80,11 @@
           <button :class="{ active: activeTab === 'details' }" @click="activeTab = 'details'">
             جزئیات
           </button>
-          <button :class="{ active: activeTab === 'comments' }" @click="activeTab = 'comments'">نظرات</button>
-
+          <button :class="{ active: activeTab === 'comments' }" @click="activeTab = 'comments'">
+            نظرات
+          </button>
         </div>
+
         <div v-if="product.properties?.length" class="product-properties-list">
           <h4>ویژگی‌های محصول</h4>
           <ul>
@@ -102,7 +101,19 @@
         </div>
 
         <div v-else class="comments">
-          <p>هنوز نظری برای این محصول ثبت نشده است.</p>
+          <div v-if="commentStore.loading">در حال بارگذاری نظرات...</div>
+          <div v-else>
+            <div v-if="commentStore.comments.length === 0">
+              هنوز نظری برای این محصول ثبت نشده است.
+            </div>
+            <ul v-else class="comment-list">
+              <li v-for="c in commentStore.comments" :key="c.id" class="comment-item">
+                <p class="user">{{ c.user.fullname || c.user.username }}:</p>
+                <p class="text">{{ c.text }}</p>
+                <p class="date">{{ c.jalali_created_date }}</p>
+              </li>
+            </ul>
+          </div>
           <button class="submit-comment golden-button" @click="openCommentModal">ثبت نظر</button>
         </div>
       </div>
@@ -132,12 +143,10 @@
             <input v-model="commentForm.firstName" type="text" placeholder="نام" />
             <input v-model="commentForm.lastName" type="text" placeholder="نام خانوادگی" />
           </div>
-
           <div class="row">
             <input v-model="commentForm.email" type="email" placeholder="ایمیل" />
             <input v-model="commentForm.phone" type="text" placeholder="تلفن همراه" />
           </div>
-
           <input class="title1" v-model="commentForm.title" type="text" placeholder="عنوان" />
           <textarea v-model="commentForm.comment" placeholder="نظر خود را وارد کنید..."></textarea>
         </div>
@@ -155,23 +164,36 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 import { useProductStore } from '@/stores/useProductStore'
 import { useCategoryStore } from '@/stores/useCategoryStore'
 import { useCartStore } from '@/stores/useCartStore'
 import StickyHeader from '@/components/StickyHeader.vue'
+import { useProductCommentStore } from '@/stores/useProductCommentStore'
 
 const route = useRoute()
 const productStore = useProductStore()
 const categoryStore = useCategoryStore()
 const cartStore = useCartStore()
+const commentStore = useProductCommentStore()
 
 const selectedSize = ref(null)
 const quantity = ref(1)
 const activeTab = ref('details')
+const isCommentModalOpen = ref(false)
+
+const commentForm = ref({
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  title: '',
+  comment: '',
+})
 
 const productId = computed(() => Number(route.params.id))
 const product = computed(() => productStore.selectedProduct)
-
 const categoryTitle = computed(() => {
   const category = categoryStore.allCategories.find((c) => c.id === product.value?.category?.id)
   return category ? category.title : ''
@@ -179,7 +201,6 @@ const categoryTitle = computed(() => {
 const alreadyInCart = computed(() =>
   cartStore.items.some((item) => item.product.id === productId.value),
 )
-
 const relatedProducts = computed(() => {
   if (!product.value?.category?.id) return []
   return productStore.products
@@ -200,24 +221,13 @@ function toPersianNumber(number) {
 async function loadProduct() {
   await productStore.getProductById(productId.value)
 }
-
 async function addToCart(productId) {
   if (alreadyInCart.value) {
-    alert('این محصول قبلاً به سبد خرید شما اضافه شده است.')
+    toast.error('این محصول قبلاً به سبد خرید اضافه شده است')
     return
   }
   await cartStore.addItem(productId, quantity.value)
 }
-
-const isCommentModalOpen = ref(false)
-const commentForm = ref({
-  firstName: '',
-  lastName: '',
-  email: '',
-  phone: '',
-  title: '',
-  comment: '',
-})
 
 function openCommentModal() {
   isCommentModalOpen.value = true
@@ -226,51 +236,48 @@ function closeCommentModal() {
   isCommentModalOpen.value = false
 }
 
-function submitComment() {
+async function submitComment() {
   if (
     !commentForm.value.firstName.trim() ||
     !commentForm.value.lastName.trim() ||
     !commentForm.value.email.trim() ||
     !commentForm.value.comment.trim()
   ) {
-    alert('لطفاً فیلدهای ضروری را پر کنید.')
+    toast.error('لطفاً فیلدهای ضروری را پر کنید')
     return
   }
 
-  console.log('نظر ثبت شد:', commentForm.value)
-  alert('نظر شما با موفقیت ثبت شد!')
+  const commentData = { ...commentForm.value, text: commentForm.value.comment }
+  await commentStore.submitComment(productId.value, commentData)
+  await commentStore.fetchApprovedComments(productId.value)
 
-  commentForm.value = {
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    title: '',
-    comment: '',
-  }
+  commentForm.value = { firstName: '', lastName: '', email: '', phone: '', title: '', comment: '' }
   closeCommentModal()
 }
 
 onMounted(async () => {
-  productStore.selectedProduct = null 
+  productStore.selectedProduct = null
   await categoryStore.getAllCategories()
   await productStore.getAllProducts()
   await loadProduct()
+  if (productId.value) await commentStore.fetchApprovedComments(productId.value)
 })
-
-
 
 watch(
   () => route.params.id,
   async () => {
-    productStore.selectedProduct = null  
+    productStore.selectedProduct = null
     quantity.value = 1
     selectedSize.value = null
     await loadProduct()
+    if (productId.value) await commentStore.fetchApprovedComments(productId.value)
   },
 )
 
-
+watch(activeTab, async (tab) => {
+  if (tab === 'comments' && productId.value)
+    await commentStore.fetchApprovedComments(productId.value)
+})
 </script>
 
 <style scoped>
@@ -667,6 +674,39 @@ watch(
 
 .product-properties-list .prop-value {
   color: #555;
+}
+.comment-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-top: 15px;
+}
+
+.comment-item {
+  border-bottom: 1px solid #eee;
+  padding: 12px 0;
+}
+
+.comment-item:last-child {
+  border-bottom: none;
+}
+
+.comment-item .user {
+  font-weight: bold;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.comment-item .text {
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 4px;
+  line-height: 1.6;
+}
+
+.comment-item .date {
+  font-size: 13px;
+  color: #888;
 }
 
 @media (max-width: 900px) {

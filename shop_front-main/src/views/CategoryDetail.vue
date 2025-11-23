@@ -418,4 +418,156 @@ watch(
   color: #fff;
   border-color: gold;
 }
+
+@media (max-width: 1200px) {
+  .breadcrumb {
+    margin: 15px 30px;
+  }
+
+  .filter-bar {
+    margin: 20px 30px 10px;
+  }
+
+  .featured-card {
+    width: 420px;
+    height: 750px;
+  }
+
+  .featured-image-wrapper {
+    height: 75%;
+  }
+
+  .product-image-wrapper {
+    height: 320px;
+  }
+}
+
+
+@media (max-width: 900px) {
+  .breadcrumb {
+    margin: 10px 20px;
+    font-size: 13px;
+  }
+
+  .filter-bar {
+    margin: 10px 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .filter-right {
+    padding: 8px 14px;
+    font-size: 14px;
+  }
+
+  .featured-products {
+    gap: 20px;
+    margin-top: 10px;
+  }
+
+  .featured-card {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+  }
+
+  .featured-image-wrapper {
+    height: 400px;
+  }
+
+  .featured-info {
+    height: auto;
+  }
+
+  .product-image-wrapper {
+    height: 300px;
+  }
+}
+
+
+@media (max-width: 600px) {
+
+  .category-product-page {
+    padding-bottom: 40px;
+  }
+
+  .breadcrumb {
+    margin: 10px 16px;
+    font-size: 12px;
+  }
+
+  .filter-bar {
+    margin: 10px 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .filter-right {
+    width: 100%;
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .filter-dropdown {
+    right: 0;
+    width: 100%;
+  }
+
+  .featured-products {
+    margin: 15px 10px;
+  }
+
+  .featured-card {
+    width: 100%;
+    height: auto;
+  }
+
+  .featured-image-wrapper {
+    height: 300px;
+  }
+
+  .featured-name {
+    font-size: 18px;
+  }
+
+  .featured-price {
+    font-size: 15px;
+  }
+
+  .product-grid {
+    gap: 16px;
+    margin: 0 12px 30px;
+  }
+
+  .product-image-wrapper {
+    height: 250px;
+  }
+
+  .product-name {
+    font-size: 17px;
+  }
+
+  .product-price {
+    font-size: 15px;
+  }
+
+  .pagination button {
+    padding: 5px 10px;
+  }
+}
+
+
+@media (max-width: 400px) {
+  .featured-image-wrapper {
+    height: 240px;
+  }
+  .product-image-wrapper {
+    height: 200px;
+  }
+  .filter-right {
+    font-size: 13px;
+    padding: 8px;
+  }
+}
+
 </style>

@@ -97,6 +97,12 @@ const sidebarMenuItems = computed(() => {
         active: isActiveRoute('/admin/articles'),
       },
       {
+        name: 'مدیریت تماس با ما',
+        icon:['fas', 'fa-phone-square-alt'],
+        path: '/admin/contactus',
+        active: isActiveRoute('/admin/contactus')
+      },
+      {
         name: 'مدیریت درباره ما',
         icon: ['fas', 'info-circle'],
         path: '/admin/aboutusmanager',

@@ -39,8 +39,9 @@ onMounted(() => categoryStore.getAllCategories())
   font-family: 'IRANSansX', sans-serif;
 }
 
+
 .categories-container {
-  padding: 60px 40px; 
+  padding: 60px 40px;
   text-align: center;
 }
 
@@ -67,6 +68,7 @@ onMounted(() => categoryStore.getAllCategories())
   box-shadow: 0 2px 8px rgba(249, 199, 16, 0.4);
 }
 
+
 .categories-grid {
   display: grid;
   direction: ltr;
@@ -74,12 +76,13 @@ onMounted(() => categoryStore.getAllCategories())
   gap: 65px;
   max-width: 1200px;
   margin: 0 auto;
-  justify-items: center; 
+  justify-items: center;
 }
+
 
 .category-item {
   background: #fff;
-  direction: rtl; 
+  direction: rtl;
   border-radius: 20px;
   padding: 30px 20px;
   text-align: center;
@@ -117,7 +120,7 @@ onMounted(() => categoryStore.getAllCategories())
 
 .category-content {
   position: relative;
-  z-index: 2; 
+  z-index: 2;
 }
 
 .category-image {
@@ -150,18 +153,66 @@ onMounted(() => categoryStore.getAllCategories())
   color: #f9c710;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 900px) {
   .categories-container {
-    padding: 40px 15px;
+    padding: 50px 20px;
   }
-  .page-title {
-    font-size: 28px;
-    margin-bottom: 40px;
-  }
+
   .categories-grid {
-    gap: 30px; 
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    justify-items: center;
+    gap: 40px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+
+  .category-image {
+    width: 100px;
+    height: 100px;
+  }
+
+  .category-item h3 {
+    font-size: 20px;
   }
 }
+
+@media (max-width: 600px) {
+  .categories-container {
+    padding: 35px 15px;
+  }
+
+  .page-title {
+    font-size: 26px;
+    margin-bottom: 30px;
+  }
+
+  .categories-grid {
+    gap: 25px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .category-item {
+    padding: 20px 15px;
+    border-radius: 16px;
+  }
+
+  .category-image {
+    width: 85px;
+    height: 85px;
+    padding: 10px;
+  }
+
+  .category-item h3 {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 400px) {
+  .categories-grid {
+    grid-template-columns: 1fr; 
+  }
+
+  .category-item {
+    width: 90%;
+    margin: 0 auto;
+  }
+}
+
 </style>

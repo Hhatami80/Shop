@@ -77,6 +77,7 @@ const banners = [
   position: relative;
 }
 
+
 .banner-content {
   text-align: left;
   color: #fff;
@@ -93,11 +94,11 @@ const banners = [
   animation: fadeIn 0.8s ease-in-out;
 }
 
+
 .banner-title {
   font-size: 2rem;
   font-weight: 900;
   margin-bottom: 8px;
-  letter-spacing: -0.5px;
 }
 
 .banner-subtitle {
@@ -107,14 +108,8 @@ const banners = [
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 :deep(.swiper-pagination-bullet) {
@@ -126,22 +121,53 @@ const banners = [
   background: #fff;
 }
 
-@media (max-width: 768px) {
+
+@media (max-width: 1024px) {
   .category-banner {
-    height: 60vh;
+    height: 70vh;
   }
+
   .banner-content {
     left: 50%;
     top: 65%;
     transform: translate(-50%, -50%);
+    padding: 18px 22px;
+    max-width: 80%;
     text-align: center;
-    padding: 15px 20px;
   }
+
   .banner-title {
-    font-size: 1.4rem;
+    font-size: 1.6rem;
   }
+
   .banner-subtitle {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .category-banner {
+    height: 50vh;
+  }
+
+  .banner-content {
+    padding: 14px 18px;
+    max-width: 90%;
+    top: 70%;
+    animation: none !important;
+  }
+
+  .banner-title {
+    font-size: 1.3rem;
+  }
+
+  .banner-subtitle {
+    font-size: 0.85rem;
+  }
+
+  :deep(.swiper-pagination-bullet) {
+    width: 8px !important;
+    height: 8px !important;
   }
 }
 </style>

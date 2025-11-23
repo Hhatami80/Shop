@@ -54,7 +54,8 @@ import {
   faClipboardList,
   faColumns,
   faBars,
-  faInbox
+  faInbox,
+  faPhoneSquareAlt
 
 } from '@fortawesome/free-solid-svg-icons'
 
@@ -93,7 +94,8 @@ library.add(
   faClipboardList,
   faColumns,
   faBars,
-  faInbox
+  faInbox,
+  faPhoneSquareAlt
   
 )
 

@@ -31,6 +31,7 @@ import CommetsManager from '@/components/CommetsManager.vue'
 import CategoryDetail from '@/views/CategoryDetail.vue'
 import Dashboard from '@/components/Dashboard.vue'
 import AdminDashboard from '@/components/AdminDashboard.vue'
+import AdminContactInfoPage from '@/components/AdminContactInfoPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -122,6 +123,7 @@ const router = createRouter({
         { path: 'footer', component: FooterManager },
         { path: 'changepass', component: ChangePass },
         { path: 'articles', component: ArticleList },
+        { path: 'contactus', component:AdminContactInfoPage},
         {
           path: 'articles/create',
           component: ArticleForm,

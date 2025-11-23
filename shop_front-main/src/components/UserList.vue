@@ -16,23 +16,32 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in store.users" :key="user.id">
+        <tr v-for="user in paginatedUsers" :key="user.id">
           <td>{{ user.id }}</td>
           <td>{{ user.username }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.phone }}</td>
           <!-- <td>{{ user.address || '-' }}</td> -->
           <td>
-              <button class="btn-details" @click="openModal(user)">
-                <fa-icon :icon="['fas', 'eye']" /> مشاهده
-              </button>
-            </td>
+            <button class="btn-details" @click="openModal(user)">
+              <fa-icon :icon="['fas', 'eye']" /> مشاهده
+            </button>
+          </td>
           <td>
             <button class="btn btn-delete" @click="handleDelete(user.id)">حذف</button>
           </td>
         </tr>
       </tbody>
     </table>
+    <div v-if="totalPages > 1" class="pagination">
+      <button class="pagination-btn" :disabled="currentPage === 1" @click="prevPage">قبلی</button>
+
+      <span>صفحه {{ currentPage }} از {{ totalPages }}</span>
+
+      <button class="pagination-btn" :disabled="currentPage === totalPages" @click="nextPage">
+        بعدی
+      </button>
+    </div>
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal">
         <h3>جزئیات آدرس{{ selectedUser.username }}</h3>
@@ -50,14 +59,13 @@
           </thead>
           <tbody>
             <tr v-for="address in selectedUser.address || []" :key="address.id">
-
-              <td>{{ address.province.name || "-" }}</td>
-              <td>{{ address.city.name || "-" }}</td>
-              <td>{{ address.neighborhood || "-" }}</td>
-              <td>{{ address.street || "-" }}</td>
-              <td>{{ address.plate || "-" }}</td>
-              <td>{{ address.postal_code || "-" }}</td>
-              <td>{{ address.full_address || "-" }}</td>
+              <td>{{ address.province.name || '-' }}</td>
+              <td>{{ address.city.name || '-' }}</td>
+              <td>{{ address.neighborhood || '-' }}</td>
+              <td>{{ address.street || '-' }}</td>
+              <td>{{ address.plate || '-' }}</td>
+              <td>{{ address.postal_code || '-' }}</td>
+              <td>{{ address.full_address || '-' }}</td>
             </tr>
             <tr v-if="!selectedUser.address.length">
               <td colspan="7" style="text-align: center">هیچ آدرسی برای این کاربر موجود نیست</td>
@@ -74,51 +82,69 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
-import { useUserStore } from "@/stores/useUserStore";
-import Swal from "sweetalert2";
+import { onMounted, ref, computed } from 'vue'
+import { useUserStore } from '@/stores/useUserStore'
+import Swal from 'sweetalert2'
 
-const store = useUserStore();
+const store = useUserStore()
 const showModal = ref(false)
 const selectedUser = ref({})
 
+const currentPage = ref(1)
+const pageSize = 5
+
+const totalPages = computed(() => Math.ceil(store.users.length / pageSize))
+
+const paginatedUsers = computed(() => {
+  const start = (currentPage.value - 1) * pageSize
+  return store.users.slice(start, start + pageSize)
+})
+
+function nextPage() {
+  if (currentPage.value < totalPages.value) currentPage.value++
+}
+
+function prevPage() {
+  if (currentPage.value > 1) currentPage.value--
+}
+
 onMounted(() => {
-  store.fetchUsers();
-});
+  store.fetchUsers()
+})
 
 const handleDelete = (id) => {
   Swal.fire({
     title: '<span style="font-weight:bold; font-size:20px;">آیا مطمئنی؟</span>',
     html: '<p style="font-size:16px;">با حذف این کاریر دیگر قابل بازیابی نیست!</p>',
-    icon: "warning",
+    icon: 'warning',
     showCancelButton: true,
-    confirmButtonColor: "#e63946",
-    cancelButtonColor: "#adb5bd",
+    confirmButtonColor: '#e63946',
+    cancelButtonColor: '#adb5bd',
     confirmButtonText: '<i class="fa fa-trash"></i> حذف کاریر',
     cancelButtonText: '<i class="fa fa-times"></i> لغو',
     buttonsStyling: false,
     customClass: {
-      popup: "my-swal-popup",
-      confirmButton: "my-swal-confirm",
-      cancelButton: "my-swal-cancel",
+      popup: 'my-swal-popup',
+      confirmButton: 'my-swal-confirm',
+      cancelButton: 'my-swal-cancel',
     },
   }).then((result) => {
     if (result.isConfirmed) {
-      store.deleteUser(id);
+      store.deleteUser(id)
       Swal.fire({
         title: '<span style="font-weight:bold; font-size:20px;">حذف شد!</span>',
         html: '<p style="font-size:16px;">کاریر موردنظر با موفقیت حذف شد.</p>',
-        icon: "success",
-        confirmButtonText: "باشه",
+        icon: 'success',
+        confirmButtonText: 'باشه',
         buttonsStyling: false,
         customClass: {
-          popup: "my-swal-popup",
-          confirmButton: "my-swal-confirm",
+          popup: 'my-swal-popup',
+          confirmButton: 'my-swal-confirm',
         },
-      });
+      })
     }
-  });
-};
+  })
+}
 
 const openModal = (user) => {
   selectedUser.value = user
@@ -127,7 +153,6 @@ const openModal = (user) => {
 const closeModal = () => {
   showModal.value = false
 }
-
 </script>
 
 <style scoped>
@@ -147,7 +172,6 @@ const closeModal = () => {
   border-radius: 12px;
   box-shadow: 0 8px 20px var(--shadow-color);
   direction: rtl;
-  font-family: "Vazirmatn", sans-serif;
 }
 
 .title {
@@ -247,7 +271,6 @@ const closeModal = () => {
   background: #0056b3;
 }
 
-
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -303,9 +326,33 @@ const closeModal = () => {
 .btn-close:hover {
   background: #5a6268;
 }
+.pagination {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 25px;
+  gap: 10px;
+  text-align: center;
+  direction: ltr;
+}
+
+.pagination-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: var(--primary-color);
+  color: #222;
+  font-weight: 600;
+}
+
+.pagination-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
 
 :global(.my-swal-popup) {
-  font-family: "Vazirmatn", sans-serif;
   border-radius: 12px;
   direction: rtl;
 }
