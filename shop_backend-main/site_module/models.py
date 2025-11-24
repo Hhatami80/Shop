@@ -103,7 +103,7 @@ class ContactUsInfo(models.Model):
     instagram = models.CharField(max_length=255)
     telegram = models.CharField(max_length=255)
     whatsapp = models.CharField(max_length=255)
-    work_hours = models
+    work_hours = models.CharField(max_length=255)
 
     updated_at = models.DateTimeField(auto_now=True)
 
