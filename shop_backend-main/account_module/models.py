@@ -25,8 +25,8 @@ class ExpiringToken(Token):
 
 
 def get_image():
-    images_dir = os.path.join(settings.MEDIA_ROOT, 'images', 'profiles', 'defaults')
-    image = os.listdir(images_dir)[0]
+    image_dir = os.path.join(settings.MEDIA_ROOT, 'images', 'profiles', 'defaults')
+    image = os.listdir(image_dir)[0]
     return f'images/profiles/defaults/{image}'
 
 
@@ -39,11 +39,24 @@ class User(AbstractUser):
         (ROLE_CHOICE_USER, 'user'),
     )
 
+    username = models.CharField(
+        max_length=150,
+        unique=True,
+        error_messages={
+            'unique': "این نام کاربری از قبل استفاده شده است.",
+        }
+    )
+    
     @property
     def fullname(self):
         return f"{self.first_name} {self.last_name}".strip()
     
-    phone = models.CharField(max_length=100, unique=True, null=False, blank=False, default=0, error_messages={
+    phone = models.CharField(
+        max_length=100,
+        unique=True,
+        null=False, blank=False,
+        default=0, 
+        error_messages={
         'unique': 'این شماره تلفن در سیستم وجود دارد.'
     })
     is_active = models.BooleanField(default=True)
@@ -60,6 +73,8 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'کاربر'
         verbose_name_plural = 'کاربران'
+        
+    
 
 
 class Province(models.Model):
