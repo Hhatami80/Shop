@@ -80,7 +80,7 @@ const totalRevenue = computed(() => transactionStore.transactions.length)
   display: flex;
   flex-wrap: wrap;
   gap: 20px; 
-  justify-content: flex-start; 
+  justify-content: center;
 }
 
 .info-boxes > * {

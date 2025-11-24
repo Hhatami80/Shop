@@ -90,7 +90,6 @@
                   <p class="review-date">{{ comment.jalali_created_date }}</p>
                 </div>
 
-               
                 <div class="review-rating">
                   <span
                     v-for="star in 5"
@@ -102,30 +101,6 @@
                 </div>
 
                 <p class="review-text">{{ comment.text }}</p>
-
-                
-                <div class="review-actions">
-                  <button @click="likeComment(comment.id)">👍 {{ comment.likes }}</button>
-                  <button @click="dislikeComment(comment.id)">👎 {{ comment.dislikes }}</button>
-                  <button @click="startReply(comment.id)">پاسخ</button>
-                </div>
-
-                
-                <div v-if="replyTo === comment.id" class="reply-box">
-                  <textarea v-model="replyText" placeholder="پاسخ خود را بنویسید..."></textarea>
-                  <button @click="sendReply(comment.id)">ارسال پاسخ</button>
-                </div>
-
-                
-                <div v-if="comment.replies?.length" class="replies">
-                  <div class="reply" v-for="reply in comment.replies" :key="reply.id">
-                    <p class="reply-author">
-                      <strong>{{ reply.user.username }}</strong>
-                    </p>
-                    <p class="reply-date">{{ reply.jalali_created_date }}</p>
-                    <p class="reply-text">{{ reply.text }}</p>
-                  </div>
-                </div>
               </div>
             </transition-group>
           </div>
@@ -162,29 +137,6 @@ const userRating = ref(0)
 const hoverRating = ref(0)
 const newComment = ref('')
 
-const replyTo = ref(null)
-const replyText = ref('')
-
-function startReply(id) {
-  replyTo.value = id
-}
-
-async function sendReply(parentId) {
-  if (!replyText.value) return
-
-  await commentStore.submitComment(props.product.id, replyText.value, parentId)
-
-  replyText.value = ''
-  replyTo.value = null
-}
-
-function likeComment(id) {
-  console.log("Liked", id)
-}
-
-function dislikeComment(id) {
-  console.log("Disliked", id)
-}
 
 
 const alreadyInCart = computed(() => {
@@ -202,8 +154,6 @@ watch(
   },
   { immediate: true },
 )
-
-
 
 const productComments = computed(() => {
   if (!props.product?.id) return []
@@ -244,11 +194,9 @@ async function submitComment() {
     console.error(err)
   }
 }
-
 </script>
 
 <style scoped>
-
 * {
   box-sizing: border-box !important;
   min-width: 0 !important;
@@ -256,7 +204,6 @@ async function submitComment() {
 html {
   font-size: 14px;
 }
-
 
 .modal-overlay {
   position: fixed;
@@ -305,7 +252,6 @@ html {
   opacity: 0;
 }
 
-
 .close-btn {
   position: absolute;
   top: 12px;
@@ -330,7 +276,6 @@ html {
   transform: scale(1.05);
 }
 
-
 .tabs {
   display: flex;
   gap: 0.6rem;
@@ -353,13 +298,11 @@ html {
   color: #fff;
 }
 
-
 .tab-content {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
-
 
 .product-card {
   display: grid;
@@ -373,7 +316,6 @@ html {
   width: 100%;
 }
 
-
 .product-image img {
   width: 100%;
   height: auto;
@@ -382,7 +324,6 @@ html {
   border: 1px solid #ddd;
   object-fit: cover;
 }
-
 
 .product-details h2 {
   font-size: clamp(1rem, 2.1vw, 1.3rem);
@@ -414,7 +355,6 @@ html {
   font-size: 1.05rem;
   margin-right: 6px;
 }
-
 
 .actions {
   display: flex;
@@ -602,7 +542,6 @@ html {
   overflow-wrap: break-word;
 }
 
-
 .review-actions {
   display: flex;
   gap: 0.6rem;
@@ -620,9 +559,8 @@ html {
 }
 .review-actions button:hover {
   color: #000;
-  background: rgba(0,0,0,0.03);
+  background: rgba(0, 0, 0, 0.03);
 }
-
 
 .reply-box {
   margin-top: 0.6rem;
@@ -701,7 +639,6 @@ html {
     padding: clamp(10px, 3vw, 14px);
   }
 }
-
 
 .old-price {
   text-decoration: line-through;

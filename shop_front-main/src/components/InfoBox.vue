@@ -38,19 +38,29 @@ export default {
 
 <style scoped>
 .info-box {
-  background: rgba(255, 255, 255, 0.1); 
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  gap: 20px;
+  flex-direction: column; 
+  text-align: center; 
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(12px);
   border-radius: 15px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex: 1 1 220px;
-  border-top: 5px solid #f1c40f; 
-  transition: transform 0.3s, box-shadow 0.3s;
   cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border-top: 5px solid #f1c40f;
 }
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  justify-content: center;
+  text-align: center; 
+}
+
 .info-box:hover {
   transform: translateY(-8px);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
@@ -72,10 +82,7 @@ export default {
   transform: scale(1.1);
   background: rgba(255, 255, 255, 0.35);
 }
-.content {
-  display: flex;
-  flex-direction: column;
-}
+
 .label {
   font-size: 0.95rem;
   color: #7f6a3e;
