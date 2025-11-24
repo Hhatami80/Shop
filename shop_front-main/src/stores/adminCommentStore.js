@@ -10,7 +10,6 @@ export const useAdminCommentStore = defineStore('adminComments', {
     error: null,
     selectedComments: [],
     unapproved_count: 0,
-
     page: 1,
     totalPages: 10,
     q: '',

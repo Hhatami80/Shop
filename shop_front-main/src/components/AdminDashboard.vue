@@ -4,7 +4,7 @@
     <div class="info-boxes">
       <InfoBox
         label="نظرات تایید نشده"
-        :value="unapprovedCommentsCount"
+        :value="commentStore.unapproved_count"
         iconClass="fas fa-comments"
         route="/admin/comments"
       />
@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import InfoBox from '@/components/InfoBox.vue'
 import { useUserStore } from '@/stores/useUserStore'
 import { useTransactionStore } from '@/stores/useTransactionStore'
@@ -49,12 +49,12 @@ onMounted(async () => {
     userStore.fetchUsers(),
     transactionStore.fetchAll(),
     orderStore.fetchOrders(),
-    commentStore.fetchAllComments({ status: 'pending' }), 
+    commentStore.fetchAllComments(), 
   ])
 })
 
 
-const unapprovedCommentsCount = commentStore.unapproved_count
+
 
 
 const usersCount = computed(() => userStore.users.length || 0)

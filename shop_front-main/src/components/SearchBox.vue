@@ -75,10 +75,8 @@ const searchProducts = debounce(async (text) => {
   }
   isLoading.value = true
   try {
-    const response = await productService.get()
-    results.value = response.data.products.filter((p) =>
-      p.title.toLowerCase().includes(text.toLowerCase()),
-    )
+    const response = await productService.searchProducts(query.value)
+    results.value = response.data
   } catch (err) {
     console.error(err)
   } finally {

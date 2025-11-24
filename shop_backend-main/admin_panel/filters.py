@@ -2,7 +2,7 @@ import django_filters
 from django.db.models import Q
 
 class AdminCommentFilter(django_filters.FilterSet):
-    status = django_filters.BooleanFilter('is_approved', method='status_filter')
+    status = django_filters.CharFilter('status', method='status_filter')
     q = django_filters.CharFilter(field_name="text", method='query_all_words')
     
     def status_filter(self, queryset, name, value):
@@ -12,6 +12,8 @@ class AdminCommentFilter(django_filters.FilterSet):
             return queryset.filter(is_approved=True)
         elif value == "unapproved":
             return queryset.filter(is_approved=False)
+        else:
+            return queryset
     
     def query_all_words(self, queryset, name, value):
         if not value:

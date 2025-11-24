@@ -4,6 +4,9 @@ export const productService = {
   get() {
     return api.get('/products')
   },
+  searchProducts(query) {
+    return api.get(`/search-product?title=${query}`)
+  },
   getSpecialProducts(){
     return api.get('products/special-products')
   },

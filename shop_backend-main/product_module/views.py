@@ -24,11 +24,17 @@ from .serializers import ProductCommentReadSerializer, ProductCommentWriteSerial
     ProductRatingSerializer, OrderSerializer, CategoryBannerSerializer, CategorySerializer, WalletSerializer, \
     TransactionSerializer
 from .services import create_order
-from .filters import OrderFilter
+from .filters import OrderFilter, ProductFilter
 from .pagination import DefaultPagination
 
-
 # Create your views here.
+class FilteredProductsView(ListAPIView):
+    serializer_class = ProductSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProductFilter
+    queryset = Product.objects.filter(is_active=True).all()
+    
+
 
 class ProductDetailView(APIView):
     def get(self, request: Request, product_id):
