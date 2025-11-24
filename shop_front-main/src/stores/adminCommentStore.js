@@ -24,6 +24,7 @@ export const useAdminCommentStore = defineStore('adminComments', {
       page = this.page,
       per_page = this.per_page,
     } = {}) {
+      this.error = null
       try {
         const res = await adminCommentService.getAll({
           status: status === 'all' ? '' : status,
@@ -34,6 +35,7 @@ export const useAdminCommentStore = defineStore('adminComments', {
 
         this.comments = res.data.results.results
         this.unapproved_count = res.data.unapproved_count
+        this.totalPages = res.data.results.total_pages
       } catch (err) {
         console.error('خطا در دریافت نظرات:', err)
         this.error = 'خطا در دریافت نظرات'

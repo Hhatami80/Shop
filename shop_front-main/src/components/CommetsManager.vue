@@ -104,7 +104,11 @@
           <tbody>
             <tr v-for="comment in commentStore.comments" :key="comment.id">
               <td>
-                <input type="checkbox" :value="comment.id" v-model="commentStore.selectedComments" />
+                <input
+                  type="checkbox"
+                  :value="comment.id"
+                  v-model="commentStore.selectedComments"
+                />
               </td>
               <td>{{ comment.user?.username }}</td>
               <td>{{ comment.product?.title }}</td>
@@ -130,14 +134,13 @@
           </tbody>
         </table>
       </div>
-
-      <Pagination
-        :page="commentStore.page"
-        :totalPages="commentStore.totalPages"
-        :maxPages="5"
-        @page-change="changePage"
-      />
     </div>
+    <Pagination
+      :page="commentStore.page"
+      :totalPages="commentStore.totalPages"
+      :maxPages="5"
+      @page-change="changePage"
+    />
   </div>
 </template>
 
