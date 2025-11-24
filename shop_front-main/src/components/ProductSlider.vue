@@ -62,7 +62,9 @@ defineProps({
 })
 
 const selectedProduct = ref(null)
-const openModal = (product) => (selectedProduct.value = product)
+const openModal = (product) => {
+  selectedProduct.value = product
+}
 </script>
 
 <style scoped>

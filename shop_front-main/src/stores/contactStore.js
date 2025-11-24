@@ -21,6 +21,19 @@ export const useContactStore = defineStore("contactInfo", {
       } finally {
         this.loading = false;
       }
+    },
+    async updateInfo(data) {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const response = await contactService.updateInfo(data);
+        this.info = response.data;
+      } catch (err) {
+        this.error = "خطا در دریافت اطلاعات تماس";
+      } finally {
+        this.loading = false;
+      }
     }
   }
 });

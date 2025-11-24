@@ -136,7 +136,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch  } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 import { useCartStore } from '@/stores/useCartStore'
@@ -145,6 +145,10 @@ import { useProductStore } from '@/stores/useProductStore'
 const props = defineProps({
   show: Boolean,
   product: Object,
+})
+
+onMounted(async () => {
+  await productStore.getProductById(props.product?.id)
 })
 const emit = defineEmits(['close'])
 
