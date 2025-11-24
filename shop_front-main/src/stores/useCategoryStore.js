@@ -22,12 +22,15 @@ export const useCategoryStore = defineStore('category', {
 
   actions: {
     async getAllCategories() {
+      this.loading = true
       try {
         const response = await categoryService.get();
         this.allCategories = response.data.categories || response.data || [];
       } catch (error) {
         console.error('خطا در دریافت دسته‌ها:', error.response?.data || error);
         toast.error('خطا در دریافت دسته‌بندی‌ها');
+      }finally {
+        this.loading = false
       }
     },
 

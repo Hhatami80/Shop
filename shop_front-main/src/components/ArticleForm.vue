@@ -14,12 +14,13 @@
 
       <div class="form-group">
         <label>خلاصه</label>
-        <textarea v-model="form.short_description" class="form-control lg"></textarea>
+        <MarkdownEditor v-model="form.short_description" />
+
       </div>
 
       <div class="form-group">
         <label>متن مقاله</label>
-        <ArticleEditor v-model="form.full_description" />
+        <MarkdownEditor v-model="form.full_description" />
       </div>
 
       <div class="form-group">
@@ -41,7 +42,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useArticleStore } from '@/stores/ArticleStore'
-import ArticleEditor from '@/components/ArticleEditor.vue'
+import MarkdownEditor from '@/components/MarkdownEditor.vue'
 
 const route = useRoute()
 const router = useRouter()

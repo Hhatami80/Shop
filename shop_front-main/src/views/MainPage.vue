@@ -1,5 +1,5 @@
 <template>
-  <Loading v-model="isLoading" :logo="logoImage " />
+  <Loading v-model="isLoading" :logo="logoImage" />
   <div class="page-container">
     <section class="section">
       <search-box />
@@ -26,19 +26,17 @@
 
     <section class="section">
       <ProductSlider :new_products="newProducts" title="محصولات جدید" />
-
-
     </section>
   </div>
 </template>
-
-
-
 
 <script setup>
 import { onMounted, ref, computed } from 'vue'
 import FeaturedProductsSlider from '@/components/FeaturedProductsSlider.vue'
 import { useProductStore } from '@/stores/useProductStore'
+import { useFeatureSectionStore } from '@/stores/FeatureSectionStore'
+import { useCategoryStore } from '@/stores/useCategoryStore'
+import { useAboutUsStore } from '@/stores/useAboutUsStore'
 import AboutUs from '@/components/AboutUs.vue'
 import FeatureSection from '@/components/FeatureSection.vue'
 import HomeCategories from '@/components/HomeCategories.vue'
@@ -50,23 +48,28 @@ import logoImage from '@/assets/image/logo.png'
 const isLoading = ref(true)
 const productStore = useProductStore()
 const selectedProductId = ref(null)
-
-
+const FeatureSectionStore = useFeatureSectionStore()
+const CategoryStore = useCategoryStore()
+const AboutUsStore = useAboutUsStore()
 
 const newProducts = computed(() => productStore.new_products)
 
-
 onMounted(async () => {
   try {
-    await productStore.getAllProducts()
-    await productStore.getBestSellers()
+    await Promise.all([
+      productStore.getAllProducts(),
+      productStore.getBestSellers(),
+      FeatureSectionStore.getFeatureSection(),
+      CategoryStore.getAllCategories(),
+      AboutUsStore.fetchAbout(),
+    ])
 
     if (productStore.products.length > 0) {
       const firstId = productStore.products[0].id
       await productStore.getProductById(firstId)
     }
   } finally {
-    isLoading.value = false 
+    isLoading.value = false
   }
 })
 </script>
@@ -84,6 +87,3 @@ onMounted(async () => {
   margin-bottom: 60px;
 }
 </style>
-
-
-

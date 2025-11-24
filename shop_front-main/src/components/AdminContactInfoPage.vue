@@ -6,7 +6,7 @@
     </div>
 
     <div class="card">
-      <form @submit.prevent="updateInfo">
+      <form v-if="info" @submit.prevent="updateInfo">
         <div class="form-grid">
           <div class="form-group">
             <label>عنوان</label>
@@ -64,31 +64,28 @@
           </div>
         </div>
 
-        <button type="submit" class="submit-btn">ذخیره تغییرات</button>
+        <button type="submit" class="submit-btn" :disabled="store.saving">
+          {{ store.saving ? 'در حال ذخیره...' : 'ذخیره تغییرات' }}
+        </button>
       </form>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { toast } from 'vue3-toastify'
-import 'vue3-toastify/dist/index.css'
+import { onMounted, computed } from 'vue'
+import { useAdminContactInfoStore } from '@/stores/contactInfoAdminStore'
 
-const info = ref({
-  title: 'تماس با ما',
-  subtitle: 'از شنیدن نظرات شما خوشحال می‌شویم',
-  address: 'تهران، خیابان ولیعصر',
-  phone: '021-12345678',
-  email: 'info@example.com',
-  work_hours: 'شنبه تا چهارشنبه، ۹ تا ۱۸',
-  instagram: 'https://instagram.com/demo',
-  telegram: 'https://t.me/demo',
-  whatsapp: 'https://wa.me/1234567890',
+const store = useAdminContactInfoStore()
+
+onMounted(() => {
+  store.fetchInfo()
 })
 
-function updateInfo() {
-  toast.success('اطلاعات با موفقیت ذخیره شد (دمو)!')
+const info = computed(() => store.info)
+
+async function updateInfo() {
+  await store.updateInfo()
 }
 </script>
 
@@ -183,12 +180,12 @@ function updateInfo() {
 }
 
 .social-input label {
-  width: 90px; 
+  width: 90px;
   font-size: 14px;
 }
 
 .social-input input {
-  flex: 1; 
+  flex: 1;
   padding: 10px 12px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -199,5 +196,4 @@ function updateInfo() {
 .social-input input:focus {
   border-color: #facc15;
 }
-
 </style>

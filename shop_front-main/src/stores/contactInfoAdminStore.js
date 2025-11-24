@@ -14,14 +14,27 @@ export const useAdminContactInfoStore = defineStore("adminContactInfo", {
 
   actions: {
     async fetchInfo() {
-      this.loading = true;
-      try {
-        const res = await contactService.getInfo();
-        this.info = res.data;
-      } finally {
-        this.loading = false;
-      }
-    },
+  this.loading = true;
+  try {
+    const res = await contactService.getInfo();
+    this.info = res.data;
+  } catch {
+    this.info = {
+      title: "",
+      subtitle: "",
+      address: "",
+      phone: "",
+      email: "",
+      work_hours: "",
+      instagram: "",
+      telegram: "",
+      whatsapp: ""
+    };
+  } finally {
+    this.loading = false;
+  }
+}
+,
 
     async updateInfo() {
       this.saving = true;
