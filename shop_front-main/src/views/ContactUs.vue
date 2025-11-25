@@ -99,7 +99,7 @@ async function submitForm() {
       message: form.value.message,
     })
 
-    toast.success('پیام شما با موفقیت ارسال شد!')
+    toast.success('پیام شما با موفقیت ارسال شد')
     form.value = { name: '', email: '', message: '' }
   } catch (err) {
     toast.error('خطا در ارسال پیام')

@@ -1,19 +1,15 @@
 <template>
   <div class="editor-wrapper" :class="theme">
-    
     <div class="toolbar">
       <button @click="toggleTheme">
         {{ theme === 'light' ? 'حالت شب' : 'حالت روز' }}
       </button>
       <button @click="togglePreview">
-        {{ previewOnly ? "نمایش ویرایشگر" : "فقط پیش‌نمایش" }}
+        {{ previewOnly ? 'نمایش ویرایشگر' : 'فقط پیش‌نمایش' }}
       </button>
-      <button @click="emitSave">
-        ذخیره
-      </button>
+      <button @click="emitSave">ذخیره</button>
     </div>
 
-    
     <MdEditor
       v-if="!previewOnly"
       v-model="content"
@@ -28,112 +24,106 @@
       style="direction: rtl; text-align: right; font-family: Vazir, Tahoma, sans-serif"
     />
 
-    
-    <MdPreview
-      v-else
-      :model-value="content"
-      :theme="theme"
-      style="direction: rtl; text-align: right; background: #fff; font-family: Vazir, Tahoma, sans-serif"
-      class="preview-box"
-    />
+    <MdPreview v-else :model-value="content" :theme="theme" language="fa-IR" class="preview-box" />
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
-import { MdEditor, MdPreview, config } from "md-editor-v3";
-import "md-editor-v3/lib/style.css";
-
+import { ref, watch } from 'vue'
+import { MdEditor, MdPreview, config } from 'md-editor-v3'
+import 'md-editor-v3/lib/style.css'
 
 const faIR = {
-  bold: "پررنگ",
-  italic: "کج",
-  underline: "زیرخط",
-  strikeThrough: "خط‌خورده",
-  title: "عنوان",
-  quote: "نقل قول",
-  unorderedList: "لیست نامرتب",
-  orderedList: "لیست مرتب",
-  link: "لینک",
-  image: "تصویر",
-  table: "جدول",
-  code: "کد",
-  codeBlock: "بلوک کد",
-  preview: "پیش‌نمایش",
-  fullscreen: "تمام صفحه",
-  uploadImage: "آپلود تصویر",
-  undo: "بازگشت",
-  redo: "بازکردن",
-};
-
+  bold: 'پررنگ',
+  italic: 'کج',
+  underline: 'زیرخط',
+  strikeThrough: 'خط‌خورده',
+  title: 'عنوان',
+  quote: 'نقل قول',
+  unorderedList: 'لیست نامرتب',
+  orderedList: 'لیست مرتب',
+  link: 'لینک',
+  image: 'تصویر',
+  table: 'جدول',
+  code: 'کد',
+  codeBlock: 'بلوک کد',
+  preview: 'پیش‌نمایش',
+  fullscreen: 'تمام صفحه',
+  uploadImage: 'آپلود تصویر',
+  undo: 'بازگشت',
+  redo: 'بازکردن',
+}
 
 config({
-  language: "fa-IR",
-  languageUserDefined: { "fa-IR": faIR },
+  editorConfig: {
+    language: "fa-IR"
+  },
+  languageUserDefined: {
+    "fa-IR": faIR,
+  }
 });
+
+
 
 const props = defineProps({
-  modelValue: { type: String, default: "" },
-});
+  modelValue: { type: String, default: '' },
+})
 
-const emits = defineEmits(["update:modelValue", "save"]);
+const emits = defineEmits(['update:modelValue', 'save'])
 
-const content = ref(props.modelValue);
-const theme = ref("light");
-const previewOnly = ref(false);
-
+const content = ref(props.modelValue)
+const theme = ref('light')
+const previewOnly = ref(false)
 
 const customToolbar = [
-  "bold",
-  "underline",
-  "italic",
-  "strikeThrough",
-  "title",
-  "quote",
-  "unorderedList",
-  "orderedList",
-  "link",
-  "image",
-  "table",
-  "code",
-  "codeBlock",
-  "preview",
-  "fullscreen",
-];
+  'bold',
+  'underline',
+  'italic',
+  'strikeThrough',
+  'title',
+  'quote',
+  'unorderedList',
+  'orderedList',
+  'link',
+  'image',
+  'table',
+  'code',
+  'codeBlock',
+  'preview',
+  'fullscreen',
+]
 
 watch(content, (value) => {
-  emits("update:modelValue", value);
-});
+  emits('update:modelValue', value)
+})
 
 const toggleTheme = () => {
-  theme.value = theme.value === "light" ? "dark" : "light";
-};
+  theme.value = theme.value === 'light' ? 'dark' : 'light'
+}
 
 const togglePreview = () => {
-  previewOnly.value = !previewOnly.value;
-};
-
+  previewOnly.value = !previewOnly.value
+}
 
 const handleUpload = async (files, callback) => {
-  const urls = [];
+  const urls = []
   for (const file of files) {
-    const formData = new FormData();
-    formData.append("file", file);
+    const formData = new FormData()
+    formData.append('file', file)
 
-    
-    const res = await fetch("https://your-api.com/upload", {
-      method: "POST",
+    const res = await fetch('https://your-api.com/upload', {
+      method: 'POST',
       body: formData,
-    });
-    const data = await res.json();
-    urls.push(data.url);
+    })
+    const data = await res.json()
+    urls.push(data.url)
   }
-  callback(urls);
-};
+  callback(urls)
+}
 
 const emitSave = () => {
-  emits("save", content.value);
-};
+  emits('save', content.value)
+}
 </script>
 
 <style scoped>

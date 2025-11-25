@@ -67,11 +67,11 @@ onMounted(async () => {
 const ordersCount = computed(() => orderStore.totalOrders)
 const cartCount = computed(() => cartStore.totalQuantity)
 const walletBalance = computed(() => walletStore.balance)
-const userInfo = computed(() => `${userStore.profile.username || '-'}\n${userStore.profile.phone || '-'}`)
+const userInfo = computed(() => `${userStore.profile.fullname || '-'}\n${userStore.profile.phone || '-'}`)
 
 const isUserInfoIncomplete = computed(() => {
-  const { username, phone } = userStore.profile
-  return !username || !phone
+  const { fullname, phone } = userStore.profile
+  return !fullname || !phone
 })
 
 const goToUpdateProfile = () => {

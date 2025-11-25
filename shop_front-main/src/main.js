@@ -98,14 +98,6 @@ library.add(
   faPhoneSquareAlt
   
 )
-import { config } from 'md-editor-v3'
-import faIR from './utils/md-editor-fa'
-config({
-  language: 'fa-IR',
-  languageUserDefined: {
-    'fa-IR': faIR
-  }
-})
 
 const app = createApp(App)
 

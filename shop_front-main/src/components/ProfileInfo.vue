@@ -2,9 +2,7 @@
   <div class="profile-section">
     <h3>پروفایل کاربری</h3>
 
-    
     <form @submit.prevent="saveProfile" class="profile-form" novalidate>
-      
       <div class="avatar-section">
         <img
           :src="
@@ -20,7 +18,6 @@
         </label>
       </div>
 
-      
       <div class="form-group">
         <label>نام کاربری:</label>
         <input v-model="store.profile.username" type="text" :disabled="!editing" />
@@ -76,7 +73,6 @@
       </button>
     </form>
 
- 
     <h4>پیش‌نمایش اطلاعات</h4>
     <table class="preview-table">
       <thead>
@@ -140,7 +136,6 @@ const errors = reactive({
   phone: '',
 })
 
-
 function toJalali(gDate) {
   if (!gDate) return ''
   const [gy, gm, gd] = gDate.split('-').map(Number)
@@ -155,14 +150,22 @@ const birthdateShamsi = computed(() => {
   return toJalali(date)
 })
 
-
 onMounted(async () => {
   const module = await import('vue3-persian-datetime-picker')
   DatePicker.value = module.default
   datePickerLoaded.value = true
-  await store.fetchProfile()
-})
 
+  await store.fetchProfile()
+
+  if (
+    !store.profile.first_name ||
+    !store.profile.last_name ||
+    !store.profile.phone ||
+    !store.profile.username
+  ) {
+    editing.value = true
+  }
+})
 
 const onPhoneInput = (e) => {
   let val = e.target.value.replace(/\D/g, '')
@@ -170,14 +173,12 @@ const onPhoneInput = (e) => {
   store.profile.phone = val
 }
 
-
 const onFileChange = (e) => {
   const file = e.target.files[0]
   if (!file) return
   store.profile.image = file
   store.profile.previewImage = URL.createObjectURL(file)
 }
-
 
 function validateForm() {
   let valid = true
@@ -192,7 +193,6 @@ function validateForm() {
   })
   return valid
 }
-
 
 const saveProfile = async () => {
   if (!validateForm()) {

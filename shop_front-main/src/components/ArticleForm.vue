@@ -15,7 +15,6 @@
       <div class="form-group">
         <label>خلاصه</label>
         <MarkdownEditor v-model="form.short_description" />
-
       </div>
 
       <div class="form-group">
@@ -69,8 +68,8 @@ const handleImage = (e) => {
 const handleSubmit = async () => {
   const data = new FormData()
   data.append('title', form.value.title)
-  data.append('short_description', form.value.short_description)
-  data.append('full_description', form.value.full_description)
+  data.append('short_description', form.value.short_description ?? '')
+  data.append('full_description', form.value.full_description ?? '')
   if (form.value.image) data.append('image', form.value.image)
 
   if (route.params.id) {
@@ -105,7 +104,7 @@ onMounted(async () => {
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  
+
   direction: rtl;
   color: #333;
 }
@@ -176,7 +175,6 @@ textarea.form-control:focus {
   height: auto;
   display: block;
 }
-
 
 .form-submit {
   text-align: center;

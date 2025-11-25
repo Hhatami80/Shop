@@ -1,7 +1,7 @@
 <template>
   <div class="wallet-page">
     <div v-if="!bank" class="bank-warning">
-       برای استفاده از کیف پول، لطفاً حساب بانکی خود را در بخش حساب بانکی وارد کنید.
+      برای استفاده از کیف پول، لطفاً حساب بانکی خود را در بخش حساب بانکی وارد کنید.
       <button class="go-bank-btn" @click="goToBankSection">رفتن به حساب بانکی</button>
     </div>
 
@@ -19,9 +19,10 @@
         <h3>مدیریت کیف پول</h3>
         <div class="action-row">
           <input v-model.number="amount" type="number" placeholder="مبلغ (تومان)" />
-          <button class="btn-charge" @click="goToPayment">
+          <button class="btn-charge" @click="goToPayment" :disabled="!bank">
             <fa-icon :icon="['fas', 'plus-circle']" /> شارژ
           </button>
+
           <!-- <button class="btn-withdraw" @click="withdraw">
             <fa-icon :icon="['fas', 'minus-circle']" /> برداشت
           </button> -->
@@ -149,9 +150,7 @@ const goToBankSection = () => {
   background: linear-gradient(165deg, #f6f7fc, #e6ebf5);
   border-radius: 32px;
   box-shadow: inset 0 0 50px rgba(255, 255, 255, 0.25);
-  
 }
-
 
 .bank-warning {
   background: #fff4e5;
@@ -163,7 +162,7 @@ const goToBankSection = () => {
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  
+
   font-weight: 500;
   font-size: 0.95rem;
   animation: fadeSlide 0.4s ease;
@@ -177,13 +176,14 @@ const goToBankSection = () => {
   padding: 10px 18px;
   cursor: pointer;
   font-weight: 600;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 .go-bank-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
 }
-
 
 .wallet-top-row {
   display: flex;
@@ -206,13 +206,14 @@ const goToBankSection = () => {
   border-radius: 20px;
   background: linear-gradient(145deg, #ffffff, #e8ecf4);
   box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 .wallet-card-wrapper:hover > * {
   transform: translateY(-5px);
   box-shadow: 0 18px 35px rgba(0, 0, 0, 0.12);
 }
-
 
 .wallet-actions {
   flex: 1;
@@ -252,13 +253,14 @@ const goToBankSection = () => {
   font-size: 0.95rem;
   background: #fafafa;
   outline: none;
-  transition: border 0.2s, box-shadow 0.2s;
+  transition:
+    border 0.2s,
+    box-shadow 0.2s;
 }
 .action-row input:focus {
   border-color: #f9c710;
   box-shadow: 0 0 6px rgba(249, 199, 16, 0.4);
 }
-
 
 .action-row button {
   flex: 0 0 auto;
@@ -290,7 +292,6 @@ const goToBankSection = () => {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(220, 53, 69, 0.35);
 }
-
 
 .wallet-transactions {
   background: rgba(255, 255, 255, 0.97);
@@ -342,7 +343,6 @@ const goToBankSection = () => {
   font-weight: bold;
 }
 
-
 .empty-state {
   padding: 80px 0;
   text-align: center;
@@ -358,7 +358,6 @@ const goToBankSection = () => {
   margin-top: 14px;
   color: #555;
 }
-
 
 .pagination {
   display: flex;
@@ -390,7 +389,6 @@ const goToBankSection = () => {
   font-weight: bold;
 }
 
-
 @keyframes fadeScaleIn {
   0% {
     opacity: 0;
@@ -403,15 +401,25 @@ const goToBankSection = () => {
 }
 
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes fadeSlide {
-  0% { opacity: 0; transform: translateY(-10px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-
 
 @media (max-width: 1000px) {
   .wallet-top-row {
@@ -424,5 +432,4 @@ const goToBankSection = () => {
     max-width: 100%;
   }
 }
-
 </style>
