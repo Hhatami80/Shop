@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.core.files.storage import default_storage
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
@@ -6,17 +7,17 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .models import Article
 from .serializers import ArticleSerializer
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.generics import ListCreateAPIView
+from account_module.permissions import IsAdmin
+
 
 
 # Create your views here.
-
-class ArticleView(APIView):
-
-    def get(self, request: Request):
-        articles = Article.objects.all()
-        article_serializer = ArticleSerializer(articles, many=True, context={'request': request})
-        return Response({'articles': article_serializer.data}, status.HTTP_200_OK)
+class ArticleView(ListCreateAPIView):
+    serializer_class = ArticleSerializer
+    parser_classes =  [JSONParser, MultiPartParser, FormParser]
+    queryset = Article.objects.all()
 
 
 class ArticleDetail(APIView):
@@ -54,3 +55,21 @@ class ArticleDetail(APIView):
 #         articles = Article.objects.get(pk=article_id)
 #         articles.delete()
 #         return Response({'data': 'مقاله با موفقیت حذف شد'}, status.HTTP_200_OK)
+
+class ArticleImageUpload(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+    permission_classes = [IsAuthenticated, IsAdmin]
+    
+    def post(self, request: Request):
+        image = request.FILES.get("file")
+        
+        if not image:
+            return Response({
+                "error": "تصویری ارسال نشده است."
+            }, status=404)
+        path = default_storage.save(f"article_images/{image.name}", image)
+        url = default_storage.url(path)
+        abs_url = request.build_absolute_uri(url)
+        return Response({
+            "url": abs_url
+        }, status.HTTP_200_OK)
