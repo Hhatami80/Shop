@@ -14,7 +14,7 @@ export const useArticleStore = defineStore('articles', {
     async fetchArticles() {
       this.loading = true
       const res = await articleService.getAll()
-      this.articles = res.data.articles || []
+      this.articles = res.data || []
       this.loading = false
     },
 

@@ -43,6 +43,7 @@
 import { ref, watch } from "vue";
 import { MdEditor, MdPreview, config } from "md-editor-v3";
 import "md-editor-v3/lib/style.css";
+import api from "@/services/AxiosService"
 
 
 const faIR = {
@@ -121,11 +122,16 @@ const handleUpload = async (files, callback) => {
     formData.append("file", file);
 
     
-    const res = await fetch("https://your-api.com/upload", {
-      method: "POST",
-      body: formData,
-    });
-    const data = await res.json();
+    const res = await api.post(
+      "http://192.168.1.14:8000/api/articles/upload-image/",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    )
+    const data = res.data;
     urls.push(data.url);
   }
   callback(urls);

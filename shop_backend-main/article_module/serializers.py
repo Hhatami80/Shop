@@ -5,6 +5,7 @@ import jdatetime
 
 
 class ArticleSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(required=False, allow_null=True)
     class Meta:
         model = Article
         fields = '__all__'
