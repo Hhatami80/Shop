@@ -7,29 +7,55 @@
       {{ article.jalali_created_date || 'تاریخ نامشخص' }}
     </p>
 
-    <p class="article-short">
-      {{ article.short_description }}
+    <p class="article-short" v-html="rendered_short_description">
     </p>
-    <div class="article-content" v-html="article.full_description"></div>
+    <div class="article-content" v-html="rendered_full_description"></div>
   </div>
 
   <div v-else-if="loading">در حال بارگذاری...</div>
   <div v-else class="error">مقاله یافت نشد</div>
 </template>
 <script setup>
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useArticleStore } from '@/stores/ArticleStore'
+import md from "@/utils/markdown";
+
 
 const store = useArticleStore()
 const route = useRoute()
 
-const loading = computed(() => store.loading)
-const article = computed(() => store.article)
+const short_description = ref("");
+const full_description = ref("");
 
+const rendered_short_description = ref("");
+const rendered_full_description = ref("");
+
+// store-based computed properties
+const loading = computed(() => store.loading);
+const article = computed(() => store.article);
+
+// fetch article on mount
 onMounted(() => {
-  store.fetchArticle(route.params.id)
-})
+  store.fetchArticle(route.params.id);
+});
+
+// React when article loads from store
+watch(
+  () => store.article,
+  (a) => {
+    if (!a) return;
+
+    short_description.value = a.short_description || "";
+    full_description.value = a.full_description || "";
+
+    // Render markdown
+    rendered_short_description.value = md.render(short_description.value);
+    rendered_full_description.value = md.render(full_description.value);
+  },
+  { immediate: true }
+);
+
 </script>
 
 <style scoped>

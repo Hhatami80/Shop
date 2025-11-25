@@ -6,7 +6,7 @@ import 'vue3-toastify/dist/index.css'
 export const useArticleStore = defineStore('articles', {
   state: () => ({
     articles: [],
-    article: null,
+    article: {},
     loading: false,
   }),
 
