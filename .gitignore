@@ -6,3 +6,6 @@ __pycache__/
 shop_backend-main/db.sqlite3
 shop_backend-main/*/__pycache__/*.*
 shop_backend-main/shop_backend-main.rar
+.idea/misc.xml
+.idea/Shop.iml
+shop_backend-main/.idea/*
