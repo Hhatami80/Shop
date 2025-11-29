@@ -21,6 +21,10 @@
     </section>
 
     <section class="section">
+    <WearableSlider title="پوشینه ها" :products="productStore.bestsellers" />
+    </section>
+
+    <section class="section">
       <FeaturedProductsSlider title="محصولات ویژه" :discounted_product="productStore.bestsellers" />
     </section>
 
@@ -42,6 +46,7 @@ import FeatureSection from '@/components/FeatureSection.vue'
 import HomeCategories from '@/components/HomeCategories.vue'
 import ProductSlider from '@/components/ProductSlider.vue'
 import BestSellerSlider from '@/components/BestSellerSlider.vue'
+import WearableSlider from '@/components/WearableSlider.vue'
 import Loading from '@/components/Loading.vue'
 import logoImage from '@/assets/image/logo.png'
 
