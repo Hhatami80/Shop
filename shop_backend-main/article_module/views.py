@@ -3,7 +3,7 @@ from django.core.files.storage import default_storage
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from .models import Article
 from .serializers import ArticleSerializer
@@ -17,8 +17,13 @@ from account_module.permissions import IsAdmin
 class ArticleView(ListCreateAPIView):
     serializer_class = ArticleSerializer
     parser_classes =  [JSONParser, MultiPartParser, FormParser]
+    permission_classes = [IsAdmin]
     queryset = Article.objects.all()
 
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [permission() for permission in self.permission_classes]
+        return [AllowAny()]
 
 class ArticleDetail(APIView):
     def get(self, request: Request, article_id):
