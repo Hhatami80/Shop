@@ -1,8 +1,26 @@
 from rest_framework import serializers
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.request import Request
 
-from .models import Product, ProductCategory, Brand, ProductProperty, ProductComment, ProductGallery, ProductTag, Cart, \
-    CartItem, ProductRating, OrderItem, Order, CategoryBanner, Wallet, WalletTransaction, Payment
+from .models import (
+    CategoryBannerGallery,
+    Product,
+    ProductCategory,
+    Brand,
+    ProductProperty,
+    ProductComment,
+    ProductGallery,
+    ProductTag,
+    Cart,
+    CartItem,
+    ProductRating,
+    OrderItem,
+    Order,
+    CategoryBanner,
+    Wallet,
+    WalletTransaction,
+    Payment,
+)
 from mixins.dedup_image_serializer import DedupImageMixin
 from django.utils import timezone
 import json
@@ -16,23 +34,49 @@ class ProductMiniSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'title', 'image']
+        fields = ["id", "title", "image"]
+
+
+class CategoryGallerySerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True)
+    
+    class Meta:
+        model = CategoryBannerGallery
+        fields = "__all__"
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    parser_classes = [MultiPartParser, FormParser]
     image = serializers.ImageField(use_url=True)
-    image_field_name = 'image'
+    image_field_name = "image"
     categories = ProductMiniSerializer(read_only=True, many=True)
+    banner_images = CategoryGallerySerializer(many=True, read_only=True, source="images")
 
     class Meta:
         model = ProductCategory
-        exclude = ['slug']
+        exclude = ["slug"]
 
+    def create(self, validated_data):
+        request: Request = self.context.get("request")
+        category = ProductCategory.objects.create(**validated_data)
+        i = 0
+        banner = request.FILES.get(f"banner[{i}]")
+        text = request.data.get(f"text[{i}]")
+        while banner != None and text != None:
+            CategoryBannerGallery.objects.create(
+                category=category,
+                text=text,
+                image=banner
+                )
+            i += 1
+            banner = request.FILES.get(f"banner[{i}]")
+            text = request.data.get(f"text[{i}]")
+        return category
 
 class ProductPropertySerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductProperty
-        fields = ['key', 'value']
+        fields = ["key", "value"]
 
 
 class ProductGallerySerializer(serializers.ModelSerializer):
@@ -40,8 +84,7 @@ class ProductGallerySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductGallery
-        fields = '__all__'
-
+        fields = "__all__"
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -50,8 +93,7 @@ class ProductSerializer(serializers.ModelSerializer):
     images = ProductGallerySerializer(many=True, read_only=True)
     category = CategorySerializer(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(
-        queryset=ProductCategory.objects.all(),
-        write_only=True
+        queryset=ProductCategory.objects.all(), write_only=True
     )
     properties = ProductPropertySerializer(many=True)
     # is_favorited = serializers.SerializerMethodField()
@@ -60,14 +102,13 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = "__all__"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['category'] = CategorySerializer(read_only=True)
-        self.fields['category_id'] = serializers.PrimaryKeyRelatedField(
-            queryset=ProductCategory.objects.all(),
-            write_only=True
+        self.fields["category"] = CategorySerializer(read_only=True)
+        self.fields["category_id"] = serializers.PrimaryKeyRelatedField(
+            queryset=ProductCategory.objects.all(), write_only=True
         )
 
     def to_internal_value(self, data):
@@ -77,14 +118,17 @@ class ProductSerializer(serializers.ModelSerializer):
             try:
                 mutable = dict(data)
             except Exception:
-                mutable = data.copy() if hasattr(data, 'copy') else data
+                mutable = data.copy() if hasattr(data, "copy") else data
 
-        if 'properties' in mutable and isinstance(mutable['properties'], str):
+        if "properties" in mutable and isinstance(mutable["properties"], str):
             try:
-                mutable['properties'] = json.loads(mutable['properties'])
+                mutable["properties"] = json.loads(mutable["properties"])
             except json.JSONDecodeError:
                 raise serializers.ValidationError(
-                    {'properties': 'Invalid JSON format. Use [{"key":"k","value":"v"}, ...]'})
+                    {
+                        "properties": 'Invalid JSON format. Use [{"key":"k","value":"v"}, ...]'
+                    }
+                )
         return super().to_internal_value(mutable)
 
     # def get_is_favorited(self, obj):
@@ -106,11 +150,11 @@ class ProductSerializer(serializers.ModelSerializer):
         return 0
 
     def create(self, validated_data):
-        request = self.context.get('request')
-        properties_data = validated_data.pop('properties', [])
-        category = validated_data.pop('category_id')
+        request = self.context.get("request")
+        properties_data = validated_data.pop("properties", [])
+        category = validated_data.pop("category_id")
         product = Product.objects.create(category=category, **validated_data)
-        uploaded_images = request.FILES.getlist('uploaded_images')
+        uploaded_images = request.FILES.getlist("uploaded_images")
         if uploaded_images:
             for image in uploaded_images:
                 ProductGallery.objects.create(product=product, image=image)
@@ -118,16 +162,18 @@ class ProductSerializer(serializers.ModelSerializer):
         for prop in properties_data:
             if not isinstance(prop, dict):
                 continue
-            if 'key' in prop and 'value' in prop:
-                ProductProperty.objects.create(product=product, key=prop['key'], value=prop['value'])
+            if "key" in prop and "value" in prop:
+                ProductProperty.objects.create(
+                    product=product, key=prop["key"], value=prop["value"]
+                )
         return product
 
     def update(self, instance, validated_data):
-        request = self.context.get('request')
-        properties_data = validated_data.pop('properties', None)
-        category = validated_data.pop('category_id', None)
-        
-        uploaded_images = request.FILES.getlist('uploaded_images')
+        request = self.context.get("request")
+        properties_data = validated_data.pop("properties", None)
+        category = validated_data.pop("category_id", None)
+
+        uploaded_images = request.FILES.getlist("uploaded_images")
         if uploaded_images:
             for image in uploaded_images:
                 ProductGallery.objects.create(product=instance, image=image)
@@ -146,11 +192,9 @@ class ProductSerializer(serializers.ModelSerializer):
             for prop in properties_data:
                 if not isinstance(prop, dict):
                     continue
-                if 'key' in prop and 'value' in prop:
+                if "key" in prop and "value" in prop:
                     ProductProperty.objects.create(
-                        product=instance,
-                        key=prop['key'],
-                        value=prop['value']
+                        product=instance, key=prop["key"], value=prop["value"]
                     )
 
         return instance
@@ -161,23 +205,22 @@ class BrandSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Brand
-        fields = ['id', 'title', 'image', 'price', 'sub_title']
+        fields = ["id", "title", "image", "price", "sub_title"]
 
 
 class ProductCommentReadSerializer(serializers.ModelSerializer):
     product = ProductMiniSerializer()
     user = UserSerializer()
-    
+
     class Meta:
         model = ProductComment
-        fields = '__all__'
-
+        fields = "__all__"
 
 
 class ProductCommentWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductComment
-        fields = ['text', 'parent']
+        fields = ["text", "parent"]
 
     def create(self, validated_data):
         now = timezone.now()
@@ -185,40 +228,60 @@ class ProductCommentWriteSerializer(serializers.ModelSerializer):
 
         def convert_to_persian_digits(number):
             persian_digits = {
-                '0': '۰', '1': '۱', '2': '۲', '3': '۳', '4': '۴',
-                '5': '۵', '6': '۶', '7': '۷', '8': '۸', '9': '۹'
+                "0": "۰",
+                "1": "۱",
+                "2": "۲",
+                "3": "۳",
+                "4": "۴",
+                "5": "۵",
+                "6": "۶",
+                "7": "۷",
+                "8": "۸",
+                "9": "۹",
             }
-            return ''.join(persian_digits.get(d, d) for d in str(number))
+            return "".join(persian_digits.get(d, d) for d in str(number))
 
         persian_day = convert_to_persian_digits(jdt.day)
         persian_year = convert_to_persian_digits(jdt.year)
         persian_months = [
-            "", "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
-            "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"
+            "",
+            "فروردین",
+            "اردیبهشت",
+            "خرداد",
+            "تیر",
+            "مرداد",
+            "شهریور",
+            "مهر",
+            "آبان",
+            "آذر",
+            "دی",
+            "بهمن",
+            "اسفند",
         ]
         persian_month = persian_months[jdt.month]
 
-        validated_data['jalali_created_date'] = f"{persian_day} {persian_month} {persian_year}"
+        validated_data["jalali_created_date"] = (
+            f"{persian_day} {persian_month} {persian_year}"
+        )
         return super().create(validated_data)
 
 
 class ProductDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['description']
-
+        fields = ["description"]
 
 
 class ProductTagSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductTag
-        fields = '__all__'
+        fields = "__all__"
 
 
 class ProductRatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductRating
-        fields = ['product', 'rating']
+        fields = ["product", "rating"]
 
     def validate_rating(self, value):
         if not 1 <= value <= 5:
@@ -229,12 +292,12 @@ class ProductRatingSerializer(serializers.ModelSerializer):
 class CartItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
     product_id = serializers.PrimaryKeyRelatedField(
-        queryset=Product.objects.all(), source='product', write_only=True
+        queryset=Product.objects.all(), source="product", write_only=True
     )
 
     class Meta:
         model = CartItem
-        fields = ['id', 'product', 'product_id', 'quantity', 'total_price']
+        fields = ["id", "product", "product_id", "quantity", "total_price"]
 
     def get_total_price(self, obj):
         return obj.total_price()
@@ -246,32 +309,34 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        fields = ['items', 'total_price']
+        fields = ["items", "total_price"]
 
     def get_total_price(self, obj):
         return obj.total_price()
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all(), write_only=True)
-    product_detail = ProductSerializer(source='product', read_only=True)
+    product = serializers.PrimaryKeyRelatedField(
+        queryset=Product.objects.all(), write_only=True
+    )
+    product_detail = ProductSerializer(source="product", read_only=True)
 
     class Meta:
         model = OrderItem
-        fields = ['id', 'product', 'product_detail', 'quantity', 'price']
+        fields = ["id", "product", "product_detail", "quantity", "price"]
 
 
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = [
-            'id',
-            'gateway',
-            'is_successful',
-            'payment_method',
-            'authority',
-            'ref_id',
-            'created_at'
+            "id",
+            "gateway",
+            "is_successful",
+            "payment_method",
+            "authority",
+            "ref_id",
+            "created_at",
         ]
 
 
@@ -284,28 +349,30 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = [
-            'id',
-            'user',
-            'status',
-            'total_price',
-            'items',
-            'payment',
-            'created_at',
-            'created_at_jalali'
+            "id",
+            "user",
+            "status",
+            "total_price",
+            "items",
+            "payment",
+            "created_at",
+            "created_at_jalali",
         ]
         read_only_fields = ["user", "total_price", "created_at"]
 
     def get_created_at_jalali(self, obj):
-        return jdatetime.datetime.fromgregorian(datetime=obj.created_at).strftime("%d %B %Y")
+        return jdatetime.datetime.fromgregorian(datetime=obj.created_at).strftime(
+            "%d %B %Y"
+        )
 
     def create(self, validated_data):
-        items_data = validated_data.pop('items')
+        items_data = validated_data.pop("items")
         order = Order.objects.create(**validated_data)
         total = 0
         for item_data in items_data:
-            product = item_data.pop('product')
-            quantity = item_data['quantity']
-            price = item_data['price']
+            product = item_data.pop("product")
+            quantity = item_data["quantity"]
+            price = item_data["price"]
             total += quantity * price
             OrderItem.objects.create(order=order, product=product, **item_data)
         order.total_price = total
@@ -316,7 +383,7 @@ class OrderSerializer(serializers.ModelSerializer):
 class CategoryBannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = CategoryBanner
-        fields = '__all__'
+        fields = "__all__"
 
 
 class TransactionSerializer(serializers.ModelSerializer):
@@ -324,7 +391,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WalletTransaction
-        fields = ['id', 'type', 'method', 'amount', 'description', 'date']
+        fields = ["id", "type", "method", "amount", "description", "date"]
 
     def get_date(self, obj):
         return obj.created_at.strftime("%Y-%m-%d %H:%M")
@@ -335,5 +402,4 @@ class WalletSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Wallet
-        fields = ['balance', 'transactions']
-
+        fields = ["balance", "transactions"]

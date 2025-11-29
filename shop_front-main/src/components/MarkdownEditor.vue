@@ -31,6 +31,8 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { MdEditor, MdPreview, config } from 'md-editor-v3'
+import FA_IR from '@vavt/cm-extension/dist/locale/fa-IR';
+
 import 'md-editor-v3/lib/style.css'
 import api from '@/services/AxiosService'
 
@@ -57,10 +59,9 @@ const faIR = {
 
 config({
   editorConfig: {
-    language: 'fa-IR',
-  },
-  languageUserDefined: {
-    'fa-IR': faIR,
+    languageUserDefined: {
+      'fa-IR': FA_IR,
+    },
   },
 })
 

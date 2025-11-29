@@ -36,10 +36,14 @@ class ProductView(APIView):
             discounted_products_serializer = ProductSerializer(discounted_products, many=True, context={'request': request})
             new_products = products_query.order_by('-created_date').all()
             new_products_serializer = ProductSerializer(new_products, many=True, context={'request': request})
+            pooshineh_products = products_query.filter(category__title__contains="پوشینه").all()
+            pooshineh_serializer = ProductSerializer(pooshineh_products, many=True, context={'request': request})
             return Response({
                 'products': product_serializer.data,
                 'discounted_products': discounted_products_serializer.data,
-                'new_products': new_products_serializer.data
+                'new_products': new_products_serializer.data,
+                'pooshineh': pooshineh_serializer.data,
+                
             }, status.HTTP_200_OK)
         except Product.DoesNotExist:
             return Response({

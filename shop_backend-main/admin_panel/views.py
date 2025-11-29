@@ -149,10 +149,10 @@ class UpdatePropertyView(APIView):
 # region Category
 
 class AddCategoryView(APIView):
-    permission_classes = [IsAuthenticated, IsAdmin]
-
+    permission_classes = [IsAdmin, IsAuthenticated]
+    
     def post(self, request: Request):
-        category_serializer = CategorySerializer(data=request.data)
+        category_serializer = CategorySerializer(data=request.data, context={'request': request})
         if category_serializer.is_valid():
             category_serializer.save()
             return Response({'data': category_serializer.data}, status.HTTP_201_CREATED)
