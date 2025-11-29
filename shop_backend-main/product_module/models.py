@@ -168,6 +168,8 @@ class Product(models.Model):
     class Meta:
         verbose_name = "محصول"
         verbose_name_plural = "محصولات"
+        
+        ordering = ['-created_date']
 
 
 class Order(models.Model):
