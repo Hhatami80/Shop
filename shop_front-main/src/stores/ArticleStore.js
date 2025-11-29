@@ -22,7 +22,7 @@ export const useArticleStore = defineStore('articles', {
       this.loading = true
       const res = await articleService.get(id)
     
-      this.article = res.data.articles
+      this.article = res.data
 
   
       this.loading = false
