@@ -31,16 +31,13 @@ const full_description = ref("");
 const rendered_short_description = ref("");
 const rendered_full_description = ref("");
 
-// store-based computed properties
 const loading = computed(() => store.loading);
 const article = computed(() => store.article);
 
-// fetch article on mount
 onMounted(() => {
   store.fetchArticle(route.params.id);
 });
 
-// React when article loads from store
 watch(
   () => store.article,
   (a) => {
@@ -49,7 +46,7 @@ watch(
     short_description.value = a.short_description || "";
     full_description.value = a.full_description || "";
 
-    // Render markdown
+
     rendered_short_description.value = md.render(short_description.value);
     rendered_full_description.value = md.render(full_description.value);
   },
