@@ -23,6 +23,7 @@ class Article(models.Model):
     full_description = models.TextField(verbose_name='توضیحات تکمیلی مقاله', null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
     jalali_created_date = models.CharField(max_length=200, blank=True, null=True)
+    is_published = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.title}'

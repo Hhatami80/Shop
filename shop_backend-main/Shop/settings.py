@@ -42,6 +42,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # INSTALLED PACKAGES
+    'rest_framework',
+    'corsheaders',
+    'rest_framework.authtoken',
+    'jalali_date',
+    'slugify',
+    'requests',
     # MODULES
     'account_module',
     'home_module',
@@ -51,13 +58,7 @@ INSTALLED_APPS = [
     'article_module',
     'user_panel_module',
     'payments',
-    # INSTALLED PACKAGES
-    'rest_framework',
-    'corsheaders',
-    'rest_framework.authtoken',
-    'jalali_date',
-    'slugify',
-    'requests',
+    'comments'
 ]
 
 MIDDLEWARE = [
