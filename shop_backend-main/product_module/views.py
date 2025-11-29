@@ -224,20 +224,11 @@ class OrderDetailView(APIView):
         except Exception as e:
             return Response({'error': json.dumps(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-
     
-
-class CategoryBannerView(APIView):
-    def get(self, request: Request):
-        cat_banner = CategoryBanner.objects.all()
-        banner_serializer = CategoryBannerSerializer(cat_banner, many=True, context={'request': request})
-        return Response({'data': banner_serializer.data}, status.HTTP_200_OK)
-
-
 class SingleCategoryView(APIView):
     def get(self, request: Request, category_id):
-        category = ProductCategory.objects.get(pk=category_id)
-        category_serializer = CategorySerializer(category)
+        category = ProductCategory.objects.prefetch_related("images").get(pk=category_id)
+        category_serializer = CategorySerializer(category, context={'request': request})
         return Response({'data': category_serializer.data}, status.HTTP_200_OK)
 
 

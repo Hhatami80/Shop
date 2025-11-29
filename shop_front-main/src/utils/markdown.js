@@ -24,4 +24,46 @@ md.renderer.rules.image = function (tokens, idx, options, env, self) {
   return self.renderToken(tokens, idx, options);
 };
 
+const defaultHeadingOpen =
+  md.renderer.rules.heading_open ||
+  function (tokens, idx, opts, env, self) {
+    return self.renderToken(tokens, idx, opts);
+  };
+
+md.renderer.rules.heading_open = function (tokens, idx, options, env, self) {
+  const token = tokens[idx];
+
+  // Only modify <h2>
+  if (token.tag === "h2") {
+    // Add class or inline styles
+    token.attrSet("class", "my-h2");
+    token.attrSet(
+      "style",
+      "font-size: 22px; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #444;"
+    );
+  }
+
+  // Render normally afterwards
+  return defaultHeadingOpen(tokens, idx, options, env, self);
+};
+
+const defaultParagraphOpen =
+  md.renderer.rules.paragraph_open ||
+  function (tokens, idx, options, env, self) {
+    return self.renderToken(tokens, idx, options);
+  };
+
+md.renderer.rules.paragraph_open = function (tokens, idx, options, env, self) {
+  const token = tokens[idx];
+
+  // Add class + styles
+  token.attrSet("class", "my-paragraph");
+  token.attrSet(
+    "style",
+    "line-height: 1.75; margin: 0.75rem 0; font-size: 15px; color: #333;"
+  );
+
+  return defaultParagraphOpen(tokens, idx, options, env, self);
+};
+
 export default md;
