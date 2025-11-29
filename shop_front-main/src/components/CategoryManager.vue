@@ -5,11 +5,21 @@
     <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="modern-form-card">
       <input v-model="form.title" placeholder="عنوان دسته" required class="form-input" />
       <div class="file-input-wrapper">
-        <input type="file" ref="fileInput" @change="handleFileUpload" required id="file-upload" class="hidden-file-input" />
+        <input
+          type="file"
+          ref="fileInput"
+          @change="handleFileUpload"
+          required
+          id="file-upload"
+          class="hidden-file-input"
+        />
         <label for="file-upload" class="custom-file-label">
           <i class="fas fa-upload"></i> {{ imageFile ? imageFile.name : 'انتخاب تصویر دسته' }}
         </label>
       </div>
+      <button type="button" class="submit-button primary-btn" @click="isBannerModalOpen = true">
+        افزودن بنرها
+      </button>
       <button type="submit" class="submit-button primary-btn">
         <i class="fas fa-plus"></i> افزودن
       </button>
@@ -46,6 +56,7 @@
     </table>
 
     <edit-modal v-model="isEditModalOpen" :category="categoryToEdit" @save="saveEditedCategory" />
+    <banner-modal v-model="isBannerModalOpen" :banners="banners" @update="updateBanners" />
   </div>
 </template>
 
@@ -53,6 +64,7 @@
 import { ref, onMounted } from 'vue'
 import { useCategoryStore } from '@/stores/useCategoryStore'
 import EditModal from '@/components/EditModal.vue'
+import BannerModal from './BannerModal.vue'
 import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css'
 import { toast } from 'vue3-toastify'
@@ -63,12 +75,19 @@ const form = ref({ title: '' })
 const imageFile = ref(null)
 const fileInput = ref(null)
 
+const banners = ref([])
+const isBannerModalOpen = ref(false)
+
 const loading = ref(false)
 const error = ref(null)
 
 onMounted(async () => {
   await loadCategories()
 })
+
+function updateBanners(newList) {
+  banners.value = newList
+}
 
 const loadCategories = async () => {
   try {
@@ -90,9 +109,17 @@ const handleSubmit = async () => {
   formData.append('title', form.value.title)
   if (imageFile.value) formData.append('image', imageFile.value)
 
+  banners.value.forEach((banner, index) => {
+    if (banner.file) {
+      formData.append(`banner[${index}]`, banner.file)
+    }
+    if (banner.text) {
+      formData.append(`text[${index}]`, banner.text)
+    }
+  })
+
   const isSuccess = await categoryStore.addCategory(formData)
   if (isSuccess) {
-    
     resetForm()
     await loadCategories()
   } else {
@@ -155,21 +182,20 @@ const saveEditedCategory = async ({ id, formData }) => {
 }
 </script>
 
-
 <style scoped>
 .category-management {
-  --primary-color: #ffd700; 
-  --primary-color-hover: #E6C200; 
+  --primary-color: #ffd700;
+  --primary-color-hover: #e6c200;
   --primary-text-color: #333;
   --primary-light: #fff8e1;
   --secondary-color: #34495e;
-  --danger-color: #dc3545; 
-  --success-color: #28a745; 
-  --bg-light: #f8f9fa; 
+  --danger-color: #dc3545;
+  --success-color: #28a745;
+  --bg-light: #f8f9fa;
   --border-light: #e9ecef;
   --shadow-color: rgba(0, 0, 0, 0.08);
-  --warning-color: #FF9800;
-  
+  --warning-color: #ff9800;
+
   font-family: 'Vazirmatn', sans-serif;
   padding: 25px;
   background-color: var(--bg-light);
@@ -203,12 +229,14 @@ const saveEditedCategory = async ({ id, formData }) => {
   font-size: 15px;
   flex: 1 1 200px;
   background-color: #fff;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
 }
 
 .form-input:focus {
   border-color: var(--primary-color);
-  box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); 
+  box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
   outline: none;
 }
 
@@ -224,18 +252,20 @@ const saveEditedCategory = async ({ id, formData }) => {
   display: block;
   padding: 12px 15px;
   border-radius: 8px;
-  background-color: var(--primary-color); 
-  color: var(--primary-text-color); 
+  background-color: var(--primary-color);
+  color: var(--primary-text-color);
   border: 1px solid var(--primary-color);
   text-align: center;
   cursor: pointer;
-  transition: background-color 0.3s, opacity 0.3s;
+  transition:
+    background-color 0.3s,
+    opacity 0.3s;
   font-size: 15px;
   font-weight: 600;
 }
 
 .custom-file-label:hover {
-  background-color: var(--primary-color-hover); 
+  background-color: var(--primary-color-hover);
   opacity: 1;
 }
 
@@ -245,7 +275,7 @@ const saveEditedCategory = async ({ id, formData }) => {
 
 .primary-btn {
   background-color: var(--primary-color);
-  color: var(--primary-text-color); 
+  color: var(--primary-text-color);
   border: none;
   border-radius: 8px;
   padding: 12px 25px;
@@ -257,7 +287,7 @@ const saveEditedCategory = async ({ id, formData }) => {
 }
 
 .primary-btn:hover {
-  background-color: var(--primary-color-hover); 
+  background-color: var(--primary-color-hover);
   box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
 }
 
@@ -271,7 +301,8 @@ const saveEditedCategory = async ({ id, formData }) => {
   margin: 30px 0;
 }
 
-.loading-state, .error-state {
+.loading-state,
+.error-state {
   text-align: center;
   padding: 30px;
   font-size: 1.1rem;
@@ -298,11 +329,12 @@ const saveEditedCategory = async ({ id, formData }) => {
 }
 
 .data-table thead tr {
-  background-color: var(--primary-color); 
-  color: var(--primary-text-color); 
+  background-color: var(--primary-color);
+  color: var(--primary-text-color);
 }
 
-th, td {
+th,
+td {
   padding: 15px;
   text-align: center;
 }
@@ -313,12 +345,12 @@ th {
 }
 
 .data-table tbody tr:nth-child(even) {
-  background-color: var(--primary-light); 
+  background-color: var(--primary-light);
 }
 
 .data-table tbody tr:hover {
-  background-color: var(--primary-light); 
-  filter: brightness(0.95); 
+  background-color: var(--primary-light);
+  filter: brightness(0.95);
 }
 
 .table-title {
@@ -340,12 +372,14 @@ th {
 }
 
 .action-btn {
-  border: 1px solid transparent; 
+  border: 1px solid transparent;
   border-radius: 8px;
   padding: 10px 15px;
   font-weight: 500;
   cursor: pointer;
-  transition: 0.3s, transform 0.1s;
+  transition:
+    0.3s,
+    transform 0.1s;
   margin: 0 5px;
   display: inline-flex;
   align-items: center;
@@ -357,7 +391,7 @@ th {
 }
 
 .btn-edit {
-  background-color: var(--warning-color); 
+  background-color: var(--warning-color);
   color: white;
 }
 
@@ -367,7 +401,7 @@ th {
   transform: translateY(-1px);
 }
 .btn-delete {
-  background-color: var(--danger-color); 
+  background-color: var(--danger-color);
   color: white;
 }
 
@@ -377,7 +411,7 @@ th {
   transform: translateY(-1px);
 }
 
- /* .my-swal-popup {
+/* .my-swal-popup {
   font-family: 'Vazirmatn', sans-serif;
   border-radius: 12px;
   direction: rtl;
