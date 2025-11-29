@@ -59,6 +59,8 @@ watch(
 </script>
 
 <style scoped>
+
+
 .article-view {
   direction: rtl;
   background: #ffffff;
@@ -78,7 +80,7 @@ watch(
 }
 
 .article-view h1 {
-  font-size: 2.4rem;
+  font-size: 26px;
   font-weight: 800;
   margin-bottom: 1.5rem;
   text-align: center;
@@ -119,16 +121,6 @@ watch(
   font-style: italic;
 }
 
-.article-short {
-  font-weight: 600;
-  font-size: 1.2rem;
-  margin: 1.5rem 0;
-  color: #374151;
-  background: #fef3c7;
-  padding: 1rem 1.2rem;
-  border-right: 6px solid #f59e0b;
-  border-radius: 12px;
-}
 
 .article-content {
   color: #374151;
@@ -138,11 +130,12 @@ watch(
 }
 
 .article-content p {
+  font-size: 15px;
   margin-bottom: 1.2rem;
 }
 
 .article-content h2 {
-  font-size: 1.6rem;
+  font-size: 22px;
   margin: 2rem 0 1rem;
   font-weight: 700;
   color: #0f172a;
