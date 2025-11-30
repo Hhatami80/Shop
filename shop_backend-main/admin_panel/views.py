@@ -200,7 +200,7 @@ class UpdateCategoryView(APIView):
             return Response({'data': 'اطلاعات ویرایش شد'}, status.HTTP_201_CREATED)
         return Response({'errors': category_serializer.errors}, status.HTTP_400_BAD_REQUEST)
 
-from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView, CreateAPIView
 from product_module.serializers import CategoryGallerySerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import NotFound
@@ -210,6 +210,8 @@ class UpdateCategoryBanner(RetrieveUpdateAPIView):
     serializer_class = CategoryGallerySerializer
     permission_classes = [IsAdmin]
     lookup_url_kwarg = 'banner_id'
+    
+    
     
     def get_queryset(self):
         cat_id = self.kwargs.get('category_id')
@@ -246,8 +248,23 @@ class DeleteCategoryBanner(RetrieveDestroyAPIView):
             return queryset.get(id=banner_id)
         except CategoryBanner.DoesNotExist:
             raise NotFound("Banner not found for this category.")
-    
-    
+
+class AddCategoryBanner(CreateAPIView):
+    serializer_class = CategoryGallerySerializer
+    permission_classes = [IsAdmin]
+
+    def create(self, request, *args, **kwargs):
+        category_id = kwargs.get('category_id')
+        category = get_object_or_404(ProductCategory, pk=category_id)
+
+        data = request.data.copy()
+        data['category'] = category.id  # inject category FK
+        
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=201)
 
 # endregion
 

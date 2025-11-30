@@ -64,7 +64,9 @@
     <banner-view-modal
       v-if="isBannerViewModalOpen"
       :banners="selectedCategoryBanners"
+      :category-id="selectedCategory.id"
       @close="isBannerViewModalOpen = false"
+      @refresh="loadCategories"
     />
     <edit-modal v-model="isEditModalOpen" :category="categoryToEdit" @save="saveEditedCategory" />
     <banner-modal v-model="isBannerModalOpen" :banners="banners" @update="updateBanners" />
@@ -92,11 +94,11 @@ const isBannerModalOpen = ref(false)
 
 const loading = ref(false)
 const error = ref(null)
-
+const selectedCategory = ref({})
 const selectedCategoryBanners = ref([])
 
 const openBannerModal = (category) => {
-  
+  selectedCategory.value = category
   selectedCategoryBanners.value = category.banner_images || []
   isBannerViewModalOpen.value = true
 }
@@ -109,10 +111,11 @@ function updateBanners(newList) {
   banners.value = newList
 }
 
+
 const loadCategories = async () => {
   try {
     loading.value = true
-    await categoryStore.getAllCategories()
+    await categoryStore.getAllCategories();
   } catch (err) {
     error.value = 'خطا در دریافت دسته‌بندی‌ها'
   } finally {
