@@ -23,7 +23,7 @@
 
 <script setup>
 import { useCategoryStore } from '@/stores/useCategoryStore'
-import Banner from '@/components/Banner.vue'
+import Banner from '@/components/CategoryBanner.vue'
 import { onMounted } from 'vue'
 import StickyHeader from '@/components/StickyHeader.vue'
 

@@ -1,7 +1,7 @@
 <template>
   <div class="category-product-page">
     <StickyHeader :visible="true" />
-    <Banner />
+    <Banner :banners="currentCategoryBannerImages" />
 
     <div class="breadcrumb">
       <router-link to="/">صفحه اصلی</router-link>
@@ -78,7 +78,7 @@
 import { ref, computed, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import StickyHeader from "@/components/StickyHeader.vue";
-import Banner from "@/components/Banner.vue";
+import Banner from "@/components/CategoryBanner.vue";
 import { useCategoryStore } from "@/stores/useCategoryStore";
 
 const categoryStore = useCategoryStore();
@@ -98,7 +98,10 @@ const allProducts = computed(() =>
 );
 const featuredProducts = computed(() => allProducts.value.slice(0, 2));
 const gridProducts = ref([]);
-
+const currentCategoryBannerImages = computed(() => {
+  const cat = categoryStore.getCategoryById(currentCategoryId.value);
+  return cat?.banner_images || [];
+});
 watch(
   allProducts,
   () => {

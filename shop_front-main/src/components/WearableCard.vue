@@ -1,22 +1,30 @@
 <template>
-  <div class="bestseller-card" @click="$emit('click', product)">
-    <div class="product-image">
-      <img :src="product.image || defaultImage" :alt="product.title" />
+  <div class="final-product-card">
+    <div class="image-wrapper">
+      <img :src="product.image || defaultImage" :alt="product.title" class="product-image" />
+      <div v-if="!product.inStock" class="out-of-stock">ناموجود</div>
     </div>
 
-    <div class="product-info">
-      <h3 class="product-title">{{ product.title }}</h3>
-      <p class="product-desc">{{ product.description }}</p>
+    <div class="content">
+      <h3 class="title">{{ product.title }}</h3>
+
+      <p class="desc">
+        {{ product.description }}
+      </p>
 
       <div class="price-section">
-        <span class="price">{{ formatPrice(product.price) }} تومان</span>
-        <span v-if="product.discountPrice" class="old-price">
+        <div class="price">
+          {{ formatPrice(product.price) }}
+          <span class="toman">تومان</span>
+        </div>
+
+        <div v-if="product.discountPrice" class="old-price">
           {{ formatPrice(product.discountPrice) }}
-        </span>
+        </div>
       </div>
 
       <button
-        class="add-to-cart"
+        class="buy-btn"
         :disabled="!product.inStock"
         @click.stop="$emit('openModal', product)"
       >
@@ -32,122 +40,144 @@ defineProps({
 })
 
 const defaultImage = '/default-product.jpg'
-const formatPrice = (price) => (price ? price.toLocaleString('fa-IR').replace(/٬/g, ",") : '۰')
+
+const formatPrice = (price) => {
+  return price ? price.toLocaleString('fa-IR') : '۰'
+}
 </script>
 
 <style scoped>
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  font-family: 'IRANSansX', sans-serif;
-}
-
-.bestseller-card {
+.final-product-card {
+  width: 420px;
+  height: 640px;
+  background: #fff;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 372px;
-  min-width: 220px;
-  background: #fff;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: all 0.35s ease;
   cursor: pointer;
 }
 
-.bestseller-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+.final-product-card:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18);
+}
+
+.image-wrapper {
+  height: 46%;
+  background: #fafafa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  position: relative;
 }
 
 .product-image {
   width: 100%;
-  aspect-ratio: 473/710; 
-  overflow: hidden;
-  border-bottom: 2px solid #f9c710;
-}
-
-.product-image img {
-  width: 100%;
   height: 100%;
-  object-fit: cover; 
-  display: block;
+  object-fit: contain;
+  transition: transform 0.5s ease;
 }
 
+.final-product-card:hover .product-image {
+  transform: scale(1.04);
+}
 
-.product-info {
+.out-of-stock {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  font-size: 1.8rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content {
+  height: 54%;
+  padding: 22px 28px 26px;
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
-  padding: 12px 15px;
+  justify-content: flex-start;
+  gap: 14px;
 }
 
-.product-title {
+.title {
   font-size: 1rem;
   font-weight: bold;
-  color: #222;
-  margin-bottom: 6px;
-  line-height: 1.4em;
+  color: #1a1a1a;
+  margin: 0;
+  line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.product-desc {
+.desc {
   font-size: 0.875rem;
-  line-height: 1.4em;
   color: #555;
-  margin-bottom: 10px;
-  min-height: 60px;
+  line-height: 1.7;
+  margin: 0;
+  overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 .price-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 12px;
+  margin-top: auto;
 }
 
 .price {
-  font-size: 1rem;
-  font-weight: bold;
+  font-size: 1.1rem;
+  font-weight: 900;
   color: #f9c710;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.price .toman {
+  font-size: 1rem;
+  color: #777;
 }
 
 .old-price {
-  font-size: 0.875rem;
+  font-size: 1rem;
+  color: #aaa;
   text-decoration: line-through;
-  color: #888;
 }
 
-.add-to-cart {
-  margin-top: auto;
+.buy-btn {
+  margin-top: 14px;
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   font-weight: bold;
-  border-radius: 10px;
+  border-radius: 12px;
   border: none;
   background: #f9c710;
   color: #222;
   cursor: pointer;
+  box-shadow: 0 4px 15px rgba(249, 199, 16, 0.4);
   transition: background 0.2s ease;
 }
 
-.add-to-cart:hover:not(:disabled) {
+.buy-btn:hover:not(:disabled) {
   background: #e5b809;
 }
 
-.add-to-cart:disabled {
-  background: #ccc;
+.buy-btn:disabled {
+  background: #ddd;
+  color: #777;
   cursor: not-allowed;
 }
 </style>

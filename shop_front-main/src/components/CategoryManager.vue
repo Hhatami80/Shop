@@ -31,11 +31,13 @@
       <i class="fas fa-spinner fa-spin"></i> در حال بارگذاری...
     </div>
     <div v-else-if="error" class="error-state">{{ error }}</div>
+
     <table v-else class="data-table">
       <thead>
         <tr>
           <th>عنوان</th>
           <th>تصویر</th>
+          <th>بنرها</th>
           <th>عملیات</th>
         </tr>
       </thead>
@@ -43,6 +45,11 @@
         <tr v-for="cat in categoryStore.allCategories" :key="cat.id">
           <td class="table-title">{{ cat.title }}</td>
           <td><img :src="cat.image" alt="Category Image" class="category-image" /></td>
+          <td>
+            <button class="action-btn btn-view" @click="openBannerModal(cat)">
+              <i class="fas fa-images"></i> مشاهده
+            </button>
+          </td>
           <td>
             <button class="action-btn btn-edit" @click="editCategory(cat)">
               <i class="fas fa-pen"></i> ویرایش
@@ -54,7 +61,11 @@
         </tr>
       </tbody>
     </table>
-
+    <banner-view-modal
+      v-if="isBannerViewModalOpen"
+      :banners="selectedCategoryBanners"
+      @close="isBannerViewModalOpen = false"
+    />
     <edit-modal v-model="isEditModalOpen" :category="categoryToEdit" @save="saveEditedCategory" />
     <banner-modal v-model="isBannerModalOpen" :banners="banners" @update="updateBanners" />
   </div>
@@ -63,6 +74,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useCategoryStore } from '@/stores/useCategoryStore'
+import BannerViewModal from './BannerViewModal.vue'
 import EditModal from '@/components/EditModal.vue'
 import BannerModal from './BannerModal.vue'
 import Swal from 'sweetalert2'
@@ -74,12 +86,20 @@ const categoryStore = useCategoryStore()
 const form = ref({ title: '' })
 const imageFile = ref(null)
 const fileInput = ref(null)
-
+const isBannerViewModalOpen = ref(false)
 const banners = ref([])
 const isBannerModalOpen = ref(false)
 
 const loading = ref(false)
 const error = ref(null)
+
+const selectedCategoryBanners = ref([])
+
+const openBannerModal = (category) => {
+  
+  selectedCategoryBanners.value = category.banner_images || []
+  isBannerViewModalOpen.value = true
+}
 
 onMounted(async () => {
   await loadCategories()

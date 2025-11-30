@@ -97,7 +97,7 @@ const openModal = (product) => {
 }
 
 .product-swiper {
-  padding-bottom: 45px;
+  padding-bottom: 60px;
 }
 
 .product-swiper .swiper-slide {
@@ -127,6 +127,28 @@ const openModal = (product) => {
   color: #666;
   font-size: 1rem;
   padding: 1rem 0;
+}
+.product-swiper :deep(.swiper-pagination) {
+  bottom: 15px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+.product-swiper :deep(.swiper-pagination-bullet) {
+  width: 12px;
+  height: 12px;
+  background: #ddd;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.product-swiper :deep(.swiper-pagination-bullet-active) {
+  background: #f9c710;
+  opacity: 1;
+  transform: scale(1.4);
+  box-shadow: 0 0 15px rgba(249, 199, 16, 0.6);
 }
 
 @media (max-width: 1024px) {

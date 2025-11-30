@@ -13,6 +13,7 @@
         :key="index"
         class="banner-slide"
         :style="{ backgroundImage: `url(${banner.image})` }"
+
       >
         <div class="banner-content">
           <h2 class="banner-title">{{ banner.title }}</h2>
@@ -22,38 +23,33 @@
     </swiper>
   </div>
 </template>
-
 <script setup>
-import { Swiper, SwiperSlide } from "swiper/vue";
-import { Autoplay, Pagination, EffectFade } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/effect-fade";
-import "swiper/css/pagination";
-
-
-import img1 from "@/assets/image/coffee.jpg";
-import img2 from "@/assets/image/coffee.jpg";
-import img3 from "@/assets/image/coffee2.jpg";
-
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import { Autoplay, Pagination, EffectFade } from 'swiper/modules'
+import 'swiper/css'
+import 'swiper/css/effect-fade'
+import 'swiper/css/pagination'
+import img1 from '@/assets/image/coffee.jpg'
+import img2 from '@/assets/image/coffee.jpg'
+import img3 from '@/assets/image/coffee2.jpg'
 const banners = [
   {
     image: img1,
-    title: "قهوه‌ای با عطر زندگی",
-    subtitle: "لحظه‌هات رو با طعم واقعی قهوه تازه شروع کن ☕️",
+    title: 'قهوه‌ای با عطر زندگی',
+    subtitle: 'لحظه‌هات رو با طعم واقعی قهوه تازه شروع کن ☕️',
   },
   {
     image: img2,
-    title: "طعمی از آرامش و انرژی",
-    subtitle: "قهوه، الهام‌بخش شروعی دوباره در هر روز توست.",
+    title: 'طعمی از آرامش و انرژی',
+    subtitle: 'قهوه، الهام‌بخش شروعی دوباره در هر روز توست.',
   },
   {
     image: img3,
-    title: "از دانه تا فنجان، با عشق",
-    subtitle: "با بهترین دانه‌های عربیکا، تجربه‌ای خاص از طعم ناب.",
+    title: 'از دانه تا فنجان، با عشق',
+    subtitle: 'با بهترین دانه‌های عربیکا، تجربه‌ای خاص از طعم ناب.',
   },
-];
+]
 </script>
-
 <style scoped>
 .category-banner {
   width: 100%;
@@ -61,13 +57,11 @@ const banners = [
   position: relative;
   overflow: hidden;
 }
-
 .banner-swiper,
 .banner-slide {
   width: 100%;
   height: 100%;
 }
-
 .banner-slide {
   background-size: cover;
   background-position: center;
@@ -76,8 +70,6 @@ const banners = [
   justify-content: center;
   position: relative;
 }
-
-
 .banner-content {
   text-align: left;
   color: #fff;
@@ -93,40 +85,37 @@ const banners = [
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   animation: fadeIn 0.8s ease-in-out;
 }
-
-
 .banner-title {
   font-size: 2rem;
   font-weight: 900;
   margin-bottom: 8px;
 }
-
 .banner-subtitle {
   font-size: 1rem;
   opacity: 0.9;
   font-weight: 400;
 }
-
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-
 :deep(.swiper-pagination-bullet) {
   background: #f9c710;
   opacity: 0.8;
 }
-
 :deep(.swiper-pagination-bullet-active) {
   background: #fff;
 }
-
-
 @media (max-width: 1024px) {
   .category-banner {
     height: 70vh;
   }
-
   .banner-content {
     left: 50%;
     top: 65%;
@@ -135,36 +124,29 @@ const banners = [
     max-width: 80%;
     text-align: center;
   }
-
   .banner-title {
     font-size: 1.6rem;
   }
-
   .banner-subtitle {
     font-size: 0.95rem;
   }
 }
-
 @media (max-width: 600px) {
   .category-banner {
     height: 50vh;
   }
-
   .banner-content {
     padding: 14px 18px;
     max-width: 90%;
     top: 70%;
     animation: none !important;
   }
-
   .banner-title {
     font-size: 1.3rem;
   }
-
   .banner-subtitle {
     font-size: 0.85rem;
   }
-
   :deep(.swiper-pagination-bullet) {
     width: 8px !important;
     height: 8px !important;
