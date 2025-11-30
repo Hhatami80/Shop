@@ -18,10 +18,10 @@ from rest_framework.decorators import api_view, permission_classes
 from account_module.models import User
 from payments.models import Transaction
 from .models import Product, ProductGallery, ProductComment, Cart, CartItem, ProductRating, OrderItem, Order, \
-    CategoryBanner, ProductCategory, Payment, Wallet, WalletTransaction, WalletPayment
+    ProductCategory, Payment, Wallet, WalletTransaction, WalletPayment
 from .serializers import ProductCommentReadSerializer, ProductCommentWriteSerializer, ProductSerializer, ProductGallerySerializer, \
     ProductDescriptionSerializer, ProductPropertySerializer, CartItemSerializer, CartSerializer, \
-    ProductRatingSerializer, OrderSerializer, CategoryBannerSerializer, CategorySerializer, WalletSerializer, \
+    ProductRatingSerializer, OrderSerializer, CategorySerializer, WalletSerializer, \
     TransactionSerializer
 from .services import create_order
 from .filters import OrderFilter, ProductFilter

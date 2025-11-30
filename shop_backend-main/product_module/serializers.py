@@ -16,7 +16,6 @@ from .models import (
     ProductRating,
     OrderItem,
     Order,
-    CategoryBanner,
     Wallet,
     WalletTransaction,
     Payment,
@@ -72,6 +71,28 @@ class CategorySerializer(serializers.ModelSerializer):
             banner = request.FILES.get(f"banner[{i}]")
             text = request.data.get(f"text[{i}]")
         return category
+    
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+        i = 0
+        banner = request.FILES.get(f"banner[{i}]")
+        text = request.FILES.get(f"text[{i}]")
+        while banner != None and text != None:
+            CategoryBannerGallery.objects.create(
+                category=instance,
+                image=banner,
+                text=text,
+            )
+            i += 1
+            banner = request.FILES.get(f"banner[{i}]")
+            text = request.data.get(f"text[{i}]")
+        
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+            
+        instance.save()
+        
+        return instance
 
 class ProductPropertySerializer(serializers.ModelSerializer):
     class Meta:
@@ -378,12 +399,6 @@ class OrderSerializer(serializers.ModelSerializer):
         order.total_price = total
         order.save()
         return order
-
-
-class CategoryBannerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CategoryBanner
-        fields = "__all__"
 
 
 class TransactionSerializer(serializers.ModelSerializer):

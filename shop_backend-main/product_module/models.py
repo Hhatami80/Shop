@@ -365,21 +365,6 @@ class ProductGallery(models.Model):
         verbose_name_plural = "تصاویر گالری"
 
 
-class CategoryBanner(models.Model):
-
-    title = models.CharField(verbose_name="عنوان بنر", max_length=100, default="")
-    image = models.ImageField(
-        verbose_name="بنر دسته بندی", upload_to="images/category_banner"
-    )
-
-    def __str__(self):
-        return f"{self.title} --> {self.title}"
-
-    class Meta:
-        verbose_name = "بنر دسته بندی"
-        verbose_name_plural = "بنر های دسته بندی"
-
-
 # models.py
 class Payment(models.Model):
     class PaymentMethod(models.TextChoices):
