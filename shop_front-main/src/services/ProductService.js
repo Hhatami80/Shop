@@ -14,6 +14,10 @@ export const productService = {
     return api.get('/products/bestsellers')
   },
 
+  getPooshine() {
+    return api.get('/products/pooshine')
+  },
+
   getById(productId) {
     return api.get(`/products/${productId}`)
   },

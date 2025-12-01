@@ -3,8 +3,8 @@
     <div class="modal-card">
       <h3 class="modal-title">بنرهای دسته‌بندی</h3>
 
-      <div v-if="banners.length" class="banner-list">
-        <div v-for="(b, index) in banners" :key="b.id" class="banner-item">
+      <div v-if="catBannerStore.banners?.length" class="banner-list">
+        <div v-for="(b, index) in catBannerStore.banners" :key="b.id" class="banner-item">
           <img :src="b.image" class="banner-preview" />
           <p class="banner-text">{{ b.text || '' }}</p>
 
@@ -38,7 +38,7 @@
       </div>
     </div>
   </div>
-  <add-banner-modal
+  <banner-modal
   v-model="modelValue"
   :banners="[]"
   @update="saveNewBanners"
@@ -48,17 +48,20 @@
 
 <script setup>
 import { useCategoryBannerStore } from '@/stores/useCatBannerStore'
-import AddBannerModal from './BannerModal.vue'
-import { ref } from 'vue'
+import BannerModal from './BannerModal.vue'
+import { ref, computed, onMounted } from 'vue'
+import Swal from 'sweetalert2'
 
 const catBannerStore = useCategoryBannerStore()
 // Props
 const props = defineProps({
-  banners: Array,
   categoryId: Number, // required for API calls
 })
 
-
+onMounted(async () => {
+  console.log(props.categoryId)
+  await catBannerStore.fetchBanners(props.categoryId)
+})
 
 // Local state
 let editingBanner = ref(null)
@@ -114,13 +117,51 @@ const saveEdit = async () => {
   emitRefresh()
 }
 
+// const deleteBanner = async (banner) => {
+//   if (!confirm('حذف بنر؟')) return
+
+//   await catBannerStore.deleteBanner(props.categoryId, banner.id)
+
+//   emitRefresh()
+// }
+
 const deleteBanner = async (banner) => {
-  if (!confirm('حذف بنر؟')) return
+  Swal.fire({
+    title: '<span style="font-weight:bold; font-size:20px;">حذف بنر؟</span>',
+    html: '<p style="font-size:16px;">این بنر پس از حذف دیگر قابل بازیابی نخواهد بود.</p>',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#e63946',
+    cancelButtonColor: '#adb5bd',
+    confirmButtonText: '<i class="fa fa-trash"></i> حذف بنر',
+    cancelButtonText: '<i class="fa fa-times"></i> لغو',
+    buttonsStyling: false,
+    customClass: {
+      popup: 'my-swal-popup',
+      confirmButton: 'my-swal-confirm',
+      cancelButton: 'my-swal-cancel',
+    },
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      await catBannerStore.deleteBanner(props.categoryId, banner.id)
 
-  await catBannerStore.deleteBanner(props.categoryId, banner.id)
+      Swal.fire({
+        title: '<span style="font-weight:bold; font-size:20px;">حذف شد!</span>',
+        html: '<p style="font-size:16px;">بنر موردنظر با موفقیت حذف شد.</p>',
+        icon: 'success',
+        confirmButtonText: 'باشه',
+        buttonsStyling: false,
+        customClass: {
+          popup: 'my-swal-popup',
+          confirmButton: 'my-swal-confirm',
+        },
+      })
 
-  emitRefresh()
+      emitRefresh()
+    }
+  })
 }
+
 
 const emit = defineEmits(['close', 'refresh'])
 const emitRefresh = () => emit('refresh')

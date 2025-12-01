@@ -2,7 +2,7 @@
   <div class="final-product-card">
     <div class="image-wrapper">
       <img :src="product.image || defaultImage" :alt="product.title" class="product-image" />
-      <div v-if="!product.inStock" class="out-of-stock">ناموجود</div>
+      <!-- <div v-if="!product.inStock" class="out-of-stock">ناموجود</div> -->
     </div>
 
     <div class="content">

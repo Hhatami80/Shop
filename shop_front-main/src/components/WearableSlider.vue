@@ -28,7 +28,9 @@
       </SwiperSlide>
     </Swiper>
 
-    <p v-else class="loading">در حال بارگذاری پرفروش‌ها...</p>
+    <p v-else-if="products.length==0" class="loading">محصولی یافت نشد!</p>
+    <p v-else class="loading">در حال بارگذاری محصولات...</p>
+
 
     <ProductModal
       v-if="selectedProduct"

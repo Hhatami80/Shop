@@ -34,7 +34,14 @@ class FilteredProductsView(ListAPIView):
     filterset_class = ProductFilter
     queryset = Product.objects.filter(is_active=True).all()
     
-
+from .serializers import CategoryGallerySerializer
+from .models import CategoryBannerGallery
+class CategoryBannerDetailView(APIView):
+    def get(self, request: Request, category_id: int):
+        gallery = CategoryBannerGallery.objects.filter(category=category_id).all()
+        serializer = CategoryGallerySerializer(gallery, many=True, context={"request": request})
+        return Response(serializer.data)
+    
 
 class ProductDetailView(APIView):
     def get(self, request: Request, product_id):
@@ -96,29 +103,6 @@ class ProductPropertyView(APIView):
         property_serializer = ProductPropertySerializer(product_property, many=True)
         return Response({'specs': property_serializer.data}, status.HTTP_200_OK)
 
-
-# class ToggleFavoriteView(APIView):
-#     permission_classes = [IsAuthenticated]
-#
-#     def post(self, request: Request, pk):
-#         product = Product.objects.filter(pk=pk).first()
-#         if not product:
-#             return Response({'errors': 'محصول پیدا نشد'}, status.HTTP_404_NOT_FOUND)
-#
-#         favorite, created = Favorite.objects.get_or_create(user=request.user, product=product)
-#         if not created:
-#             favorite.delete()
-#             return Response({'data': 'از محصولات مورد علاقه حذف شد'}, status.HTTP_200_OK)
-#
-#         return Response({'data': 'به محصولات مورد علاقه اضافه شد'}, status.HTTP_200_OK)
-#
-#
-# class FavoriteListView(ListAPIView):
-#     permission_classes = [IsAuthenticated]
-#     serializer_class = ProductSerializer
-#
-#     def get_queryset(self):
-#         return Product.objects.filter(favorite_by__user=self.request.user)
 
 
 class SetProductRatingView(APIView):

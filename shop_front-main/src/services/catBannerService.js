@@ -1,8 +1,8 @@
 import api from '@/services/AxiosService'
 
 export default {
-  geteBanners(categoryId) {
-    return api.get(`/category/${categoryId}`)
+  getBanners(categoryId) {
+    return api.get(`/category/${categoryId}/banners`)
   },
 
   updateBanner(categoryId, bannerId, formData) {

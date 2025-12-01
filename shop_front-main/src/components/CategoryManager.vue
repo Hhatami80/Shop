@@ -63,7 +63,6 @@
     </table>
     <banner-view-modal
       v-if="isBannerViewModalOpen"
-      :banners="selectedCategoryBanners"
       :category-id="selectedCategory.id"
       @close="isBannerViewModalOpen = false"
       @refresh="loadCategories"
@@ -82,8 +81,10 @@ import BannerModal from './BannerModal.vue'
 import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css'
 import { toast } from 'vue3-toastify'
+import { useCategoryBannerStore } from '@/stores/useCatBannerStore'
 
 const categoryStore = useCategoryStore()
+const catbannerStore = useCategoryBannerStore()
 
 const form = ref({ title: '' })
 const imageFile = ref(null)

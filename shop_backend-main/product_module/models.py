@@ -121,7 +121,7 @@ class Product(models.Model):
         ProductCategory,
         on_delete=models.CASCADE,
         verbose_name="دسته بندی محصول",
-        related_name="categories",
+        related_name="products",
     )
     final_price = models.PositiveBigIntegerField(
         null=True, blank=True, verbose_name="قیمت نهایی"
