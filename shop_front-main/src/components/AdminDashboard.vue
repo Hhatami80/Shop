@@ -67,46 +67,92 @@ const totalRevenue = computed(() => transactionStore.transactions.length)
 
 <style scoped>
 .dashboard {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
-.title {
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: #444;
-}
-.info-boxes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px; 
-  justify-content: center;
+  --gold: #f9c710;
+  --gold-hover: #e6b800;
+  --gold-light: #fff9e6;
+  --dark: #1a1a1a;
+  --gray-100: #f8f9fa;
+  --gray-600: #6c757d;
+
+  font-family: 'IRANSansX', sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
+  min-height: 100vh;
+  padding: 3rem 2rem;
+  direction: rtl;
 }
 
-.info-boxes > * {
-  flex: 1 1 220px;
-  max-width: 250px;
-  min-width: 180px; 
-  box-sizing: border-box;
+
+.title {
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: var(--dark);
+  text-align: center;
+  margin: 0 0 4rem 0;
+  position: relative;
+  letter-spacing: 1px;
+}
+
+.title::after {
+  content: '';
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 8px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(249, 199, 16, 0.4);
+}
+
+
+.info-boxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+
+@media (min-width: 768px) {
+  .info-boxes {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (min-width: 1200px) {
-  .info-boxes > * {
-    flex: 1 1 calc(25% - 15px); 
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1199px) {
-  .info-boxes > * {
-    flex: 1 1 calc(50% - 10px);
-  }
-}
-
-@media (max-width: 767px) {
-  .info-boxes > * {
-    flex: 1 1 100%;
+  .info-boxes {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2.5rem;
   }
 }
 
 
+.info-boxes::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(249,199,16,0.05), transparent);
+  animation: shimmer 3s infinite;
+  pointer-events: none;
+  border-radius: 28px;
+  opacity: 0.3;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.dashboard:empty::after {
+  content: 'در حال بارگذاری داشبورد...';
+  display: block;
+  text-align: center;
+  font-size: 1.4rem;
+  color: var(--gray-600);
+  padding: 6rem;
+  font-weight: 600;
+}
 </style>
