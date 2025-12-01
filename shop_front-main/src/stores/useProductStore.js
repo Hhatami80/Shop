@@ -10,6 +10,7 @@ export const useProductStore = defineStore('product', {
     products: [],
     new_products: [],
     bestsellers: [],
+    pooshine: [],
     bestsellersImage: [],
     selectedProduct: {},
     description: '',
@@ -106,6 +107,20 @@ export const useProductStore = defineStore('product', {
         toast.error(this.error)
       } finally {
         this.loading = false
+      }
+    },
+    async getPooshine() {
+      this.loading = true
+      this.errors = null
+
+      try {
+        const response = await productService.getPooshine()
+        this.pooshine = response.data
+      } catch (error) {
+        console.log(error)
+        this.error = error.data.message
+      } finally {
+        this.loading = true
       }
     },
     async getBestSellers() {

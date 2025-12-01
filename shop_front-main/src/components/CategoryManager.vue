@@ -77,8 +77,9 @@
     </table>
     <banner-view-modal
       v-if="isBannerViewModalOpen"
-      :banners="selectedCategoryBanners"
+      :category-id="selectedCategory.id"
       @close="isBannerViewModalOpen = false"
+      @refresh="loadCategories"
     />
     <edit-modal v-model="isEditModalOpen" :category="categoryToEdit" @save="saveEditedCategory" />
     <banner-modal v-model="isBannerModalOpen" :banners="banners" @update="updateBanners" />
@@ -94,8 +95,10 @@ import BannerModal from './BannerModal.vue'
 import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css'
 import { toast } from 'vue3-toastify'
+import { useCategoryBannerStore } from '@/stores/useCatBannerStore'
 
 const categoryStore = useCategoryStore()
+const catbannerStore = useCategoryBannerStore()
 
 const form = ref({ title: '' })
 const imageFile = ref(null)
@@ -106,10 +109,11 @@ const isBannerModalOpen = ref(false)
 
 const loading = ref(false)
 const error = ref(null)
-
+const selectedCategory = ref({})
 const selectedCategoryBanners = ref([])
 
 const openBannerModal = (category) => {
+  selectedCategory.value = category
   selectedCategoryBanners.value = category.banner_images || []
   isBannerViewModalOpen.value = true
 }
@@ -122,10 +126,11 @@ function updateBanners(newList) {
   banners.value = newList
 }
 
+
 const loadCategories = async () => {
   try {
     loading.value = true
-    await categoryStore.getAllCategories()
+    await categoryStore.getAllCategories();
   } catch (err) {
     error.value = 'خطا در دریافت دسته‌بندی‌ها'
   } finally {

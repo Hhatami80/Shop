@@ -21,7 +21,13 @@ class BannerView(APIView):
         banner_serializer = BannerImageSerializer(banner, many=True, context={'request': request})
         return Response({'banner': banner_serializer.data}, status.HTTP_200_OK)
 
-
+class PooshineProductsView(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request: Request):
+        pooshine = Product.objects.filter(category__title="پوشینه").all()
+        serializer = ProductSerializer(pooshine, many=True, context={'request': request})
+        return Response(serializer.data)
+    
 class ProductView(APIView):
     def get(self, request: Request):
         try:

@@ -4,9 +4,9 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework import status, viewsets
-from product_module.models import Product, ProductProperty, ProductCategory, Brand, ProductComment, CategoryBanner, Order
+from product_module.models import Product, ProductProperty, ProductCategory, Brand, ProductComment, Order
 from product_module.serializers import ProductCommentReadSerializer, ProductSerializer, ProductPropertySerializer, CategorySerializer, \
-    BrandSerializer, CategoryBannerSerializer, OrderSerializer
+    BrandSerializer, OrderSerializer
 from site_module.serializers import BannerImageSerializer, FooterLinkSerializer, TrustSymbolSerializer, \
     HeaderSerializer, SiteSettingSerializer, SiteLogoSerializer, SiteAboutUsSerializer
 from site_module.models import BannerImages, FooterLinkBox, TrustSymbols, FooterLink, Header, SiteSetting
@@ -194,12 +194,77 @@ class UpdateCategoryView(APIView):
 
     def put(self, request: Request, category_id):
         category = self.get_object(category_id)
-        category_serializer = CategorySerializer(category, data=request.data, partial=True)
+        category_serializer = CategorySerializer(category, data=request.data, partial=True, context={'request': request})
         if category_serializer.is_valid():
             category_serializer.save()
             return Response({'data': 'اطلاعات ویرایش شد'}, status.HTTP_201_CREATED)
         return Response({'errors': category_serializer.errors}, status.HTTP_400_BAD_REQUEST)
 
+from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView, CreateAPIView
+from product_module.serializers import CategoryGallerySerializer
+from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import NotFound
+from product_module.models import CategoryBannerGallery
+
+class UpdateCategoryBanner(RetrieveUpdateAPIView):
+    serializer_class = CategoryGallerySerializer
+    permission_classes = [IsAdmin]
+    lookup_url_kwarg = 'banner_id'
+    
+    
+    
+    def get_queryset(self):
+        cat_id = self.kwargs.get('category_id')
+        category = get_object_or_404(ProductCategory, pk=cat_id)
+        return CategoryBannerGallery.objects.filter(category=category)
+        
+    def get_object(self):
+        
+        queryset = self.get_queryset()
+        banner_id = self.kwargs.get("banner_id")
+
+        try:
+            return queryset.get(id=banner_id)
+        except CategoryBannerGallery.DoesNotExist:
+            raise NotFound("Banner not found for this category.")
+
+class DeleteCategoryBanner(RetrieveDestroyAPIView):
+    serializer_class = CategoryGallerySerializer
+    permission_classes = [IsAdmin]
+    
+    lookup_url_kwarg = 'banner_id'
+    
+    def get_queryset(self):
+        cat_id = self.kwargs.get('category_id')
+        category = get_object_or_404(ProductCategory, pk=cat_id)
+        return CategoryBannerGallery.objects.filter(category=category)
+        
+    def get_object(self):
+        
+        queryset = self.get_queryset()
+        banner_id = self.kwargs.get("banner_id")
+
+        try:
+            return queryset.get(id=banner_id)
+        except CategoryBanner.DoesNotExist:
+            raise NotFound("Banner not found for this category.")
+
+class AddCategoryBanner(CreateAPIView):
+    serializer_class = CategoryGallerySerializer
+    permission_classes = [IsAdmin]
+
+    def create(self, request, *args, **kwargs):
+        category_id = kwargs.get('category_id')
+        category = get_object_or_404(ProductCategory, pk=category_id)
+
+        data = request.data.copy()
+        data['category'] = category.id  # inject category FK
+        
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=201)
 
 # endregion
 
@@ -652,39 +717,6 @@ class UpdateDeleteArticleView(APIView):
 
 
 # endregion
-
-# region CategoryBanner
-
-class CategoryBannerView(APIView):
-    def post(self, request: Request):
-        banner_serializer = CategoryBannerSerializer(data=request.data)
-        if banner_serializer.is_valid():
-            banner_serializer.save()
-            return Response({'data': 'بنر دسته بندی با موفقیت اضافه شد'}, status.HTTP_200_OK)
-        return Response({'errors': banner_serializer.data}, status.HTTP_400_BAD_REQUEST)
-
-    def get(self, request: Request, banner_id):
-        cat_banner = CategoryBanner.objects.get(pk=banner_id)
-        banner_serializer = CategoryBannerSerializer(cat_banner, context={'request': request})
-        return Response({'category_banner': banner_serializer.data}, status.HTTP_200_OK)
-
-    def put(self, request: Request, banner_id):
-        cat_banner = CategoryBanner.objects.get(pk=banner_id)
-        banner_serializer = CategoryBannerSerializer(cat_banner, data=request.data, partial=True)
-        if banner_serializer.is_valid():
-            banner_serializer.save()
-            return Response({'data': 'بنر دسته بندی با موفقیت آپدیت شد'}, status.HTTP_200_OK)
-
-        return Response({'errors': banner_serializer.errors}, status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request: Request, banner_id):
-        cat_banner = CategoryBanner.objects.get(pk=banner_id)
-        cat_banner.delete()
-        return Response({'data': 'بنر دسته بندی با موفقیت حذف شد'}, status.HTTP_200_OK)
-
-
-# endregion
-
 
 # ///////////////////////////////////
 class OrderAdminViewSet(viewsets.ModelViewSet):

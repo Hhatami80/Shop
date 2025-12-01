@@ -11,6 +11,7 @@ urlpatterns = [
     path('footer', views.SiteSettingView.as_view(), name='footer'),
     path('aboutus', views.AboutUsMainView.as_view(), name='about-us-main'),
     path('products/bestsellers', views.BestSellerView.as_view(), name='best-seller'),
+    path('products/pooshine', views.PooshineProductsView.as_view(), name='pooshine-products'),
     # path('products/special-products', views.SpecialProductsView.as_view(), name='special-products'),
     path('products/search/', views.ProductSearchView.as_view(), name='product-search'),
 ]

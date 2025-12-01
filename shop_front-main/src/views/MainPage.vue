@@ -21,7 +21,7 @@
     </section>
 
     <section class="section">
-    <WearableSlider title="پوشینه ها" :products="productStore.bestsellers" />
+    <WearableSlider title="پوشینه ها" :products="productStore.pooshine" />
     </section>
 
     <section class="section">
@@ -64,6 +64,7 @@ onMounted(async () => {
     await Promise.all([
       productStore.getAllProducts(),
       productStore.getBestSellers(),
+      productStore.getPooshine(),
       FeatureSectionStore.getFeatureSection(),
       CategoryStore.getAllCategories(),
       AboutUsStore.fetchAbout(),

@@ -19,6 +19,9 @@ urlpatterns = [
     path('category-add', views.AddCategoryView.as_view(), name='add-category'),
     path('category-delete/<int:category_id>', views.DeleteCategoryView.as_view(), name='delete-category'),
     path('category-edit/<int:category_id>', views.UpdateCategoryView.as_view(), name='update-category'),
+    path('category-edit/<int:category_id>/banners', views.AddCategoryBanner.as_view(), name='add-cat-banner'),
+    path('category-edit/<int:category_id>/banners/<int:banner_id>', views.UpdateCategoryBanner.as_view(), name='update-cat-banner'),
+    path('category-delete/<int:category_id>/banners/<int:banner_id>', views.DeleteCategoryBanner.as_view(), name='delete-cat-banner'),
     # Brand CRUD Api
     path('brands-add', views.AddBrandView.as_view(), name='add-brand'),
     path('brands-delete/<int:brand_id>', views.DeleteBrandView.as_view(), name='delete-brand'),
