@@ -25,10 +25,10 @@
 
       <button
         class="buy-btn"
-        :disabled="!product.inStock"
+        :disabled="product.is_active === false"
         @click.stop="$emit('openModal', product)"
       >
-        {{ product.inStock ? 'بررسی و خرید' : 'ناموجود' }}
+        {{ product.is_active === false ? 'ناموجود' : 'بررسی و خرید' }}
       </button>
     </div>
   </div>

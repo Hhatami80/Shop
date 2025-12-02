@@ -2,6 +2,7 @@
   <div class="category-management">
     <h2 class="page-title">مدیریت دسته‌بندی‌ها</h2>
 
+    
     <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="modern-form-card">
       <input v-model="form.title" placeholder="عنوان دسته" required class="form-input" />
       <div class="file-input-wrapper">
@@ -14,21 +15,10 @@
           class="hidden-file-input"
         />
         <label for="file-upload" class="custom-file-label">
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-          >
-            <path
-              d="M21 15V19C21 20.105 20.105 21 19 21H5C3.895 21 3 20.105 3 19V15M17 8L12 3L7 8M12 3V15"
-            />
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21 15V19C21 20.105 20.105 21 19 21H5C3.895 21 3 20.105 3 19V15M17 8L12 3L7 8M12 3V15"/>
           </svg>
-          <span class="label-text">
-            {{ imageFile ? imageFile.name : 'انتخاب تصویر دسته' }}
-          </span>
+          <span class="label-text">{{ imageFile ? imageFile.name : 'انتخاب تصویر دسته' }}</span>
         </label>
       </div>
       <button type="button" class="submit-button primary-btn" @click="isBannerModalOpen = true">
@@ -41,11 +31,13 @@
 
     <hr class="divider" />
 
+    
     <div v-if="loading" class="loading-state">
       <i class="fas fa-spinner fa-spin"></i> در حال بارگذاری...
     </div>
     <div v-else-if="error" class="error-state">{{ error }}</div>
 
+    
     <table v-else class="data-table">
       <thead>
         <tr>
@@ -75,62 +67,57 @@
         </tr>
       </tbody>
     </table>
+
+    
     <banner-view-modal
-      v-if="isBannerViewModalOpen"
-      :category-id="selectedCategory.id"
-      @close="isBannerViewModalOpen = false"
-      @refresh="loadCategories"
+      v-model="isBannerViewModalOpen"
+      :banners="selectedCategoryBanners"
     />
-    <edit-modal v-model="isEditModalOpen" :category="categoryToEdit" @save="saveEditedCategory" />
+
+    
     <banner-modal v-model="isBannerModalOpen" :banners="banners" @update="updateBanners" />
+
+    
+    <edit-modal v-model="isEditModalOpen" :category="categoryToEdit" @save="saveEditedCategory" />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useCategoryStore } from '@/stores/useCategoryStore'
+import { useCategoryBannerStore } from '@/stores/useCatBannerStore'
 import BannerViewModal from './BannerViewModal.vue'
-import EditModal from '@/components/EditModal.vue'
 import BannerModal from './BannerModal.vue'
+import EditModal from '@/components/EditModal.vue'
 import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css'
 import { toast } from 'vue3-toastify'
-import { useCategoryBannerStore } from '@/stores/useCatBannerStore'
 
 const categoryStore = useCategoryStore()
-const catbannerStore = useCategoryBannerStore()
+const catBannerStore = useCategoryBannerStore()
 
 const form = ref({ title: '' })
 const imageFile = ref(null)
 const fileInput = ref(null)
-const isBannerViewModalOpen = ref(false)
-const banners = ref([])
-const isBannerModalOpen = ref(false)
 
 const loading = ref(false)
 const error = ref(null)
-const selectedCategory = ref({})
-const selectedCategoryBanners = ref([])
 
-const openBannerModal = (category) => {
-  selectedCategory.value = category
-  selectedCategoryBanners.value = category.banner_images || []
-  isBannerViewModalOpen.value = true
-}
+const banners = ref([])  
+const isBannerModalOpen = ref(false)
 
-onMounted(async () => {
-  await loadCategories()
-})
+const isBannerViewModalOpen = ref(false)
+const selectedCategory = ref({ banner_images: [] })  
+const selectedCategoryBanners = ref([]) 
 
-function updateBanners(newList) {
-  banners.value = newList
-}
+const isEditModalOpen = ref(false)
+const categoryToEdit = ref(null)
 
 
 const loadCategories = async () => {
   try {
     loading.value = true
-    await categoryStore.getAllCategories();
+    await categoryStore.getAllCategories()
   } catch (err) {
     error.value = 'خطا در دریافت دسته‌بندی‌ها'
   } finally {
@@ -138,9 +125,23 @@ const loadCategories = async () => {
   }
 }
 
+
+const openBannerModal = (category) => {
+  selectedCategory.value = category || { banner_images: [] }
+  selectedCategoryBanners.value = selectedCategory.value.banner_images || []
+  isBannerViewModalOpen.value = true
+}
+
+
+function updateBanners(newList) {
+  banners.value = newList
+}
+
+
 const handleFileUpload = (e) => {
   imageFile.value = e.target.files[0]
 }
+
 
 const handleSubmit = async () => {
   const formData = new FormData()
@@ -148,12 +149,8 @@ const handleSubmit = async () => {
   if (imageFile.value) formData.append('image', imageFile.value)
 
   banners.value.forEach((banner, index) => {
-    if (banner.file) {
-      formData.append(`banner[${index}]`, banner.file)
-    }
-    if (banner.text) {
-      formData.append(`text[${index}]`, banner.text)
-    }
+    if (banner.file) formData.append(`banner[${index}]`, banner.file)
+    if (banner.text) formData.append(`text[${index}]`, banner.text)
   })
 
   const isSuccess = await categoryStore.addCategory(formData)
@@ -171,16 +168,17 @@ const resetForm = () => {
   if (fileInput.value) fileInput.value.value = null
 }
 
+
 const openDelete = (id) => {
   Swal.fire({
-    title: '<span style="font-weight:bold; font-size:20px;">آیا مطمئنی؟</span>',
+    title: '<span style="font-weight:bold; font-size:20px;">آیا مطمئن هستید؟</span>',
     html: '<p style="font-size:16px;">با حذف این دسته دیگر قابل بازیابی نیست!</p>',
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#007bff',
     cancelButtonColor: '#6c757d',
     confirmButtonText: '<i class="fa fa-trash"></i> حذف دسته',
-    cancelButtonText: '<i class="fa fa-times"></i> لغو',
+    cancelButtonText: '<i class="fa fa-times"></i>',
     buttonsStyling: false,
     customClass: {
       popup: 'my-swal-popup',
@@ -206,8 +204,6 @@ const openDelete = (id) => {
   })
 }
 
-const isEditModalOpen = ref(false)
-const categoryToEdit = ref(null)
 
 const editCategory = (cat) => {
   categoryToEdit.value = { ...cat }
@@ -218,7 +214,13 @@ const saveEditedCategory = async ({ id, formData }) => {
   await categoryStore.updateCategory(id, formData)
   await loadCategories()
 }
+
+
+onMounted(async () => {
+  await loadCategories()
+})
 </script>
+
 
 <style scoped>
 .category-management {

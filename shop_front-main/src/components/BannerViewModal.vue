@@ -1,212 +1,75 @@
 <template>
-  <!-- MAIN MODAL -->
   <Teleport to="body">
     <Transition name="modal">
-      <div class="modal-backdrop" @click="$emit('close')">
+      <div v-if="modelValue" class="modal-backdrop" @click="$emit('update:modelValue', false)">
         <div class="modal-panel" @click.stop>
           <div class="modal-header">
             <h3>بنرهای دسته‌بندی</h3>
-            <button class="close-btn" @click="$emit('close')" aria-label="بستن">
+            <button class="close-btn" @click="$emit('update:modelValue', false)" aria-label="بستن">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M18 6L6 18M6 6L18 18"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                  stroke-linecap="round"
-                />
+                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
               </svg>
             </button>
           </div>
 
-          <!-- LIST -->
-          <div v-if="catBannerStore.banners?.length" class="banner-list">
-            <div
-              v-for="b in catBannerStore.banners"
-              :key="b.id"
-              class="banner-item"
-            >
-              <img :src="b.image" class="banner-preview" />
-              <p class="banner-text">{{ b.text || '' }}</p>
-
-              <div class="banner-actions">
-                <button class="action-btn btn-edit" @click="startEdit(b)">
-                  ویرایش
-                </button>
-                <button class="action-btn btn-delete" @click="deleteBanner(b)">
-                  حذف
-                </button>
+          <div class="modal-body">
+            <div v-if="banners.length" class="banners-grid">
+              <div v-for="(b, index) in banners" :key="index" class="banner-card">
+                <div class="image-wrapper">
+                  <img :src="b.image" :alt="b.text || 'بنر ' + (index + 1)" class="banner-image" />
+                </div>
+                <p v-if="b.text" class="banner-caption">{{ b.text }}</p>
+                <small v-else class="no-caption">بدون متن</small>
               </div>
             </div>
-          </div>
 
-          <p v-else>هیچ بنری اضافه نشده است.</p>
-
-          <!-- EDIT FORM -->
-          <div v-if="editingBanner" class="edit-form">
-            <h4>ویرایش بنر</h4>
-
-            <input v-model="editForm.text" placeholder="متن بنر" class="form-input" />
-            <input type="file" @change="handleFile" class="form-input" />
-
-            <div class="edit-actions">
-              <button class="action-btn btn-save" @click="saveEdit">ذخیره</button>
-              <button class="action-btn btn-cancel" @click="cancelEdit">لغو</button>
+            <div v-else class="empty-state">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <circle cx="8" cy="8" r="2" />
+                <path d="M21 15L16 10L5 21" />
+              </svg>
+              <p>هیچ بنری برای این دسته‌بندی اضافه نشده است.</p>
             </div>
           </div>
 
-          <!-- FOOTER -->
-          <div class="modal-actions">
-            <button class="action-btn btn-save" @click="openAddModal">
-              افزودن بنر جدید
-            </button>
-            <button class="btn-cancel" @click="$emit('close')">بستن</button>
+          <div class="modal-footer">
+            <button class="btn-close" @click="$emit('update:modelValue', false)">بستن</button>
           </div>
         </div>
       </div>
     </Transition>
   </Teleport>
-
-  <!-- ADD BANNER MODAL -->
-  <BannerModal
-    v-model="modelValue"
-    :banners="[]"
-    @update="saveNewBanners"
-    @refresh="refreshBanners"
-  />
 </template>
 
-
 <script setup>
-import { ref, onMounted } from 'vue'
-import Swal from 'sweetalert2'
-import { useCategoryBannerStore } from '@/stores/useCatBannerStore'
-import BannerModal from './BannerModal.vue'
+import { defineProps, defineEmits } from 'vue'
 
 const props = defineProps({
-  categoryId: Number
+  modelValue: Boolean,
+  banners: {
+    type: Array,
+    default: () => []
+  }
 })
 
-const emit = defineEmits(['close', 'refresh'])
-
-const catBannerStore = useCategoryBannerStore()
-
-let editingBanner = ref(null)
-let editForm = ref({ text: '', image: null })
-let modelValue = ref(false)
-
-onMounted(async () => {
-  await catBannerStore.fetchBanners(props.categoryId)
-})
-
-const emitRefresh = () => emit('refresh')
-
-const openAddModal = () => {
-  modelValue.value = true
-}
-
-async function refreshBanners() {
-  await catBannerStore.fetchBanners(props.categoryId)
-}
-
-const saveNewBanners = async (bannerList) => {
-  for (const banner of bannerList) {
-    const form = new FormData()
-    form.append('text', banner.text)
-    if (banner.file) form.append('image', banner.file)
-
-    await catBannerStore.addBanner(props.categoryId, form)
-  }
-
-  emitRefresh()
-}
-
-const startEdit = (banner) => {
-  editingBanner.value = banner
-  editForm.value = {
-    text: banner.text,
-    image: null
-  }
-}
-
-const cancelEdit = () => {
-  editingBanner.value = null
-  editForm.value = { text: '', image: null }
-}
-
-const handleFile = (e) => {
-  editForm.value.image = e.target.files[0]
-}
-
-const saveEdit = async () => {
-  const form = new FormData()
-  form.append('text', editForm.value.text)
-  if (editForm.value.image) form.append('image', editForm.value.image)
-
-  await catBannerStore.updateBanner(props.categoryId, editingBanner.value.id, form)
-  emitRefresh()
-}
-
-const deleteBanner = async (banner) => {
-  Swal.fire({
-    title: 'حذف بنر؟',
-    html: '<p>این بنر پس از حذف قابل بازگشت نیست.</p>',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#e63946',
-    cancelButtonColor: '#adb5bd',
-    confirmButtonText: 'حذف',
-    cancelButtonText: 'لغو'
-  }).then(async (res) => {
-    if (res.isConfirmed) {
-      await catBannerStore.deleteBanner(props.categoryId, banner.id)
-
-      Swal.fire({
-        title: 'حذف شد!',
-        icon: 'success',
-        confirmButtonText: 'باشه'
-      })
-
-      emitRefresh()
-    }
-  })
-}
+const emit = defineEmits(['update:modelValue'])
 </script>
 
-
 <style scoped>
-.form-input {
-  width: 60%;
-  padding: 10px 0px;
-  border: 1px solid #dcdcdc;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  transition: border-color 0.3s;
-  margin: 0 auto 8px;
-  text-indent: 2px;
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.32s ease;
 }
-
-.form-input:focus {
-  border-color: #007bff;
-  outline: none;
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+  transform: scale(0.92);
 }
-
-.action-btn {
-  border: 1px solid transparent;
-  border-radius: 8px;
-  padding: 7px 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    0.3s,
-    transform 0.1s;
-  margin: 0 5px;
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.95rem;
-}
-
-.action-btn i {
-  margin-left: 5px;
+.modal-enter-to,
+.modal-leave-from {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .modal-backdrop {
@@ -227,8 +90,8 @@ const deleteBanner = async (banner) => {
   width: 100%;
   max-width: 780px;
   max-height: 92vh;
+  overflow-y: auto;
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.22);
-  overflow: hidden;
   direction: rtl;
   font-family: 'IRANSansX', sans-serif;
   display: flex;
@@ -242,7 +105,6 @@ const deleteBanner = async (banner) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-shrink: 0;
 }
 
 .modal-header h3 {
@@ -267,7 +129,6 @@ const deleteBanner = async (banner) => {
 
 .modal-body {
   flex: 1;
-  overflow-y: auto;
   padding: 2rem 1.8rem;
   background: #fdfdfd;
 }
@@ -359,7 +220,6 @@ const deleteBanner = async (banner) => {
   border-top: 1px solid #eee;
   display: flex;
   justify-content: center;
-  flex-shrink: 0;
 }
 
 .btn-close {
@@ -379,41 +239,5 @@ const deleteBanner = async (banner) => {
   background: #e6b800;
   transform: translateY(-3px);
   box-shadow: 0 10px 25px rgba(249, 199, 16, 0.5);
-}
-
-.btn-save {
-  padding: 10px 20px;
-  background-color: #28a745;
-  color: #fff;
-  border-radius: 8px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.btn-save:hover {
-  background-color: #218838;
-}
-
-.btn-edit {
-  background-color: var(--warning-color);
-  color: white;
-}
-
-.btn-edit:hover {
-  background-color: #e68900;
-  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.4);
-  transform: translateY(-1px);
-}
-.btn-delete {
-  background-color: var(--danger-color);
-  color: white;
-}
-
-.btn-delete:hover {
-  background-color: #c82333;
-  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
-  transform: translateY(-1px);
 }
 </style>
