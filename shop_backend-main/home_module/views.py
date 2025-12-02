@@ -24,7 +24,7 @@ class BannerView(APIView):
 class PooshineProductsView(APIView):
     permission_classes = [AllowAny]
     def get(self, request: Request):
-        pooshine = Product.objects.filter(category__title="پوشینه").all()
+        pooshine = Product.objects.filter(category__title="پوشینه", is_active=True).all()
         serializer = ProductSerializer(pooshine, many=True, context={'request': request})
         return Response(serializer.data)
     
@@ -36,11 +36,11 @@ class ProductView(APIView):
                               .prefetch_related('images')
                               .filter(is_active=True, is_done=False))
 
-            available_products = products_query.all()
+            available_products = products_query.filter(~Q(category__title="پوشینه")).all()
             product_serializer = ProductSerializer(available_products, many=True, context={'request': request})
             discounted_products = available_products
             discounted_products_serializer = ProductSerializer(discounted_products, many=True, context={'request': request})
-            new_products = products_query.order_by('-created_date').all()
+            new_products = products_query.filter(~Q(category__title="پوشینه")).order_by('-created_date').all()
             new_products_serializer = ProductSerializer(new_products, many=True, context={'request': request})
             pooshineh_products = products_query.filter(category__title__contains="پوشینه").all()
             pooshineh_serializer = ProductSerializer(pooshineh_products, many=True, context={'request': request})
@@ -163,7 +163,7 @@ class AboutUsMainView(APIView):
 
 class BestSellerView(APIView):
     def get(self, request: Request):
-        product = Product.objects.filter(is_active=True, is_done=False).order_by('-created_date').all()
+        product = Product.objects.filter(is_active=True, is_done=False).filter(~Q(category__title="پوشینه")).order_by('-created_date').all()
         serializer = BestSellerSerializer(product, many=True, context={'request': request})
         return Response({'bestsellers': serializer.data})
 

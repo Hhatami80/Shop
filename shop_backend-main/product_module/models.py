@@ -157,11 +157,8 @@ class Product(models.Model):
 
         super().save(*args, **kwargs)
 
-    def delete(
-        self, using: Any = ..., keep_parents: bool = ...
-    ) -> tuple[int, dict[str, int]]:
-        return super().delete(using, keep_parents)
-
+    def delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
     def __str__(self):
         return self.title
 

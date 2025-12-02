@@ -66,15 +66,15 @@
           <div class="add-review">
             <h3>ثبت نظر جدید</h3>
             <div class="review-stars">
-              <span
+              <!-- <span
                 v-for="i in 5"
                 :key="i"
                 :class="{ filled: i <= hoverRating || i <= userRating }"
                 @mouseover="hoverRating = i"
                 @mouseleave="hoverRating = 0"
-                @click="userRating = i"
+                @click="userRating = 5"
                 >★</span
-              >
+              > -->
             </div>
             <textarea v-model="newComment" placeholder="نظر خود را وارد کنید..."></textarea>
             <button @click="submitComment">ارسال نظر</button>
@@ -184,7 +184,7 @@ async function addToCart() {
 }
 
 async function submitComment() {
-  if (!newComment.value || userRating.value === 0 || !props.product?.id) return
+  if (!newComment.value || !props.product?.id) return
   try {
     await commentStore.submitComment(props.product.id, newComment.value, '')
     newComment.value = ''
@@ -321,8 +321,8 @@ html {
   height: auto;
   max-height: 320px;
   border-radius: 12px;
-  border: 1px solid #ddd;
-  object-fit: cover;
+  /* border: 1px solid #ddd; */
+  object-fit: contain;
 }
 
 .product-details h2 {

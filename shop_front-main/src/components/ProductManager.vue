@@ -340,6 +340,7 @@ import { useCategoryStore } from '@/stores/useCategoryStore'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 import { useAdminStore } from '@/stores/useAdminStore'
+import Swal from 'sweetalert2'
 
 const productStore = useProductStore()
 const adminStore = useAdminStore()
@@ -509,13 +510,43 @@ async function submitForm() {
 }
 
 async function removeProduct(productId, index) {
-  if (!confirm('آیا از حذف این محصول مطمئن هستید؟')) return
-  try {
-    await adminStore.deleteProduct(productId).data
-    toast.success("محصول با موفقیت حذف شد")
-  } catch {
-    toast.error(adminStore.error || 'خطا در حذف محصول')
-  }
+
+  Swal.fire({
+    title: '<span style="font-weight:bold; font-size:20px;">آیا مطمئنی؟</span>',
+    html: '<p style="font-size:16px;">با حذف،این محصول دیگر قابل بازیابی نیست!</p>',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#007bff',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: '<i class="fa fa-trash"></i> حذف محصول',
+    cancelButtonText: '<i class="fa fa-times"></i> لغو',
+    buttonsStyling: false,
+    customClass: {
+      popup: 'my-swal-popup',
+      confirmButton: 'my-swal-confirm-btn',
+      cancelButton: 'my-swal-cancel-btn',
+    },
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        await adminStore.deleteProduct(productId).data
+        toast.success("محصول با موفقیت حذف شد")
+        Swal.fire({
+          title: '<span style="font-weight:bold; font-size:20px;">حذف شد!</span>',
+          html: '<p style="font-size:16px;">محصول موردنظر با موفقیت حذف شد.</p>',
+          icon: 'success',
+          confirmButtonText: 'باشه',
+          buttonsStyling: false,
+          customClass: {
+            popup: 'my-swal-popup',
+            confirmButton: 'my-swal-confirm-btn-success',
+          },
+        })
+      } catch (error) {
+        toast.error(adminStore.error || 'خطا در حذف محصول')
+      }
+    }
+  })
 }
 
 function editProduct(product, index) {

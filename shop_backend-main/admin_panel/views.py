@@ -1,27 +1,30 @@
-from django.shortcuts import render
+from django.http import Http404
+from django.core.exceptions import ObjectDoesNotExist
+
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework import status, viewsets
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.decorators import action
+from rest_framework.permissions import BasePermission
+from rest_framework.generics import get_object_or_404
+
+
+from django_filters.rest_framework import DjangoFilterBackend
+
 from product_module.models import Product, ProductProperty, ProductCategory, Brand, ProductComment, Order
 from product_module.serializers import ProductCommentReadSerializer, ProductSerializer, ProductPropertySerializer, CategorySerializer, \
     BrandSerializer, OrderSerializer
 from site_module.serializers import BannerImageSerializer, FooterLinkSerializer, TrustSymbolSerializer, \
     HeaderSerializer, SiteSettingSerializer, SiteLogoSerializer, SiteAboutUsSerializer
 from site_module.models import BannerImages, FooterLinkBox, TrustSymbols, FooterLink, Header, SiteSetting
-from rest_framework.permissions import IsAuthenticated
-from django.db.models import Q
-import math
-from rest_framework.parsers import MultiPartParser, FormParser
 from account_module.models import User
-from account_module.serializers import UserSerializer, UserAdminSerializer
+from account_module.serializers import UserAdminSerializer
 from article_module.models import Article
 from article_module.serializers import ArticleSerializer
-from rest_framework.decorators import action
-from rest_framework.permissions import BasePermission
-from django.core.exceptions import ObjectDoesNotExist
-from django_filters.rest_framework import DjangoFilterBackend
 from .pagination import AdminCommentPaginator
 from .filters import AdminCommentFilter
 # permissions
@@ -57,20 +60,16 @@ class AddProductView(APIView):
         return Response({'errors': product_serializer.errors}, status.HTTP_400_BAD_REQUEST)
 
 
+
+
 class DeleteProductView(APIView):
     permission_classes = [IsAuthenticated, IsAdmin]
 
-    def get_object(self, category_id: int):
-        try:
-            product = Product.objects.get(pk=category_id)
-            return product
-        except ProductCategory.DoesNotExist:
-            return Response({'errors': 'محصولی وجود ندارد'}, status.HTTP_404_NOT_FOUND)
-
-    def delete(self, request: Request, product_id):
-        product = self.get_object(product_id)
+    def delete(self, request, *args, **kwargs):
+        product_id = kwargs.get('product_id', None)
+        product = get_object_or_404(Product, pk=product_id)
         product.delete()
-        return Response({'data': 'محصول با موفقیت حذف شد'}, status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UpdateProductView(APIView):
