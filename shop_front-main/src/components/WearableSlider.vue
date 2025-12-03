@@ -2,7 +2,10 @@
   <div class="product-slider-container">
     <h2 class="section-title">پوشینه ها</h2>
 
-    <div v-if="products.length > 0 && products.length <= 2" class="static-grid">
+    <!-- Static Grid برای 1 یا 2 محصول -->
+
+    <!-- Desktop Grid -->
+    <div v-if="isDesktop && products.length > 0 && products.length < 4" class="static-grid">
       <WearableCard
         v-for="product in products"
         :key="product.id"
@@ -11,13 +14,14 @@
       />
     </div>
 
+    <!-- Swiper -->
     <Swiper
-      v-else-if="products?.length"
+      v-else-if="products.length > 0"
       :modules="[Autoplay, Pagination]"
       :slides-per-view="1"
-      :space-between="30"
+      :space-between="20"
       :centered-slides="true"
-      :loop="products.length > 2"
+      :loop="products.length > 1"
       :autoplay="{ delay: 4500, disableOnInteraction: false }"
       :pagination="{ clickable: true, dynamicBullets: true }"
       :breakpoints="swiperBreakpoints"
@@ -27,11 +31,6 @@
         <WearableCard :product="product" @openModal="openModal" />
       </SwiperSlide>
     </Swiper>
-
-    <p v-else-if="products.length==0" class="loading">محصولی یافت نشد!</p>
-    <p v-else class="loading">در حال بارگذاری محصولات...</p>
-
-
     <ProductModal
       v-if="selectedProduct"
       :show="!!selectedProduct"
@@ -42,46 +41,53 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted, defineProps } from 'vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Autoplay, Pagination } from 'swiper/modules'
-import 'swiper/css'
-import 'swiper/css/pagination'
-import 'swiper/css/autoplay'
 
 import WearableCard from './WearableCard.vue'
 import ProductModal from './ProductModal.vue'
 
-defineProps({
+const props = defineProps({
   products: { type: Array, default: () => [] },
 })
 
 const selectedProduct = ref(null)
 const openModal = (product) => (selectedProduct.value = product)
 
-const swiperBreakpoints = {
-  320: { slidesPerView: 1, spaceBetween: 20, centeredSlides: true },
+// تشخیص دسکتاپ
+const windowWidth = ref(window.innerWidth)
+const handleResize = () => (windowWidth.value = window.innerWidth)
+onMounted(() => window.addEventListener('resize', handleResize))
+onUnmounted(() => window.removeEventListener('resize', handleResize))
+const isDesktop = computed(() => windowWidth.value >= 1024)
 
-  768: { slidesPerView: 1, spaceBetween: 30, centeredSlides: true },
-
-  1024: { slidesPerView: 2, spaceBetween: 32, centeredSlides: false },
-
-  1200: { slidesPerView: 2, spaceBetween: 40, centeredSlides: false },
-
+// ساخت پویا breakpoints با تعداد محصولات
+const swiperBreakpoints = computed(() => ({
+  320: { slidesPerView: 1, spaceBetween: 15, centeredSlides: true },
+  480: { slidesPerView: 1, spaceBetween: 20, centeredSlides: true },
+  768: { slidesPerView: 1, spaceBetween: 25, centeredSlides: true },
+  1024: {
+    slidesPerView: Math.min(props.products.length, 2),
+    spaceBetween: 30,
+    centeredSlides: false,
+  },
+  1280: {
+    slidesPerView: Math.min(props.products.length, 3),
+    spaceBetween: 32,
+    centeredSlides: false,
+  },
   1440: {
-    slidesPerView: 4,
+    slidesPerView: Math.min(props.products.length, 4),
     spaceBetween: 40,
     centeredSlides: false,
-    loop: false,
   },
-
   1780: {
-    slidesPerView: 4,
+    slidesPerView: Math.min(props.products.length, 4),
     spaceBetween: 50,
     centeredSlides: false,
-    loop: false,
   },
-}
+}))
 </script>
 
 <style scoped>
@@ -101,6 +107,7 @@ const swiperBreakpoints = {
   position: relative;
 }
 
+/* Grid برای محصولات کمتر از 4 روی دسکتاپ */
 .static-grid {
   display: flex;
   justify-content: center;
@@ -110,11 +117,11 @@ const swiperBreakpoints = {
   padding: 20px 0;
 }
 
+/* Swiper */
 .tall-product-swiper {
   padding: 40px 0 80px 0;
   overflow: visible !important;
 }
-
 .tall-product-swiper .swiper-slide {
   height: auto !important;
   display: flex;
@@ -122,15 +129,6 @@ const swiperBreakpoints = {
   align-items: center;
   transition: all 0.4s ease;
 }
-
-/* .tall-product-swiper .swiper-slide-active {
-  transform: scale(1.02);
-} */
-
-/* .tall-product-swiper :deep(.swiper-pagination) {
-  bottom: 20px;
-} */
-
 .tall-product-swiper :deep(.swiper-pagination-bullet) {
   width: 12px;
   height: 12px;
@@ -138,7 +136,6 @@ const swiperBreakpoints = {
   opacity: 0.7;
   transition: all 0.3s ease;
 }
-
 .tall-product-swiper :deep(.swiper-pagination-bullet-active) {
   background: #f9c710;
   opacity: 1;
@@ -154,23 +151,25 @@ const swiperBreakpoints = {
   font-weight: 500;
 }
 
+/* ریسپانسیو */
 @media (max-width: 1280px) {
   .static-grid {
     gap: 30px;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .product-slider-container {
     padding: 60px 4%;
   }
-
   .section-title {
-    font-size: 2rem;
+    font-size: 1.5rem;
+    margin-bottom: 40px;
   }
-
-  .section-title::after {
-    height: 4px;
+  /* Grid روی موبایل به ستون تبدیل می‌شود */
+  .static-grid {
+    flex-direction: column;
+    align-items: center;
   }
 }
 
@@ -178,15 +177,9 @@ const swiperBreakpoints = {
   .product-slider-container {
     padding: 50px 3%;
   }
-
   .section-title {
-    font-size: 1.7rem;
-    margin-bottom: 35px;
-  }
-
-  .static-grid {
-    flex-direction: column;
-    align-items: center;
+    font-size: 1.3rem;
+    margin-bottom: 30px;
   }
 }
 </style>

@@ -105,15 +105,27 @@ const openModal = (product) => (selectedProduct.value = product)
   align-items: center !important;
 }
 
-.swiper-pagination-bullet {
-  background: rgba(255, 255, 255, 0.6);
-  opacity: 1;
+.product-swiper :deep(.swiper-pagination) {
+  bottom: 15px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
 }
 
-.swiper-pagination-bullet-active {
+.product-swiper :deep(.swiper-pagination-bullet) {
+  width: 12px;
+  height: 12px;
+  background: #ddd;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.product-swiper :deep(.swiper-pagination-bullet-active) {
   background: #f9c710;
-  transform: scale(1.2);
-  transition: 0.3s;
+  opacity: 1;
+  transform: scale(1.4);
+  box-shadow: 0 0 15px rgba(249, 199, 16, 0.6);
 }
 
 .loading {

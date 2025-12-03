@@ -1,6 +1,8 @@
 import { adminService } from '@/services/adminService'
 import { defineStore } from 'pinia'
 import { productService } from '@/services/ProductService'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 export const useAdminStore = defineStore('admin', {
   state: () => ({
