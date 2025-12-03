@@ -13,7 +13,7 @@
       </div>
 
       <button class="btn-add-to-cart" @click.stop="$emit('open-modal', product)">
-        <i class="fas fa-cart-plus"></i> بررسی و خرید
+         بررسی و خرید
       </button>
     </div>
   </div>
