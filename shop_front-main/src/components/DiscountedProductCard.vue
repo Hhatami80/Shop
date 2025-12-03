@@ -56,6 +56,7 @@ const showOriginalPrice = computed(
   width: 100%;
   max-width: 372px;
   min-width: 220px;
+  height: 400px;
   background: #fff;
   border-radius: 16px;
   overflow: hidden;
@@ -105,11 +106,13 @@ const showOriginalPrice = computed(
   color: #555;
   line-height: 1.4em;
   margin-bottom: 12px;
+  min-height: 60px;
+  min-height: unset;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  min-height: 60px;
+  
 }
 
 .product-price {

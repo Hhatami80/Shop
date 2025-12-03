@@ -1,62 +1,98 @@
 <template>
-  <div v-if="modelValue" class="modal-backdrop">
-    <div class="modal-card">
+  <Teleport to="body">
+    <Transition name="modal">
+      <div v-if="modelValue" class="modal-backdrop" @click="$emit('update:modelValue', false)">
+        <div class="modal-panel" @click.stop>
+          <div class="modal-header">
+            <h3>افزودن / ویرایش بنرها</h3>
+            <button class="close-btn" @click="$emit('update:modelValue', false)" tabindex="0">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M18 6L6 18M6 6L18 18"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          </div>
 
-      <h3 class="modal-title">افزودن بنرها</h3>
+          <div class="modal-body">
+            <div class="banners-table-container">
+              <table class="banners-table">
+                <thead>
+                  <tr>
+                    <th>فایل بنر</th>
+                    <th>متن روی بنر</th>
+                    <th width="100">عملیات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(item, index) in localBanners" :key="index">
+                    <td class="file-cell">
+                      <label class="file-upload-label">
+                        <span v-if="item.file?.name">{{ item.file.name }}</span>
+                        <span v-else class="placeholder-text">انتخاب فایل...</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          @change="(e) => handleFileUpload(e, index)"
+                        />
+                      </label>
+                    </td>
+                    <td>
+                      <input
+                        v-model="item.text"
+                        type="text"
+                        placeholder="مثلاً: تخفیف ویژه تا ۵۰٪"
+                        class="text-input"
+                      />
+                    </td>
+                    <td class="action-cell">
+                      <button class="btn-remove" @click="removeBanner(index)" title="حذف بنر">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                          <path
+                            d="M3 6H21M10 11V17M14 11V17M5 6L6 19C6 20.104 6.895 21 8 21H16C17.105 21 18 20.104 18 19L19 6M9 6V4C9 3.448 9.448 3 10 3H14C14.552 3 15 3.448 15 4V6"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                          />
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
 
-      <table class="banner-table">
-        <thead>
-          <tr>
-            <th>فایل بنر</th>
-            <th>متن</th>
-            <th></th>
-          </tr>
-        </thead>
+              <div v-if="localBanners.length === 0" class="empty-state">
+                <p>هنوز بنری اضافه نشده است</p>
+                <small>با دکمه زیر شروع کنید</small>
+              </div>
+            </div>
 
-        <tbody>
-          <tr
-            v-for="(item, index) in localBanners"
-            :key="index"
-          >
-            <td>
-              <input
-                type="file"
-                @change="e => handleFileUpload(e, index)"
-              />
-            </td>
-            <td>
-              <input
-                type="text"
-                v-model="item.text"
-                placeholder="متن بنر"
-                class="form-input"
-              />
-            </td>
-            <td>
-              <button
-                class="btn-delete"
-                @click="removeBanner(index)"
-              >حذف</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            <button class="btn-add-banner" @click="addBanner">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 5V19M5 12H19"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                />
+              </svg>
+              افزودن بنر جدید
+            </button>
+          </div>
 
-      <button class="btn-add" @click="addBanner">
-        + افزودن ردیف
-      </button>
-
-      <div class="modal-actions">
-        <button class="btn-cancel" @click="$emit('update:modelValue', false)">
-          لغو
-        </button>
-        <button class="btn-save" @click="saveChanges">
-          ذخیره
-        </button>
+          <div class="modal-footer">
+            <button class="btn-cancel" @click="$emit('update:modelValue', false)">لغو</button>
+            <button class="btn-save" @click="saveChanges" :disabled="localBanners.length === 0">
+              ذخیره بنرها
+            </button>
+          </div>
+        </div>
       </div>
-
-    </div>
-  </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup>
@@ -64,7 +100,7 @@ import { ref, watch } from 'vue'
 
 const props = defineProps({
   modelValue: Boolean,
-  banners: Array
+  banners: Array,
 })
 
 const emit = defineEmits(['update:modelValue', 'update'])
@@ -74,9 +110,9 @@ const localBanners = ref([])
 watch(
   () => props.banners,
   (val) => {
-    localBanners.value = JSON.parse(JSON.stringify(val))
+    localBanners.value = val ? JSON.parse(JSON.stringify(val)) : []
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 const addBanner = () => {
@@ -88,7 +124,10 @@ const removeBanner = (index) => {
 }
 
 const handleFileUpload = (e, index) => {
-  localBanners.value[index].file = e.target.files[0]
+  const file = e.target.files[0]
+  if (file) {
+    localBanners.value[index].file = file
+  }
 }
 
 const saveChanges = () => {
@@ -98,143 +137,253 @@ const saveChanges = () => {
 </script>
 
 <style scoped>
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.32s ease;
+}
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+.modal-enter-from .modal-panel,
+.modal-leave-to .modal-panel {
+  transform: scale(0.92);
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 999;
-  font-family: 'Vazirmatn', sans-serif;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
 }
 
-.modal-card {
-  background-color: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  width: 700px;
-  max-width: 95%;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+.modal-panel {
+  background: #fff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 760px;
+  max-height: 92vh;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+  direction: rtl;
+  font-family: 'IRANSansX', sans-serif;
   display: flex;
   flex-direction: column;
-  gap: 15px;
 }
 
-.modal-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #34495e;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-.banner-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  margin-bottom: 15px;
-}
-
-.banner-table th,
-.banner-table td {
-  padding: 10px 12px;
-  text-align: center;
-  border-bottom: 1px solid #e9ecef;
-  font-size: 0.95rem;
-  color: #333;
-}
-
-.banner-table th {
-  font-weight: 600;
-  background-color: #f8f9fa;
-}
-
-.banner-table input[type="file"] {
-  padding: 6px;
-}
-
-.form-input {
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
-  width: 100%;
-  font-size: 0.95rem;
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-.form-input:focus {
-  border-color: #ffd700;
-  box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
-  outline: none;
-}
-
-.btn-add {
-  padding: 10px 20px;
-  background-color: #ffd700;
-  color: #333;
-  border: none;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.3s;
-  align-self: flex-start;
-}
-
-.btn-add:hover {
-  background-color: #e6c200;
-}
-
-.btn-delete {
-  padding: 6px 12px;
-  background-color: #dc3545;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: 0.3s;
-}
-
-.btn-delete:hover {
-  background-color: #c82333;
-}
-
-.modal-actions {
+.modal-header {
+  padding: 1.5rem 1.8rem 1.2rem;
+  background: linear-gradient(135deg, #f9c710, #e6b800);
+  color: #111;
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 10px;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
 }
 
-.btn-save {
-  padding: 10px 20px;
-  background-color: #28a745;
-  color: #fff;
-  border-radius: 8px;
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.55rem;
+  font-weight: 900;
+}
+
+.close-btn {
+  background: none;
   border: none;
-  font-weight: 600;
+  color: #111;
   cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 1.8rem;
+  background: #fdfdfd;
+}
+
+.banners-table-container {
+  margin-bottom: 1.5rem;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+  background: #fff;
+}
+
+.banners-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.banners-table th {
+  background: #f8f9fa;
+  padding: 1rem 0.8rem;
+  font-weight: 700;
+  color: #222;
+  font-size: 0.95rem;
+  border-bottom: 2px solid #f9c710;
+}
+
+.banners-table td {
+  padding: 0.9rem 0.8rem;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.file-upload-label {
+  display: block;
+  padding: 0.75rem 1rem;
+  background: #f5f5f5;
+  border: 2px dashed #ccc;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.file-upload-label:hover {
+  border-color: #f9c710;
+  background: #fff9e6;
+}
+
+.file-upload-label input {
+  display: none;
+}
+
+.placeholder-text {
+  color: #999;
+  font-style: italic;
+}
+
+.text-input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1.8px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 0.95rem;
   transition: 0.3s;
 }
 
-.btn-save:hover {
-  background-color: #218838;
+.text-input:focus {
+  outline: none;
+  border-color: #f9c710;
+  box-shadow: 0 0 0 4px rgba(249, 199, 16, 0.18);
+}
+
+.btn-remove {
+  background: #ef4444;
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+  margin-right: 30px;
+}
+
+.btn-remove:hover {
+  background: #dc2626;
+  transform: scale(1.08);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #888;
+}
+
+.empty-state p {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+.empty-state small {
+  font-size: 0.9rem;
+}
+
+.btn-add-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.9rem 1.6rem;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.btn-add-banner:hover {
+  background: #059669;
+  transform: translateY(-2px);
+}
+
+.modal-footer {
+  padding: 1.4rem 1.8rem;
+  background: #f9fafb;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  flex-shrink: 0;
 }
 
 .btn-cancel {
-  padding: 10px 20px;
-  background-color: #ccc;
-  color: #333;
-  border-radius: 8px;
-  border: none;
+  padding: 0.85rem 1.8rem;
+  background: #f3f4f6;
+  color: #666;
+  border: 1.5px solid #ddd;
+  border-radius: 12px;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: 500;
   transition: 0.3s;
 }
 
 .btn-cancel:hover {
-  background-color: #b3b3b3;
+  background: #e5e7eb;
+}
+
+.btn-save {
+  padding: 0.85rem 2.2rem;
+  background: #f9c710;
+  color: #111;
+  border: none;
+  border-radius: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(249, 199, 16, 0.4);
+  transition: 0.3s;
+}
+
+.btn-save:hover:not(:disabled) {
+  background: #e6b800;
+  transform: translateY(-3px);
+}
+
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 </style>
-

@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 
 export const useCategoryBannerStore = defineStore('categoryBanner', {
   state: () => ({
-    banners: [], // holds the banners for the current category
+    banners: [], 
     loading: false,
   }),
 
@@ -23,7 +23,7 @@ export const useCategoryBannerStore = defineStore('categoryBanner', {
       try {
         const res = await catBannerService.updateBanner(categoryId, bannerId, formData)
 
-        // Update local state in memory
+        
         const index = this.banners.findIndex((b) => b.id === bannerId)
         if (index !== -1) {
           this.banners[index] = res.data // DRF returns updated object
@@ -40,7 +40,7 @@ export const useCategoryBannerStore = defineStore('categoryBanner', {
       try {
         await catBannerService.deleteBanner(categoryId, bannerId)
 
-        // Remove banner from local state
+       
         this.banners = this.banners.filter((b) => b.id !== bannerId)
       } finally {
         this.loading = false

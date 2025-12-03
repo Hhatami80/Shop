@@ -114,13 +114,13 @@ export const useProductStore = defineStore('product', {
       this.errors = null
 
       try {
-        const response = await productService.getPooshine()
-        this.pooshine = response.data
+        const response = await productService.get()
+        this.pooshine = response.data.pooshineh || []
       } catch (error) {
         console.log(error)
         this.error = error.data.message
       } finally {
-        this.loading = true
+        this.loading = false
       }
     },
     async getBestSellers() {
@@ -228,7 +228,7 @@ export const useProductStore = defineStore('product', {
       this.error = null
       try {
         await productService.create(newProduct)
-        await this.getAllProducts();
+        await this.getAllProducts()
       } catch (error) {
         console.log(error)
         this.error = 'خطا در افزودن محصول'

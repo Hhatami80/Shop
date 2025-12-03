@@ -65,7 +65,6 @@
         </div>
 
         <div class="row image-section">
-          
           <div class="image-upload-area main-image-area">
             <label class="label">عکس اصلی محصول</label>
             <input
@@ -74,6 +73,7 @@
               class="input file-input"
               @change="handleMainImage"
               :required="!isEditing && !form.imagePreview"
+              :key="mainImageKey"
             />
             <div v-if="form.imagePreview" class="image-preview-wrapper large">
               <img :src="form.imagePreview" class="image-preview" alt="پیش‌نمایش" />
@@ -81,7 +81,6 @@
             </div>
           </div>
 
-        
           <div class="image-upload-area gallery-area">
             <label class="label">گالری تصاویر</label>
             <input
@@ -90,6 +89,7 @@
               multiple
               class="input file-input"
               @change="handleGalleryUpload"
+              :key="galleryKey"
             />
             <div class="gallery-preview large">
               <div
@@ -234,102 +234,99 @@
     </div>
 
     <Teleport to="body">
-  <div v-if="isModalOpen" class="modal-overlay" @click="closeModal">
-    <div class="modal-content" @click.stop>
-      <button class="modal-close-btn" @click="closeModal">&times;</button>
+      <div v-if="isModalOpen" class="modal-overlay" @click="closeModal">
+        <div class="modal-content" @click.stop>
+          <button class="modal-close-btn" @click="closeModal">&times;</button>
 
-      <div v-if="selectedProduct" class="product-details">
-        <h3 class="product-modal-title">مشخصات: {{ selectedProduct.title }}</h3>
-        <hr class="modal-divider" />
+          <div v-if="selectedProduct" class="product-details">
+            <h3 class="product-modal-title">مشخصات: {{ selectedProduct.title }}</h3>
+            <hr class="modal-divider" />
 
-        
-        <div class="modal-images">
-          <div class="main-image-wrapper">
-            <img
-              :src="activeImage || selectedProduct.image"
-              alt="تصویر محصول"
-              class="main-image"
-            />
-          </div>
+            <div class="modal-images">
+              <div class="main-image-wrapper">
+                <img
+                  :src="activeImage || selectedProduct.image"
+                  alt="تصویر محصول"
+                  class="main-image"
+                />
+              </div>
 
-          
-          <div
-            v-if="selectedProduct.images?.length || selectedProduct.galleryPreviews?.length"
-            class="gallery-thumbnails"
-          >
-            <img
-              v-for="(img, idx) in selectedProduct.images?.map(i => i.image) || selectedProduct.galleryPreviews"
-              :key="idx"
-              :src="img"
-              :alt="`گالری ${idx + 1}`"
-              class="gallery-thumb"
-              :class="{ active: activeImage === img }"
-              @click="activeImage = img"
-            />
-          </div>
-        </div>
-
-        
-        <div class="modal-main-info">
-          <div class="modal-text-info">
-            <p class="modal-price">
-              قیمت نهایی:
-              <span>
-                {{ (selectedProduct.final_price || selectedProduct.price).toLocaleString() }} تومان
-              </span>
-            </p>
-            <p class="modal-category">
-              قیمت اصلی:
-              <span>{{ selectedProduct.price.toLocaleString() }} تومان</span>
-            </p>
-            <p class="modal-category">
-              دسته‌بندی: <span>{{ selectedProduct.category?.title }}</span>
-            </p>
-            <div v-if="selectedProduct.discount > 0" class="modal-discount-tag">
-              {{ selectedProduct.discount }}% تخفیف!
+              <div
+                v-if="selectedProduct.images?.length || selectedProduct.galleryPreviews?.length"
+                class="gallery-thumbnails"
+              >
+                <img
+                  v-for="(img, idx) in selectedProduct.images?.map((i) => i.image) ||
+                  selectedProduct.galleryPreviews"
+                  :key="idx"
+                  :src="img"
+                  :alt="`گالری ${idx + 1}`"
+                  class="gallery-thumb"
+                  :class="{ active: activeImage === img }"
+                  @click="activeImage = img"
+                />
+              </div>
             </div>
+
+            <div class="modal-main-info">
+              <div class="modal-text-info">
+                <p class="modal-price">
+                  قیمت نهایی:
+                  <span>
+                    {{
+                      (selectedProduct.final_price || selectedProduct.price).toLocaleString()
+                    }}
+                    تومان
+                  </span>
+                </p>
+                <p class="modal-category">
+                  قیمت اصلی:
+                  <span>{{ selectedProduct.price.toLocaleString() }} تومان</span>
+                </p>
+                <p class="modal-category">
+                  دسته‌بندی: <span>{{ selectedProduct.category?.title }}</span>
+                </p>
+                <div v-if="selectedProduct.discount > 0" class="modal-discount-tag">
+                  {{ selectedProduct.discount }}% تخفیف!
+                </div>
+              </div>
+            </div>
+
+            <h4 class="modal-subtitle">توضیحات</h4>
+            <p class="modal-description">{{ selectedProduct.description }}</p>
+
+            <div
+              v-if="selectedProduct.properties && selectedProduct.properties.length"
+              class="modal-properties-list"
+            >
+              <h4 class="modal-subtitle">ویژگی‌ها</h4>
+              <ul class="prop-list-modal">
+                <li
+                  v-for="(prop, pIndex) in (typeof selectedProduct.properties === 'string'
+                    ? JSON.parse(selectedProduct.properties)
+                    : selectedProduct.properties) || []"
+                  :key="pIndex"
+                >
+                  <strong>{{ prop.key }}:</strong> {{ prop.value }}
+                </li>
+              </ul>
+            </div>
+
+            <button
+              class="modal-edit-btn"
+              @click="
+                () => {
+                  editProduct(selectedProduct)
+                  closeModal()
+                }
+              "
+            >
+              <fa-icon :icon="['fas', 'edit']" /> ویرایش محصول
+            </button>
           </div>
         </div>
-
-        
-        <h4 class="modal-subtitle">توضیحات</h4>
-        <p class="modal-description">{{ selectedProduct.description }}</p>
-
-       
-        <div
-          v-if="selectedProduct.properties && selectedProduct.properties.length"
-          class="modal-properties-list"
-        >
-          <h4 class="modal-subtitle">ویژگی‌ها</h4>
-          <ul class="prop-list-modal">
-            <li
-              v-for="(prop, pIndex) in (typeof selectedProduct.properties === 'string'
-                ? JSON.parse(selectedProduct.properties)
-                : selectedProduct.properties) || []"
-              :key="pIndex"
-            >
-              <strong>{{ prop.key }}:</strong> {{ prop.value }}
-            </li>
-          </ul>
-        </div>
-
-        
-        <button
-          class="modal-edit-btn"
-          @click="
-            () => {
-              editProduct(selectedProduct)
-              closeModal()
-            }
-          "
-        >
-          <fa-icon :icon="['fas', 'edit']" /> ویرایش محصول
-        </button>
       </div>
-    </div>
-  </div>
-</Teleport>
-
+    </Teleport>
   </div>
 </template>
 
@@ -350,6 +347,9 @@ const isEditing = ref(false)
 const editingIndex = ref(-1)
 const isModalOpen = ref(false)
 const selectedProduct = ref(null)
+
+const mainImageKey = ref(Date.now())
+const galleryKey = ref(Date.now())
 
 const form = reactive({
   id: null,
@@ -386,7 +386,6 @@ function removeMainImage() {
   form.imagePreview = null
 }
 
-
 function prevPage() {
   if (currentPage.value > 1) currentPage.value--
 }
@@ -407,6 +406,8 @@ function resetForm() {
   editingIndex.value = -1
   submitSuccess.value = false
   submitError.value = null
+  mainImageKey.value = Date.now()
+  galleryKey.value = Date.now()
 }
 
 function addProperty() {
@@ -481,11 +482,11 @@ async function submitForm() {
   try {
     if (isEditing.value && form.id) {
       await productStore.updateProduct(form.id, payload)
-      
+
       toast.success('محصول با موفقیت ویرایش شد.')
     } else {
       const newProduct = await productStore.addProduct(payload)
-      await adminStore.getAllProducts();
+      await adminStore.getAllProducts()
       const category = categoryStore.allCategories.find((c) => c.id === form.category_id) || null
       productStore.products.unshift({
         ...newProduct,
@@ -562,10 +563,9 @@ function editProduct(product, index) {
   form.imagePreview = product.image || null
   form.galleryFiles = []
   form.galleryPreviews = []
-  
 
-if (Array.isArray(product.images) && product.images.length) {
-    form.galleryPreviews = product.images.map(img => img.image)
+  if (Array.isArray(product.images) && product.images.length) {
+    form.galleryPreviews = product.images.map((img) => img.image)
   } else {
     form.galleryPreviews = []
   }
@@ -580,10 +580,7 @@ if (Array.isArray(product.images) && product.images.length) {
     }
   } else if (Array.isArray(product.properties)) form.properties = [...product.properties]
   else form.properties = []
-  
 }
-
-
 
 function showProductDetails(product) {
   selectedProduct.value = product
@@ -595,7 +592,6 @@ function showProductDetails(product) {
   }
   isModalOpen.value = true
 }
-
 
 function closeModal() {
   isModalOpen.value = false
@@ -613,7 +609,6 @@ onMounted(() => {
 .product-container {
   padding: 30px;
   direction: rtl;
-  ;
   background-color: #f9f9f9;
 }
 
@@ -697,7 +692,7 @@ onMounted(() => {
 textarea.input {
   width: 100%;
   padding: 12px 14px;
-  
+
   font-size: 15px;
   border: 1px solid #ddd;
   border-radius: 10px;
@@ -782,7 +777,6 @@ textarea.input {
 }
 
 .btn-add-prop:hover {
-  
   box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
 }
 .btn {
@@ -979,18 +973,18 @@ textarea.input {
   align-items: center;
   z-index: 1000;
   backdrop-filter: blur(5px);
-  padding: 15px; 
+  padding: 15px;
   box-sizing: border-box;
 }
 
 .modal-content {
   background-color: #ffffff;
-  padding: 25px 20px; 
+  padding: 25px 20px;
   border-radius: 15px;
   width: 100%;
-  max-width: 500px; 
+  max-width: 500px;
   max-height: 90vh;
-  overflow-y: auto; 
+  overflow-y: auto;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   position: relative;
   animation: slide-in 0.3s ease-out;
@@ -1072,7 +1066,6 @@ textarea.input {
   flex: 1;
   text-align: right;
 }
-
 
 @media (max-width: 768px) {
   .modal-content {

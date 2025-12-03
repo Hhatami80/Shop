@@ -1,315 +1,243 @@
 <template>
-  <div class="modal-backdrop" @click.self="$emit('close')">
-    <div class="modal-card">
-      <h3 class="modal-title">بنرهای دسته‌بندی</h3>
+  <Teleport to="body">
+    <Transition name="modal">
+      <div v-if="modelValue" class="modal-backdrop" @click="$emit('update:modelValue', false)">
+        <div class="modal-panel" @click.stop>
+          <div class="modal-header">
+            <h3>بنرهای دسته‌بندی</h3>
+            <button class="close-btn" @click="$emit('update:modelValue', false)" aria-label="بستن">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
 
-      <div v-if="catBannerStore.banners?.length" class="banner-list">
-        <div v-for="(b, index) in catBannerStore.banners" :key="b.id" class="banner-item">
-          <img :src="b.image" class="banner-preview" />
-          <p class="banner-text">{{ b.text || '' }}</p>
+          <div class="modal-body">
+            <div v-if="banners.length" class="banners-grid">
+              <div v-for="(b, index) in banners" :key="index" class="banner-card">
+                <div class="image-wrapper">
+                  <img :src="b.image" :alt="b.text || 'بنر ' + (index + 1)" class="banner-image" />
+                </div>
+                <p v-if="b.text" class="banner-caption">{{ b.text }}</p>
+                <small v-else class="no-caption">بدون متن</small>
+              </div>
+            </div>
 
-          <!-- ACTION BUTTONS -->
-          <div class="banner-actions">
-            <button class="action-btn btn-edit" @click="startEdit(b)">ویرایش</button>
-            <button class="action-btn btn-delete" @click="deleteBanner(b)">حذف</button>
+            <div v-else class="empty-state">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <circle cx="8" cy="8" r="2" />
+                <path d="M21 15L16 10L5 21" />
+              </svg>
+              <p>هیچ بنری برای این دسته‌بندی اضافه نشده است.</p>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn-close" @click="$emit('update:modelValue', false)">بستن</button>
           </div>
         </div>
       </div>
-
-      <p v-else>هیچ بنری اضافه نشده است.</p>
-
-      <!-- EDIT FORM -->
-      <div v-if="editingBanner" class="edit-form">
-        <h4>ویرایش بنر</h4>
-
-        <input v-model="editForm.text" placeholder="متن بنر" class="form-input" />
-
-        <input type="file" @change="handleFile" class="form-input" />
-
-        <div class="edit-actions">
-          <button class="action-btn btn-save" @click="saveEdit">ذخیره</button>
-          <button class="action-btn btn-cancel" @click="cancelEdit">لغو</button>
-        </div>
-      </div>
-
-      <div class="modal-actions">
-        <button class="action-btn btn-save" @click="openAddModal">افزودن بنر جدید </button>
-        <button class="btn-cancel" @click="$emit('close')">بستن</button>
-      </div>
-    </div>
-  </div>
-  <banner-modal
-  v-model="modelValue"
-  :banners="[]"
-  @update="saveNewBanners"
-  @refresh="refreshBanners"
-/>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup>
-import { useCategoryBannerStore } from '@/stores/useCatBannerStore'
-import BannerModal from './BannerModal.vue'
-import { ref, computed, onMounted } from 'vue'
-import Swal from 'sweetalert2'
+import { defineProps, defineEmits } from 'vue'
 
-const catBannerStore = useCategoryBannerStore()
-// Props
 const props = defineProps({
-  categoryId: Number, // required for API calls
+  modelValue: Boolean,
+  banners: {
+    type: Array,
+    default: () => []
+  }
 })
 
-onMounted(async () => {
-  console.log(props.categoryId)
-  await catBannerStore.fetchBanners(props.categoryId)
-})
-
-// Local state
-let editingBanner = ref(null)
-let editForm = ref({ text: '', image: null })
-let modelValue = ref(false)
-
-const openAddModal = () => {
-  modelValue.value = true
-}
-
-async function refreshBanners() {
-  await catBannerStore.fetchBanners(props.categoryId); // reload banners from store/DB
-}
-
-const saveNewBanners = async (bannerList) => {
-
-  for (const banner of bannerList) {
-    const form = new FormData()
-    form.append(`text`, banner.text)
-    if (banner.file) form.append(`image`, banner.file)
-
-    await catBannerStore.addBanner(props.categoryId, form)
-  }
-
-  emitRefresh()
-}
-
-const startEdit = (banner) => {
-  editingBanner.value = banner
-  editForm.value = {
-    text: banner.text,
-    image: null,
-  }
-}
-
-const cancelEdit = () => {
-  editingBanner.value = null
-  editForm.value = { text: '', image: null }
-}
-
-const handleFile = (e) => {
-  editForm.value.image = e.target.files[0]
-}
-
-const saveEdit = async () => {
-  const form = new FormData()
-  form.append('text', editForm.value.text)
-  if (editForm.value.image) form.append('image', editForm.value.image)
-
-  await catBannerStore.updateBanner(props.categoryId, editingBanner.value.id, form)
-
-  // Let parent refresh
-  emitRefresh()
-}
-
-// const deleteBanner = async (banner) => {
-//   if (!confirm('حذف بنر؟')) return
-
-//   await catBannerStore.deleteBanner(props.categoryId, banner.id)
-
-//   emitRefresh()
-// }
-
-const deleteBanner = async (banner) => {
-  Swal.fire({
-    title: '<span style="font-weight:bold; font-size:20px;">حذف بنر؟</span>',
-    html: '<p style="font-size:16px;">این بنر پس از حذف دیگر قابل بازیابی نخواهد بود.</p>',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#e63946',
-    cancelButtonColor: '#adb5bd',
-    confirmButtonText: '<i class="fa fa-trash"></i> حذف بنر',
-    cancelButtonText: '<i class="fa fa-times"></i> لغو',
-    buttonsStyling: false,
-    customClass: {
-      popup: 'my-swal-popup',
-      confirmButton: 'my-swal-confirm',
-      cancelButton: 'my-swal-cancel',
-    },
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      await catBannerStore.deleteBanner(props.categoryId, banner.id)
-
-      Swal.fire({
-        title: '<span style="font-weight:bold; font-size:20px;">حذف شد!</span>',
-        html: '<p style="font-size:16px;">بنر موردنظر با موفقیت حذف شد.</p>',
-        icon: 'success',
-        confirmButtonText: 'باشه',
-        buttonsStyling: false,
-        customClass: {
-          popup: 'my-swal-popup',
-          confirmButton: 'my-swal-confirm',
-        },
-      })
-
-      emitRefresh()
-    }
-  })
-}
-
-
-const emit = defineEmits(['close', 'refresh'])
-const emitRefresh = () => emit('refresh')
+const emit = defineEmits(['update:modelValue'])
 </script>
 
 <style scoped>
-.form-input {
-  width: 60%;
-  padding: 10px 0px;
-  border: 1px solid #dcdcdc;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  transition: border-color 0.3s;
-  margin: 0 auto 8px;
-  text-indent: 2px;
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.32s ease;
 }
-
-.form-input:focus {
-  border-color: #007bff;
-  outline: none;
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+  transform: scale(0.92);
 }
-
-.action-btn {
-  border: 1px solid transparent;
-  border-radius: 8px;
-  padding: 7px 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    0.3s,
-    transform 0.1s;
-  margin: 0 5px;
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.95rem;
-}
-
-.action-btn i {
-  margin-left: 5px;
+.modal-enter-to,
+.modal-leave-from {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 999;
-}
-
-.modal-card {
-  background: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  width: 600px;
-  max-width: 95%;
-}
-
-.modal-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-.banner-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
   justify-content: center;
-  margin-bottom: 20px;
+  z-index: 9999;
+  padding: 1rem;
 }
 
-.banner-item {
+.modal-panel {
+  background: #fff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 780px;
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.22);
+  direction: rtl;
+  font-family: 'IRANSansX', sans-serif;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 150px;
-  text-align: center;
 }
 
-.banner-preview {
-  width: 100%;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 8px;
-  border: 1px solid #e9ecef;
-}
-
-.banner-text {
-  font-size: 0.9rem;
-  color: #333;
-}
-
-.modal-actions {
+.modal-header {
+  padding: 1.5rem 1.8rem 1.2rem;
+  background: linear-gradient(135deg, #f9c710, #e6b800);
+  color: #111;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.btn-cancel {
-  padding: 10px 20px;
-  background-color: #ccc;
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.55rem;
+  font-weight: 900;
+}
+
+.close-btn {
+  background: none;
   border: none;
-  border-radius: 8px;
+  color: #111;
   cursor: pointer;
-  font-weight: 500;
-  transition: 0.3s;
+  padding: 8px;
+  border-radius: 50%;
+  transition: 0.2s;
 }
 
-.btn-cancel:hover {
-  background-color: #b3b3b3;
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
-.btn-save {
-  padding: 10px 20px;
-  background-color: #28a745;
-  color: #fff;
-  border-radius: 8px;
-  border: none;
+.modal-body {
+  flex: 1;
+  padding: 2rem 1.8rem;
+  background: #fdfdfd;
+}
+
+.banners-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.8rem;
+  justify-items: center;
+}
+
+.banner-card {
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 280px;
+}
+
+.banner-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
+}
+
+.image-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  background: #f0f0f0;
+  overflow: hidden;
+}
+
+.banner-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.banner-card:hover .banner-image {
+  transform: scale(1.05);
+}
+
+.banner-caption {
+  padding: 1rem 0.8rem;
+  text-align: center;
   font-weight: 600;
+  color: #222;
+  font-size: 1rem;
+  margin: 0;
+  background: #fff;
+}
+
+.no-caption {
+  padding: 0.8rem;
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #888;
+}
+
+.empty-state svg {
+  color: #ccc;
+  margin-bottom: 1rem;
+}
+
+.empty-state p {
+  margin: 0.5rem 0 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.modal-footer {
+  padding: 1.4rem 1.8rem;
+  background: #f9fafb;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-close {
+  padding: 0.9rem 2.5rem;
+  background: #f9c710;
+  color: #111;
+  border: none;
+  border-radius: 14px;
+  font-weight: 900;
+  font-size: 1.05rem;
   cursor: pointer;
-  transition: 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 18px rgba(249, 199, 16, 0.4);
 }
 
-.btn-save:hover {
-  background-color: #218838;
-}
-
-.btn-edit {
-  background-color: var(--warning-color);
-  color: white;
-}
-
-.btn-edit:hover {
-  background-color: #e68900;
-  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.4);
-  transform: translateY(-1px);
-}
-.btn-delete {
-  background-color: var(--danger-color);
-  color: white;
-}
-
-.btn-delete:hover {
-  background-color: #c82333;
-  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
-  transform: translateY(-1px);
+.btn-close:hover {
+  background: #e6b800;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(249, 199, 16, 0.5);
 }
 </style>

@@ -42,6 +42,7 @@ const formatPrice = (price) => (price ? price.toLocaleString('fa-IR').replace(/Ù
   width: 100%;
   max-width: 372px;
   min-width: 220px;
+  height: 400px;
   background: #fff;
   border-radius: 16px;
   overflow: hidden;
@@ -96,8 +97,9 @@ const formatPrice = (price) => (price ? price.toLocaleString('fa-IR').replace(/Ù
   color: #555;
   margin-bottom: 10px;
   min-height: 60px;
+  min-height: unset;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

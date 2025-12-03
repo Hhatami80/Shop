@@ -25,11 +25,10 @@
 
       <button
         class="buy-btn"
-        
+        :disabled="product.is_active === false"
         @click.stop="$emit('openModal', product)"
       >
-        <!-- {{ product.inStock ? 'بررسی و خرید' : 'ناموجود' }} -->
-        بررسی و خرید
+        {{ product.is_active === false ? 'ناموجود' : 'بررسی و خرید' }}
       </button>
     </div>
   </div>
@@ -126,8 +125,10 @@ const formatPrice = (price) => {
   line-height: 1.7;
   margin: 0;
   overflow: hidden;
+  min-height: 60px;
+  min-height: unset;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 

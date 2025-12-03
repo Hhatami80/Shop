@@ -1,7 +1,7 @@
 <template>
   <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h4 class="mb-0">مدیریت نظرات کاربران</h4>
+    <div class="title">
+      <h4>مدیریت نظرات کاربران</h4>
     </div>
 
     <div class="row g-3 mb-4">
@@ -275,6 +275,12 @@ h4,
 .table {
   font-family: 'IRANSansX', sans-serif !important;
   direction: rtl;
+  
+}
+.title{
+  display: flex;
+  justify-content: center;
+  text-align: center;
 }
 
 .container {
