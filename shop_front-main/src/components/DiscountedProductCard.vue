@@ -3,16 +3,19 @@
     <div class="product-image">
       <img :src="product?.image || defaultImage" :alt="product.title" />
     </div>
-    <div class="product-content">
+
+    <div class="product-details">
       <h3 class="product-title">{{ product?.title }}</h3>
       <p class="product-description">{{ product?.description }}</p>
 
       <div class="product-price">
-        <span class="original" v-if="showOriginalPrice">{{ formattedOriginalPrice }}</span>
-        <span class="discounted">{{ formattedDiscountedPrice }}</span>
+        <span class="original-price" v-if="hasDiscount">{{ formattedOriginalPrice }}</span>
+        <span class="final-price">{{ formattedDiscountedPrice }}</span>
       </div>
 
-      <button class="add-button" @click.stop="$emit('open-modal', product)">بررسی و خرید</button>
+      <button class="btn-add-to-cart" @click.stop="$emit('open-modal', product)">
+        <i class="fas fa-cart-plus"></i> بررسی و خرید
+      </button>
     </div>
   </div>
 </template>
@@ -29,17 +32,16 @@ const defaultImage = '/default-product.jpg'
 const originalPrice = computed(() => Number(props.product?.price) || 0)
 const discountedPrice = computed(() => Number(props.product?.discounted_price) || 0)
 
-const formattedOriginalPrice = computed(
-  () => originalPrice.value.toLocaleString('fa-IR') + ' تومان'
+const hasDiscount = computed(() => discountedPrice.value > 0 && discountedPrice.value < originalPrice.value)
+
+const formattedOriginalPrice = computed(() => 
+  originalPrice.value.toLocaleString('fa-IR').replace(/٬/g, ',') + ' تومان'
 )
-const formattedDiscountedPrice = computed(
-  () =>
-    (discountedPrice.value > 0 ? discountedPrice.value : originalPrice.value).toLocaleString('fa-IR') +
-    ' تومان'
-)
-const showOriginalPrice = computed(
-  () => discountedPrice.value > 0 && discountedPrice.value < originalPrice.value
-)
+
+const formattedDiscountedPrice = computed(() => {
+  const price = hasDiscount.value ? discountedPrice.value : originalPrice.value
+  return price.toLocaleString('fa-IR').replace(/٬/g, ',') + ' تومان'
+})
 </script>
 
 <style scoped>
@@ -47,7 +49,6 @@ const showOriginalPrice = computed(
 *::before,
 *::after {
   box-sizing: border-box;
-  font-family: 'IRANSansX', sans-serif;
 }
 
 .product-card {
@@ -60,13 +61,14 @@ const showOriginalPrice = computed(
   background: #fff;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-  transition: transform 0.2s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
   cursor: pointer;
 }
 
 .product-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
 }
 
 .product-image {
@@ -79,21 +81,22 @@ const showOriginalPrice = computed(
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-bottom: 2px solid #f9c710; /* This was missing! */
 }
 
-.product-content {
-  padding: 12px;
+.product-details {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex-grow: 1;
+  padding: 12px 15px;
 }
 
 .product-title {
   font-size: 1rem;
   font-weight: bold;
   color: #222;
+  margin-bottom: 6px;
   line-height: 1.4em;
-  margin-bottom: 8px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -103,57 +106,54 @@ const showOriginalPrice = computed(
 
 .product-description {
   font-size: 0.875rem;
-  color: #555;
   line-height: 1.4em;
-  margin-bottom: 12px;
-  min-height: 60px;
-  min-height: unset;
+  color: #555;
+  margin-bottom: 10px;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  
 }
 
 .product-price {
+  margin-bottom: 10px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  gap: 6px;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.discounted {
+.original-price {
+  font-size: 0.875rem;
+  color: #888;
+  text-decoration: line-through;
+}
+
+.final-price {
   font-size: 1rem;
   font-weight: bold;
   color: #f9c710;
 }
 
-.original {
-  font-size: 0.875rem;
-  text-decoration: line-through;
-  color: #888;
-}
-
-.add-button {
+.btn-add-to-cart {
   margin-top: auto;
+  width: 100%;
   padding: 10px;
   font-weight: bold;
   border-radius: 10px;
   border: none;
-  width: 100%;
   background: #f9c710;
   color: #222;
   cursor: pointer;
-  transition: background 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 15px rgba(249, 199, 16, 0.4);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
-.add-button:hover {
+.btn-add-to-cart:hover {
   background: #e5b809;
-}
-
-.add-button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
+  box-shadow: 0 6px 20px rgba(229, 184, 9, 0.5);
 }
 </style>

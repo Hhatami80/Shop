@@ -99,7 +99,7 @@ const formatPrice = (price) => (price ? price.toLocaleString('fa-IR').replace(/Ù
   min-height: 60px;
   min-height: unset;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

@@ -395,7 +395,7 @@ function resetForm() {
   form.title = ''
   form.category_id = ''
   form.price = null
-  form.discount = ''
+  form.discount = 0
   form.description = ''
   form.imageFile = null
   form.imagePreview = null

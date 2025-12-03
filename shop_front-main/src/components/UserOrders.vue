@@ -17,17 +17,17 @@
         </select>
       </label>
 
-      <label>
+      <!-- <label>
         از تاریخ:
-        <component
-          :is="DatePicker"
-          v-if="datePickerLoaded"
+        <date-picker
           v-model="filterStartDate"
           format="jYYYY/jMM/jDD"
           display-format="jYYYY/jMM/jDD"
-          placeholder="انتخاب تاریخ"
+          placeholder="انتخاب تاریخ شروع"
           color="#f9c710"
-          position="bottom"
+          :clearable="true"
+          :auto-close="true"
+          class="custom-datepicker"
         />
       </label>
 
@@ -39,11 +39,13 @@
           v-model="filterEndDate"
           format="jYYYY/jMM/jDD"
           display-format="jYYYY/jMM/jDD"
-          placeholder="انتخاب تاریخ"
+          placeholder="انتخاب تاریخ پایان"
           color="#f9c710"
-          position="bottom"
+          :clearable="true"
+          :auto-close="true"
+          class="custom-datepicker"
         />
-      </label>
+      </label> -->
 
       <button class="btn btn-filter" @click="applyFilters">اعمال فیلتر</button>
       <button class="btn btn-reset" @click="resetFilters">پاک‌سازی</button>
@@ -143,7 +145,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, markRaw } from 'vue'
+import { ref, computed, onMounted, markRaw, watch } from 'vue'
 import { useOrderStore } from '@/stores/useOrderStore'
 import { toast } from 'vue3-toastify'
 
@@ -152,17 +154,16 @@ const orderStore = useOrderStore()
 const showModal = ref(false)
 const selectedOrder = ref({})
 
-
-const DatePicker = ref(null)
-const datePickerLoaded = ref(false)
+// const DatePicker = ref(null)
+// const datePickerLoaded = ref(false)
 
 const filterStatus = ref('')
-const filterStartDate = ref(null)  
-const filterEndDate = ref(null)     
+// const filterStartDate = ref('')
+// const filterEndDate = ref('')
 
-const totalPages = computed(() =>
-  Math.ceil(orderStore.totalOrders / orderStore.perPage)
-)
+
+
+const totalPages = computed(() => Math.ceil(orderStore.totalOrders / orderStore.perPage))
 
 const fetchOrders = async (page = 1) => {
   await orderStore.fetchOrders({
@@ -170,8 +171,8 @@ const fetchOrders = async (page = 1) => {
     perPage: orderStore.perPage,
     status: filterStatus.value || 'all',
     forUser: true,
-    startDate: filterStartDate.value || undefined,
-    endDate: filterEndDate.value || undefined,
+    // startDate: filterStartDate.value || undefined,
+    // endDate: filterEndDate.value || undefined,
   })
 }
 
@@ -179,19 +180,17 @@ const applyFilters = async () => fetchOrders(1)
 
 const resetFilters = async () => {
   filterStatus.value = ''
-  filterStartDate.value = null   
-  filterEndDate.value = null    
+  // filterStartDate.value = null
+  // filterEndDate.value = null
   await fetchOrders(1)
 }
 
 const nextPage = () => {
-  if (orderStore.page < totalPages.value)
-    fetchOrders(orderStore.page + 1)
+  if (orderStore.page < totalPages.value) fetchOrders(orderStore.page + 1)
 }
 
 const prevPage = () => {
-  if (orderStore.page > 1)
-    fetchOrders(orderStore.page - 1)
+  if (orderStore.page > 1) fetchOrders(orderStore.page - 1)
 }
 
 const openModal = (order) => {
@@ -209,11 +208,9 @@ const cancelOrder = async (order) => {
   await fetchOrders(orderStore.page)
 }
 
-const formatDate = (dateStr) =>
-  new Intl.DateTimeFormat('fa-IR').format(new Date(dateStr))
+const formatDate = (dateStr) => new Intl.DateTimeFormat('fa-IR').format(new Date(dateStr))
 
-const formatPrice = (price) =>
-  Number(price)?.toLocaleString('fa-IR') || '0'
+const formatPrice = (price) => Number(price)?.toLocaleString('fa-IR') || '0'
 
 const getStatusText = (status) =>
   ({
@@ -232,16 +229,19 @@ const getStatusClass = (status) =>
   })[status] || ''
 
 onMounted(async () => {
-  const dp = await import('vue3-persian-datetime-picker')
-  DatePicker.value = markRaw(dp.default)   
-  datePickerLoaded.value = true
+  // try {
+  //   const module = await import('vue3-persian-datetime-picker')
+  // DatePicker.value = markRaw(module.default || module)
+  // datePickerLoaded.value = true
+  // } catch (err) {
+  //   console.error('Failed to load datepicker:', err)
+  // }
+
   fetchOrders()
 })
 </script>
 
-
 <style scoped>
-
 .user-orders {
   max-width: 900px;
   margin: 40px auto;

@@ -14,8 +14,9 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { defineProps } from 'vue'
 
-defineProps({
+const props = defineProps({
   label: { type: String, required: true },
   value: { type: [String, Number], required: true },
   iconClass: { type: String, default: 'fas fa-chart-line' },
