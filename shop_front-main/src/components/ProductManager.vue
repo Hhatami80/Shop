@@ -51,6 +51,10 @@
             placeholder="تخفیف (مثلاً 20)"
           />
         </div>
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">نمایش در اسلایدر محصولات ویژه</label>
+          <input type="checkbox" v-model="form.is_featured" class="w-5 h-5" />
+        </div>
 
         <div class="col-full">
           <label for="description" class="label">توضیحات محصول</label>
@@ -273,9 +277,7 @@
                 <p class="modal-price">
                   قیمت نهایی:
                   <span>
-                    {{
-                      (selectedProduct.final_price || selectedProduct.price).toLocaleString()
-                    }}
+                    {{ (selectedProduct.final_price || selectedProduct.price).toLocaleString() }}
                     تومان
                   </span>
                 </p>
@@ -360,6 +362,7 @@ const form = reactive({
   description: '',
   imageFile: null,
   imagePreview: null,
+  is_featured: false,
   galleryFiles: [],
   galleryPreviews: [],
   properties: [],
@@ -398,6 +401,7 @@ function resetForm() {
   form.discount = 0
   form.description = ''
   form.imageFile = null
+  form.is_featured = false
   form.imagePreview = null
   form.galleryFiles = []
   form.galleryPreviews = []
@@ -463,6 +467,7 @@ async function submitForm() {
     payload.append('price', form.price)
     payload.append('discount', form.discount)
     payload.append('description', form.description)
+    payload.append('is_featured', form.is_featured ? 1 : 0)
     if (form.imageFile) payload.append('image', form.imageFile)
     if (form.galleryFiles)
       form.galleryFiles.forEach((file, idx) => payload.append(`uploaded_images`, file))
@@ -475,6 +480,7 @@ async function submitForm() {
       price: form.price,
       discount: form.discount,
       description: form.description,
+      is_featured: form.is_featured ? 1 : 0,
       properties: JSON.stringify(form.properties || []),
     }
   }
@@ -511,7 +517,6 @@ async function submitForm() {
 }
 
 async function removeProduct(productId, index) {
-
   Swal.fire({
     title: '<span style="font-weight:bold; font-size:20px;">آیا مطمئنی؟</span>',
     html: '<p style="font-size:16px;">با حذف،این محصول دیگر قابل بازیابی نیست!</p>',
@@ -531,7 +536,7 @@ async function removeProduct(productId, index) {
     if (result.isConfirmed) {
       try {
         await adminStore.deleteProduct(productId).data
-        toast.success("محصول با موفقیت حذف شد")
+        toast.success('محصول با موفقیت حذف شد')
         Swal.fire({
           title: '<span style="font-weight:bold; font-size:20px;">حذف شد!</span>',
           html: '<p style="font-size:16px;">محصول موردنظر با موفقیت حذف شد.</p>',
@@ -561,6 +566,7 @@ function editProduct(product, index) {
   form.description = product.description || ''
   form.imageFile = null
   form.imagePreview = product.image || null
+  form.is_featured = product.is_featured ? true : false
   form.galleryFiles = []
   form.galleryPreviews = []
 

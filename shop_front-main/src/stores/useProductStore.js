@@ -15,6 +15,7 @@ export const useProductStore = defineStore('product', {
     selectedProduct: {},
     description: '',
     specs: {},
+    featured: [],
     comments: [],
     commentForm: { text: '' },
     filters: { minPrice: 0, maxPrice: 0, selectedBrands: [] },
@@ -55,6 +56,7 @@ export const useProductStore = defineStore('product', {
 
         this.products = response.data.products.map((p) => ({
           ...p,
+          is_featured: p.is_featured ?? false,
           brand: p.brand || 'ناشناخته',
           price: Number(p.price) || 0,
           discounted_price: Number(p.discounted_price) || 0,
@@ -72,6 +74,7 @@ export const useProductStore = defineStore('product', {
           created_date: p.created_date || '',
           jalali_created_date: p.jalali_created_date || '',
         }))
+        this.featured = this.products.filter(p => p.is_featured)
       } catch (error) {
         this.error = 'خطا در دریافت محصولات'
       } finally {
@@ -151,6 +154,7 @@ export const useProductStore = defineStore('product', {
         const p = response.data.product
         this.selectedProduct = {
           ...p,
+          is_featured: p.is_featured ?? false,
           brand: p.brand || 'ناشناخته',
           price: Number(p.price) || 0,
           discounted_price: Number(p.discounted_price) || 0,
@@ -227,6 +231,14 @@ export const useProductStore = defineStore('product', {
       this.loading = true
       this.error = null
       try {
+       
+        if (newProduct instanceof FormData) {
+          
+          if (!newProduct.has('is_featured')) {
+            newProduct.append('is_featured', 0)
+          }
+        }
+
         await productService.create(newProduct)
         await this.getAllProducts()
       } catch (error) {
@@ -237,13 +249,22 @@ export const useProductStore = defineStore('product', {
         this.loading = false
       }
     },
-
     async updateProduct(productId, updatedProduct) {
       this.loading = true
       this.error = null
       try {
+        if (updatedProduct instanceof FormData) {
+          if (!updatedProduct.has('is_featured')) {
+            updatedProduct.append('is_featured', 0)
+          }
+        }
+
         const response = await productService.update(productId, updatedProduct)
-        if (response.status == 201) useAdminStore().getAllProducts()
+
+        if (response.status === 200 || response.status === 201) {
+          useAdminStore().getAllProducts()
+          toast.success('محصول با موفقیت ویرایش شد')
+        }
       } catch (error) {
         this.error = 'خطا در ویرایش محصول'
         throw error

@@ -191,37 +191,37 @@ const removeBanner = (index) => {
 }
 
 const submitEdit = async () => {
-  // 1) ذخیره خود دسته (عکس + عنوان)
+  
   const form = new FormData()
   form.append('title', editedTitle.value)
   if (imageFile.value) form.append('image', imageFile.value)
 
-  // این emit مربوط به ذخیره خود دسته است
+  
   emit('save', { id: props.category.id, formData: form })
 
 
-  // 2) مقایسه بنرهای جدید و قدیمی
+  
   const oldBanners = props.category.banner_images || []
   const newBanners = localBanners.value
 
-  // پیدا کردن بنرهای حذف‌شده
+ 
   const deleted = oldBanners.filter(
     old => !newBanners.find(n => n.id === old.id)
   )
 
-  // پیدا کردن بنرهای جدید (id ندارد)
+ 
   const added = newBanners.filter(b => !b.id)
 
-  // پیدا کردن بنرهای ویرایش‌شده
+ 
   const updated = newBanners.filter(b => b.id)
 
 
-  // --- 3) حذف بنرهای حذف‌شده ---
+ 
   for (const b of deleted) {
     await catBannerStore.deleteBanner(props.category.id, b.id)
   }
 
-  // --- 4) اضافه کردن بنرهای جدید ---
+ 
   for (const b of added) {
     const fd = new FormData()
     if (b.file) fd.append('image', b.file)
@@ -229,7 +229,7 @@ const submitEdit = async () => {
     await catBannerStore.addBanner(props.category.id, fd)
   }
 
-  // --- 5) آپدیت بنرهای قدیمی ---
+ 
   for (const b of updated) {
     const fd = new FormData()
     fd.append('text', b.text || '')

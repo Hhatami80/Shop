@@ -2,9 +2,6 @@
   <div class="product-slider-container">
     <h2 class="section-title">پوشینه ها</h2>
 
-    <!-- Static Grid برای 1 یا 2 محصول -->
-
-    <!-- Desktop Grid -->
     <div v-if="isDesktop && products.length > 0 && products.length < 4" class="static-grid">
       <WearableCard
         v-for="product in products"
@@ -14,7 +11,7 @@
       />
     </div>
 
-    <!-- Swiper -->
+   
     <Swiper
       v-else-if="products.length > 0"
       :modules="[Autoplay, Pagination]"
@@ -55,14 +52,14 @@ const props = defineProps({
 const selectedProduct = ref(null)
 const openModal = (product) => (selectedProduct.value = product)
 
-// تشخیص دسکتاپ
+
 const windowWidth = ref(window.innerWidth)
 const handleResize = () => (windowWidth.value = window.innerWidth)
 onMounted(() => window.addEventListener('resize', handleResize))
 onUnmounted(() => window.removeEventListener('resize', handleResize))
 const isDesktop = computed(() => windowWidth.value >= 1024)
 
-// ساخت پویا breakpoints با تعداد محصولات
+
 const swiperBreakpoints = computed(() => ({
   320: { slidesPerView: 1, spaceBetween: 15, centeredSlides: true },
   480: { slidesPerView: 1, spaceBetween: 20, centeredSlides: true },
@@ -107,7 +104,7 @@ const swiperBreakpoints = computed(() => ({
   position: relative;
 }
 
-/* Grid برای محصولات کمتر از 4 روی دسکتاپ */
+
 .static-grid {
   display: flex;
   justify-content: center;
@@ -117,7 +114,7 @@ const swiperBreakpoints = computed(() => ({
   padding: 20px 0;
 }
 
-/* Swiper */
+
 .tall-product-swiper {
   padding: 40px 0 80px 0;
   overflow: visible !important;
@@ -151,7 +148,7 @@ const swiperBreakpoints = computed(() => ({
   font-weight: 500;
 }
 
-/* ریسپانسیو */
+
 @media (max-width: 1280px) {
   .static-grid {
     gap: 30px;
@@ -166,7 +163,7 @@ const swiperBreakpoints = computed(() => ({
     font-size: 1.5rem;
     margin-bottom: 40px;
   }
-  /* Grid روی موبایل به ستون تبدیل می‌شود */
+
   .static-grid {
     flex-direction: column;
     align-items: center;

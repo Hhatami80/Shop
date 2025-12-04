@@ -21,11 +21,11 @@
     </section>
 
     <section class="section">
-    <WearableSlider title="پوشینه ها" :products="productStore.pooshine" />
+      <WearableSlider title="پوشینه ها" :products="productStore.pooshine" />
     </section>
 
     <section class="section">
-      <FeaturedProductsSlider title="محصولات ویژه" :discounted_product="productStore.bestsellers" />
+      <FeaturedProductsSlider title="محصولات ویژه" :discounted_product="productStore.featured" />
     </section>
 
     <section class="section">
