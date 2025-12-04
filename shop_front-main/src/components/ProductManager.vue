@@ -292,6 +292,9 @@
                   {{ selectedProduct.discount }}% تخفیف!
                 </div>
               </div>
+              <div class="modal-tags" v-if="selectedProduct.is_featured">
+                <span class="featured-tag">ویژه</span>
+              </div>
             </div>
 
             <h4 class="modal-subtitle">توضیحات</h4>
@@ -1469,6 +1472,21 @@ input:checked + .slider:before {
 .modal-edit-btn:hover {
   background-color: #1a1a1a;
 }
+.modal-tags {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.featured-tag {
+  background-color: #ffd700;
+  color: #1a1a1a;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
 .gallery-thumbnails {
   display: flex;
   flex-wrap: wrap;
