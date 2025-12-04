@@ -133,7 +133,8 @@ class Product(models.Model):
     )
     jalali_created_date = models.CharField(max_length=20, blank=True, null=True)
     is_active = models.BooleanField(default=False, null=False, blank=False)
-
+    is_featured = models.BooleanField(default=False, null=False, blank=False)
+    
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title, allow_unicode=True)
 

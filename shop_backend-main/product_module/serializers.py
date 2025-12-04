@@ -120,6 +120,7 @@ class ProductSerializer(serializers.ModelSerializer):
     # is_favorited = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
+    is_featured = serializers.BooleanField()
 
     class Meta:
         model = Product
