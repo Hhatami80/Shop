@@ -74,7 +74,7 @@ export const useProductStore = defineStore('product', {
           created_date: p.created_date || '',
           jalali_created_date: p.jalali_created_date || '',
         }))
-        this.featured = this.products.filter(p => p.is_featured)
+        this.featured = response.data.featured || []
       } catch (error) {
         this.error = 'خطا در دریافت محصولات'
       } finally {
