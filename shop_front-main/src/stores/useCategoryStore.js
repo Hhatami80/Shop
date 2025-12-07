@@ -69,13 +69,23 @@ export const useCategoryStore = defineStore('category', {
       }
     },
     async getAllProducts() {
-      try {
-        const response = await productService.get();
-        this.allProducts = response.data.products || [];
-      } catch (error) {
-        console.error('خطا در دریافت محصولات:', error.response?.data || error);
-        toast.error('خطا در دریافت محصولات');
-      }
-    },
+  try {
+    const res = await productService.get();
+
+    const merged = [
+      ...(res.data.products || []),
+      ...(res.data.pooshineh || []),
+      ...(res.data.new_products || []),
+      ...(res.data.discounted_products || []),
+      ...(res.data.featured || []),
+    ];
+    this.allProducts = Array.from(new Map(merged.map(p => [p.id, p])).values());
+
+  } catch (error) {
+    console.error('خطا در دریافت محصولات:', error.response?.data || error);
+    toast.error('خطا در دریافت محصولات');
+  }
+}
+,
   },
 });

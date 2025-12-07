@@ -3,9 +3,9 @@
     <h1>{{ article.title }}</h1>
     <img v-if="article.image" :src="article.image" alt="article image" class="article-image" />
 
-    <p class="article-meta">
+    <!-- <p class="article-meta">
       {{ article.jalali_created_date || 'تاریخ نامشخص' }}
-    </p>
+    </p> -->
 
     <p class="article-short" v-html="rendered_short_description">
     </p>

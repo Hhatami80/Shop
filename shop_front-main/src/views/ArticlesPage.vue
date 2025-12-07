@@ -13,7 +13,7 @@
         <img v-if="a.image" :src="a.image" alt="article image" />
         <h3>{{ a.title }}</h3>
         <p>{{ a.short_description }}</p>
-        <p>{{ a.jalali_created_date }}</p>
+        <!-- <p>{{ a.jalali_created_date }}</p> -->
       </div>
     </div>
   </div>

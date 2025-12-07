@@ -61,11 +61,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick , watch} from 'vue'
 import { useHeaderStore } from '@/stores/useHeaderStore'
 import { useLoginStore } from '@/stores/useLoginStore'
 import { useCartStore } from '@/stores/useCartStore'
-import { useRouter } from 'vue-router'
+import { useRouter , useRoute } from 'vue-router'
 import SearchBox from '@/components/SearchBox.vue'
 import StickyHeader from '@/components/StickyHeader.vue'
 import { toast } from 'vue3-toastify'
@@ -82,6 +82,7 @@ const headerStore = useHeaderStore()
 const loginStore = useLoginStore()
 const cartStore = useCartStore()
 const router = useRouter()
+const route = useRoute()
 
 const menuBtn = ref(null)
 const menuStyle = ref({
@@ -147,11 +148,17 @@ function handleCartClick() {
     router.push('/user/shop-cart')
   }
 }
+watch(
+  () => route.fullPath,
+  () => {
+    drawerOpen.value = false
+  }
+)
 </script>
 
 <style scoped>
 .header-main {
-  height: 300px;
+  height: 380px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -208,7 +215,7 @@ function handleCartClick() {
   justify-content: center;
   align-items: center;
   margin-top: 50px;
-  height: 100px;
+  height: 200px;
 }
 
 .menu-box {

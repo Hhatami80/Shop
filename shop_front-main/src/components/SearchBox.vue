@@ -144,7 +144,7 @@ function onBlur() {
 
 .search-results {
   position: absolute;
-  top: 80px;
+  top: 130px;
   width: 100%;
   max-height: 400px;
   overflow-y: auto;
@@ -186,7 +186,7 @@ function onBlur() {
 
 .no-results {
   position: absolute;
-  top: 80px;
+  top: 130px;
   width: 100%;
   background: white;
   padding: 3px;
