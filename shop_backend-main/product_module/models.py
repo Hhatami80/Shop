@@ -100,7 +100,7 @@ class Product(models.Model):
         verbose_name="عنوان توضیحات", null=True, blank=True, max_length=100
     )
     description = models.TextField(verbose_name="توضیحات تکمیلی", null=True, blank=True)
-    price = models.PositiveBigIntegerField(verbose_name="قیمت محصولات")
+    price = models.PositiveBigIntegerField(verbose_name="قیمت محصولات", null=True, blank=True)
     discount = models.PositiveIntegerField(
         verbose_name="تخفیف",
         null=True,
@@ -134,27 +134,35 @@ class Product(models.Model):
     jalali_created_date = models.CharField(max_length=20, blank=True, null=True)
     is_active = models.BooleanField(default=False, null=False, blank=False)
     is_featured = models.BooleanField(default=False, null=False, blank=False)
+    is_purchasable = models.BooleanField(default=True, null=False, blank=False)
     
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title, allow_unicode=True)
 
-        # Calculate discounted price
-        if self.discount:
-            try:
-                discount_amount = self.discount / 100 * float(self.price)
-                self.discounted_price = float(self.price) - discount_amount
-                self.final_price = self.discounted_price
-            except (ValueError, TypeError):
-                self.discounted_price = None
-        else:
+        # if the product is not purchasable then set price as blank
+        if not self.is_purchasable:
+            self.price = None
+            self.discount = None
             self.discounted_price = None
-            self.final_price = self.price
+        # Calculate discounted price
+        else:
+            if self.discount:
+                try:
+                    discount_amount = self.discount / 100 * float(self.price)
+                    self.discounted_price = float(self.price) - discount_amount
+                    self.final_price = self.discounted_price
+                except (ValueError, TypeError):
+                    self.discounted_price = None
+            else:
+                self.discounted_price = None
+                self.final_price = self.price
 
         if not self.jalali_created_date and self.created_date:
             jalali_date = jdatetime_datetime.fromgregorian(datetime=self.created_date)
             self.jalali_created_date = (
                 f"{jalali_date.day} {jalali_date.strftime('%B')} {jalali_date.year}"
             )
+            
 
         super().save(*args, **kwargs)
 
