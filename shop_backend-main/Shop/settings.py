@@ -58,7 +58,8 @@ INSTALLED_APPS = [
     'article_module',
     'user_panel_module',
     'payments',
-    'comments'
+    'comments',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
