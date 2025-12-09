@@ -32,7 +32,6 @@
   color: #fff;
   padding: 40px;
   text-align: center;
-  font-family: 'Vazir', sans-serif;
   direction: rtl;
 }
 

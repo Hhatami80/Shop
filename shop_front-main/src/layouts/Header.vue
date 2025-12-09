@@ -216,6 +216,7 @@ watch(
   align-items: center;
   margin-top: 50px;
   height: 200px;
+  margin-bottom: 40px;
 }
 
 .menu-box {
