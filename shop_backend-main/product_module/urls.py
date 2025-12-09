@@ -13,6 +13,7 @@ urlpatterns = [
     # routes for category
     path('category/<int:category_id>', views.SingleCategoryView.as_view()),
     path('category/<int:category_id>/banners', views.CategoryBannerDetailView.as_view()),
+    path('category/<int:category_id>/products', views.CategoryProductsView.as_view()),
     
     # routes related to cart and order
     path('cart/', views.CartView.as_view(), name='cart'),

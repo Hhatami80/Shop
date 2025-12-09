@@ -214,6 +214,12 @@ class SingleCategoryView(APIView):
         category = ProductCategory.objects.prefetch_related("images").get(pk=category_id)
         category_serializer = CategorySerializer(category, context={'request': request})
         return Response({'data': category_serializer.data}, status.HTTP_200_OK)
+    
+class CategoryProductsView(APIView):
+    def get(self, request: Request, category_id: int):
+        products = Product.objects.prefetch_related('images').filter(category=category_id, is_active=True).all()
+        products_serializer = ProductSerializer(products, many=True, context={"request": request})
+        return Response(products_serializer.data, status.HTTP_200_OK)
 
 
 @api_view(['POST'])
