@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { productService } from '@/services/ProductService'
-import toast from 'vue3-toastify'
+import {toast} from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 import { adminService } from '@/services/adminService'
 import { useAdminStore } from './useAdminStore'
@@ -266,7 +266,7 @@ export const useProductStore = defineStore('product', {
           toast.success('محصول با موفقیت ویرایش شد')
         }
       } catch (error) {
-        this.error = 'خطا در ویرایش محصول'
+        console.log(error);
         throw error
       } finally {
         this.loading = false

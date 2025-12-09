@@ -490,9 +490,7 @@ async function submitForm() {
 
   try {
     if (isEditing.value && form.id) {
-      await productStore.updateProduct(form.id, payload)
-
-      toast.success('محصول با موفقیت ویرایش شد.')
+      const response = await productStore.updateProduct(form.id, payload)
     } else {
       const newProduct = await productStore.addProduct(payload)
       await adminStore.getAllProducts()
@@ -513,9 +511,9 @@ async function submitForm() {
 
     resetForm()
   } catch (error) {
-    const message = productStore.error || 'خطا در ذخیره محصول. لطفاً اتصال و داده‌ها را بررسی کنید.'
-    submitError.value = message
-    toast.error(message)
+    console.log(error)
+
+    toast.error(error)
   }
 }
 
@@ -1148,9 +1146,7 @@ textarea.input {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .image-preview-wrapper.large:hover img,
@@ -1200,9 +1196,7 @@ textarea.input {
   border: 3px solid #f9c710;
   background: #fff;
   box-shadow: 0 4px 12px rgba(249, 199, 16, 0.25);
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .gallery-thumb.large:hover {
