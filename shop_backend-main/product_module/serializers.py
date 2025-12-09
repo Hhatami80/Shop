@@ -117,7 +117,6 @@ class ProductSerializer(serializers.ModelSerializer):
         queryset=ProductCategory.objects.all(), write_only=True
     )
     properties = ProductPropertySerializer(many=True)
-    # is_favorited = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
     is_featured = serializers.BooleanField()
