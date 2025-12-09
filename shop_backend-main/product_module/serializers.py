@@ -120,6 +120,7 @@ class ProductSerializer(serializers.ModelSerializer):
     average_rating = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
     is_featured = serializers.BooleanField()
+    price = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -152,11 +153,11 @@ class ProductSerializer(serializers.ModelSerializer):
                 )
         return super().to_internal_value(mutable)
 
-    # def get_is_favorited(self, obj):
-    #     user = self.context.get('request').user
-    #     if user.is_authenticated:
-    #         return obj.favorited_by.filter(user=user).exists()
-    #     return False
+    def get_price(self, obj):
+        if obj.is_purchasable:
+            return obj.price
+        else:
+            return "برای سفارش تماس بگیرید."
 
     def get_average_rating(self, obj):
         ratings = obj.ratings.all()
@@ -220,7 +221,15 @@ class ProductSerializer(serializers.ModelSerializer):
 
         return instance
 
+    def validate(self, attrs):
+        is_purchasable = attrs.get('is_purchasable', getattr(self.instance, 'is_purchasable', True))
+        price = attrs.get('price')
+        if not is_purchasable and price is not None:
+            attrs.pop('price', None)
+            # uncomment below if error is required
+            # raise serializers.ValidationError("اگر کالا قابل خرید نیست ، نباید قیمت داشته باشد.")
 
+        return attrs
 class BrandSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True)
 
