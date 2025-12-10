@@ -147,16 +147,19 @@ function toPersianNumber(number) {
 
 onMounted(async () => {
   await categoryStore.getAllCategories();
-  await categoryStore.getAllProducts();
+  await categoryStore.getProductsByCategoryApi(currentCategoryId.value);
+
   
 });
 
 watch(
   () => route.params.id,
-  () => {
+  async () => {
     currentPage.value = 1;
+    await categoryStore.getProductsByCategoryApi(currentCategoryId.value);
   }
 );
+
 </script>
 
 <style scoped>

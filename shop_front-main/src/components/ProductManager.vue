@@ -28,7 +28,10 @@
             </option>
           </select>
         </div>
-
+        <div class="col-full">
+          <label>محصول قابل خرید است </label>
+          <input type="checkbox" v-model="form.is_purchasable" />
+        </div>
         <div class="col-half">
           <label for="price" class="label">قیمت اصلی (تومان)</label>
           <input
@@ -51,9 +54,9 @@
             placeholder="تخفیف (مثلاً 20)"
           />
         </div>
-        <div>
-          <label class="block text-gray-700 font-medium mb-2">نمایش در اسلایدر محصولات ویژه</label>
-          <input type="checkbox" v-model="form.is_featured" class="w-5 h-5" />
+        <div class="col-full">
+          <label>نمایش در اسلایدر محصولات ویژه</label>
+          <input type="checkbox" v-model="form.is_featured" />
         </div>
 
         <div class="col-full">
@@ -277,14 +280,34 @@
                 <p class="modal-price">
                   قیمت نهایی:
                   <span>
-                    {{ (selectedProduct.final_price || selectedProduct.price).toLocaleString() }}
-                    تومان
+                    <template v-if="selectedProduct.is_purchasable">
+                      {{
+                        (selectedProduct.final_price || selectedProduct.price).toLocaleString(
+                          'fa-IR'
+                        )
+                      }}
+                      تومان
+                    </template>
+
+                    <template v-else>
+                      {{ selectedProduct.final_price || selectedProduct.price }}
+                    </template>
                   </span>
                 </p>
+
                 <p class="modal-category">
                   قیمت اصلی:
-                  <span>{{ selectedProduct.price.toLocaleString() }} تومان</span>
+                  <span>
+                    <template v-if="selectedProduct.is_purchasable">
+                      {{ selectedProduct.price.toLocaleString('fa-IR') }} تومان
+                    </template>
+
+                    <template v-else>
+                      {{ selectedProduct.price }}
+                    </template>
+                  </span>
                 </p>
+
                 <p class="modal-category">
                   دسته‌بندی: <span>{{ selectedProduct.category?.title }}</span>
                 </p>
@@ -366,6 +389,7 @@ const form = reactive({
   imageFile: null,
   imagePreview: null,
   is_featured: false,
+  is_purchasable: true,
   galleryFiles: [],
   galleryPreviews: [],
   properties: [],
@@ -405,6 +429,7 @@ function resetForm() {
   form.description = ''
   form.imageFile = null
   form.is_featured = false
+  form.is_purchasable = true
   form.imagePreview = null
   form.galleryFiles = []
   form.galleryPreviews = []
@@ -471,6 +496,7 @@ async function submitForm() {
     payload.append('discount', form.discount)
     payload.append('description', form.description)
     payload.append('is_featured', form.is_featured ? 1 : 0)
+    payload.append('is_purchasable', form.is_purchasable ? 1 : 0)
     if (form.imageFile) payload.append('image', form.imageFile)
     if (form.galleryFiles)
       form.galleryFiles.forEach((file, idx) => payload.append(`uploaded_images`, file))
@@ -484,6 +510,7 @@ async function submitForm() {
       discount: form.discount,
       description: form.description,
       is_featured: form.is_featured ? 1 : 0,
+      is_purchasable: form.is_purchasable ? 1 : 0,
       properties: JSON.stringify(form.properties || []),
     }
   }
@@ -568,6 +595,7 @@ function editProduct(product, index) {
   form.imageFile = null
   form.imagePreview = product.image || null
   form.is_featured = product.is_featured ? true : false
+  form.is_purchasable = product.is_purchasable ? true : false
   form.galleryFiles = []
   form.galleryPreviews = []
 

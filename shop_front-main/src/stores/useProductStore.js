@@ -48,7 +48,7 @@ export const useProductStore = defineStore('product', {
         const response = await productService.get()
         this.new_products = response.data.new_products.map((p) => ({
           ...p,
-          price: Number(p.price) || 0,
+          price: Number(p.price) || p.price,
           discounted_price: Number(p.discounted_price) || 0,
           image: p.image || '',
           description: p.description || '',
@@ -57,8 +57,9 @@ export const useProductStore = defineStore('product', {
         this.products = response.data.products.map((p) => ({
           ...p,
           is_featured: p.is_featured ?? false,
+          is_purchasable: p.is_purchasable,
           brand: p.brand || 'ناشناخته',
-          price: Number(p.price) || 0,
+          price: Number(p.price) || p.price,
           discounted_price: Number(p.discounted_price) || 0,
           discount: Number(p.discount) || 0,
           description: p.description || '',

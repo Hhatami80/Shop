@@ -49,7 +49,13 @@
           <button class="size-guide golden-button">راهنمای سایز</button>
         </div>
 
-        <div class="price">{{ toPersianNumber(product.price) }} تومان</div>
+        <div class="price">
+          <template v-if="isPurchasable"> {{ toPersianNumber(product.price) }} تومان </template>
+
+          <template v-else>
+            <span>{{ product.price }}</span>
+          </template>
+        </div>
 
         <div class="quantity">
           <span>تعداد</span>
@@ -64,9 +70,12 @@
           <button
             class="add-to-cart golden-button"
             @click="addToCart(product.id)"
-            :disabled="alreadyInCart"
+            :disabled="alreadyInCart || !isPurchasable"
           >
-            {{ alreadyInCart ? 'افزوده شد' : 'افزودن به سبد خرید' }}
+            <template v-if="!isPurchasable"> {{ product.price }} </template>
+            <template v-else>
+              {{ alreadyInCart ? 'افزوده شد' : 'افزودن به سبد خرید' }}
+            </template>
           </button>
           <p class="stock" v-if="product.stock <= 2">
             تنها {{ toPersianNumber(product.stock) }} عدد در انبار موجود است
@@ -199,7 +208,7 @@ const categoryTitle = computed(() => {
   return category ? category.title : ''
 })
 const alreadyInCart = computed(() =>
-  cartStore.items.some((item) => item.product.id === productId.value),
+  cartStore.items.some((item) => item.product.id === productId.value)
 )
 const relatedProducts = computed(() => {
   if (!product.value?.category?.id) return []
@@ -207,6 +216,7 @@ const relatedProducts = computed(() => {
     .filter((p) => p.category?.id === product.value.category.id && p.id !== product.value.id)
     .slice(0, 4)
 })
+const isPurchasable = computed(() => product.value?.is_purchasable === true)
 
 function increase() {
   quantity.value++
@@ -271,7 +281,7 @@ watch(
     selectedSize.value = null
     await loadProduct()
     if (productId.value) await commentStore.fetchApprovedComments(productId.value)
-  },
+  }
 )
 
 watch(activeTab, async (tab) => {

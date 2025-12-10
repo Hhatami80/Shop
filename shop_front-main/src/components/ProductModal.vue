@@ -23,13 +23,30 @@
               </div>
               <div class="price">
                 <template v-if="product.discounted_price">
-                  <span class="old-price">{{ product.price.toLocaleString('fa-IR') }} تومان</span>
-                  <span class="new-price"
-                    >{{ product.discounted_price.toLocaleString('fa-IR') }} تومان</span
-                  >
+                  <template v-if="typeof product.price === 'number'">
+                    <span class="old-price">{{ product.price.toLocaleString('fa-IR') }} تومان</span>
+                  </template>
+                  <template v-else>
+                    <span class="old-price">{{ product.price }}</span>
+                  </template>
+
+                  <template v-if="typeof product.discounted_price === 'number'">
+                    <span class="new-price">
+                      {{ product.discounted_price.toLocaleString('fa-IR') }} تومان
+                    </span>
+                  </template>
+                  <template v-else>
+                    <span class="new-price">{{ product.discounted_price }}</span>
+                  </template>
                 </template>
+
                 <template v-else>
-                  {{ product.price ? product.price.toLocaleString('fa-IR') : '0' }} تومان
+                  <template v-if="typeof product.price === 'number'">
+                    {{ product.price.toLocaleString('fa-IR') }} تومان
+                  </template>
+                  <template v-else>
+                    {{ product.price }}
+                  </template>
                 </template>
               </div>
 
@@ -45,7 +62,11 @@
                   <span>{{ count }}</span>
                   <button @click="increase">+</button>
                 </div>
-                <button class="add-to-cart" @click="addToCart" :disabled="alreadyInCart">
+                <button
+                  class="add-to-cart"
+                  @click="addToCart"
+                  :disabled="alreadyInCart || product.is_purchasable === false"
+                >
                   {{ alreadyInCart ? 'افزوده شد' : 'افزودن به سبد' }}
                 </button>
               </div>
@@ -137,8 +158,6 @@ const userRating = ref(0)
 const hoverRating = ref(0)
 const newComment = ref('')
 
-
-
 const alreadyInCart = computed(() => {
   if (!props.product?.id) return false
   return cartStore.items.some((item) => item.product.id === props.product.id)
@@ -152,7 +171,7 @@ watch(
       await commentStore.fetchApprovedComments(newVal.id)
     }
   },
-  { immediate: true },
+  { immediate: true }
 )
 
 const productComments = computed(() => {
