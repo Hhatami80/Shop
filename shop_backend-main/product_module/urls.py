@@ -5,6 +5,7 @@ urlpatterns = [
     # routes related to products
     path("search-product", views.FilteredProductsView.as_view()),
     path('products/<int:product_id>', views.ProductDetailView.as_view(), name='product-detail'),
+    path("products/<int:product_id>/gallery/<int:image_id>", views.ProductGalleryDetailView.as_view(), name="product-gallery-detail"),
     path('products/<int:product_id>/description', views.ProductDescriptionView.as_view(), name='product-detail'),
     path('products/<int:product_id>/specs', views.ProductPropertyView.as_view(), name='product-detail'),
     path('products/<int:product_id>/comments', views.AddComment.as_view(), name='add-product-comment'),

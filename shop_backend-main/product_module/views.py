@@ -55,6 +55,13 @@ class ProductDetailView(APIView):
                          'comment': comment_serializer.data}, status.HTTP_200_OK)
 
 
+class ProductGalleryDetailView(APIView):
+    def delete(self, request: Request, product_id, image_id):
+        product = get_object_or_404(Product, id=product_id)
+        image = get_object_or_404(ProductGallery, id=image_id, product=product)
+        image.delete()
+        return Response({'message': 'تصویر با موفقیت حذف شد.'}, status=status.HTTP_200_OK)
+
 class ApprovedCommentsView(APIView):
     def get(self, request: Request, product_id):
         comments = ProductComment.objects.filter(product_id=product_id, is_approved=True)
