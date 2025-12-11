@@ -8,11 +8,7 @@
       <span v-if="categoryName"> / {{ categoryName }}</span>
     </div>
     <section class="filter-bar">
-      <div
-        class="filter-right"
-        :class="{ active: isFilterOpen }"
-        @click="toggleFilterMenu"
-      >
+      <div class="filter-right" :class="{ active: isFilterOpen }" @click="toggleFilterMenu">
         <i class="fas fa-sliders-h"></i>
         <span>مرتب‌سازی</span>
         <div v-if="isFilterOpen" class="filter-dropdown" @click.stop>
@@ -32,13 +28,14 @@
       >
         <div class="featured-image-wrapper">
           <img :src="product.image" alt="محصول ویژه" class="featured-image" />
-          <span v-if="product.discount" class="featured-discount">
-            {{ product.discount }}%
-          </span>
+          <span v-if="product.discount" class="featured-discount"> {{ product.discount }}% </span>
         </div>
         <div class="featured-info">
           <h3 class="featured-name">{{ product.title }}</h3>
-          <p class="featured-price">{{ toPersianNumber(product.price) }} تومان</p>
+          <p class="product-price" v-if="product.is_purchasable">
+            {{ toPersianNumber(product.price) }} تومان
+          </p>
+          <p class="product-price" v-else>{{ product.price }}</p>
         </div>
       </router-link>
     </section>
@@ -52,12 +49,13 @@
       >
         <div class="product-image-wrapper">
           <img :src="product.image" alt="تصویر محصول" class="product-image" />
-          <span v-if="product.discount" class="discount-badge">
-            {{ product.discount }}%
-          </span>
+          <span v-if="product.discount" class="discount-badge"> {{ product.discount }}% </span>
         </div>
         <h4 class="product-name">{{ product.title }}</h4>
-        <p class="product-price">{{ toPersianNumber(product.price) }} تومان</p>
+        <p class="product-price" v-if="product.is_purchasable">
+          {{ toPersianNumber(product.price) }} تومان
+        </p>
+        <p class="product-price" v-else>{{ product.price }}</p>
       </router-link>
     </section>
 
@@ -75,98 +73,92 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
-import { useRoute } from "vue-router";
-import StickyHeader from "@/components/StickyHeader.vue";
-import Banner from "@/components/CategoryBanner.vue";
-import { useCategoryStore } from "@/stores/useCategoryStore";
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import StickyHeader from '@/components/StickyHeader.vue'
+import Banner from '@/components/CategoryBanner.vue'
+import { useCategoryStore } from '@/stores/useCategoryStore'
 
-const categoryStore = useCategoryStore();
-const route = useRoute();
+const categoryStore = useCategoryStore()
+const route = useRoute()
 
-const isFilterOpen = ref(false);
-const selectedSort = ref("");
-const currentPage = ref(1);
-const itemsPerPage = 8;
+const isFilterOpen = ref(false)
+const selectedSort = ref('')
+const currentPage = ref(1)
+const itemsPerPage = 8
 
-const categoryName = ref("");
+const categoryName = ref('')
 
-const currentCategoryId = computed(() => Number(route.params.id));
+const currentCategoryId = computed(() => Number(route.params.id))
 
-const allProducts = computed(() =>
-  categoryStore.getProductsByCategory(currentCategoryId.value)
-);
-const featuredProducts = computed(() => allProducts.value.slice(0, 2));
-const gridProducts = ref([]);
+const allProducts = computed(() => categoryStore.getProductsByCategory(currentCategoryId.value))
+const featuredProducts = computed(() => allProducts.value.slice(0, 2))
+const gridProducts = ref([])
 const currentCategoryBannerImages = computed(() => {
-  const cat = categoryStore.getCategoryById(currentCategoryId.value);
-  return cat?.banner_images || [];
-});
+  const cat = categoryStore.getCategoryById(currentCategoryId.value)
+  return cat?.banner_images || []
+})
 watch(
   allProducts,
   () => {
-    gridProducts.value = allProducts.value.slice(2);
-    currentPage.value = 1;
+    gridProducts.value = allProducts.value.slice(2)
+    currentPage.value = 1
   },
   { immediate: true }
-);
+)
 
 watch(
   [() => categoryStore.allCategories, currentCategoryId],
   () => {
-    const cat = categoryStore.getCategoryById(currentCategoryId.value);
-    categoryName.value = cat ? cat.title || cat.name : "";
+    const cat = categoryStore.getCategoryById(currentCategoryId.value)
+    categoryName.value = cat ? cat.title || cat.name : ''
   },
   { immediate: true }
-);
+)
 
 function toggleFilterMenu() {
-  isFilterOpen.value = !isFilterOpen.value;
+  isFilterOpen.value = !isFilterOpen.value
 }
 function sortBy(type) {
-  selectedSort.value = type;
-  if (type === "priceAsc") gridProducts.value.sort((a, b) => a.price - b.price);
-  if (type === "priceDesc") gridProducts.value.sort((a, b) => b.price - a.price);
-  if (type === "discount") gridProducts.value.sort((a, b) => b.discount - a.discount);
-  isFilterOpen.value = false;
+  selectedSort.value = type
+  if (type === 'priceAsc') gridProducts.value.sort((a, b) => a.price - b.price)
+  if (type === 'priceDesc') gridProducts.value.sort((a, b) => b.price - a.price)
+  if (type === 'discount') gridProducts.value.sort((a, b) => b.discount - a.discount)
+  isFilterOpen.value = false
 }
 
-const totalPages = computed(() => Math.ceil(gridProducts.value.length / itemsPerPage));
+const totalPages = computed(() => Math.ceil(gridProducts.value.length / itemsPerPage))
 const paginatedProducts = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  return gridProducts.value.slice(start, start + itemsPerPage);
-});
+  const start = (currentPage.value - 1) * itemsPerPage
+  return gridProducts.value.slice(start, start + itemsPerPage)
+})
 function changePage(page) {
-  currentPage.value = page;
+  currentPage.value = page
 }
 
 function toPersianNumber(number) {
-  if (number === null || number === undefined) return "";
-  return Number(number).toLocaleString("fa-IR");
+  if (number === null || number === undefined) return ''
+  return Number(number).toLocaleString('fa-IR')
 }
 
 onMounted(async () => {
-  await categoryStore.getAllCategories();
-  await categoryStore.getProductsByCategoryApi(currentCategoryId.value);
-
-  
-});
+  await categoryStore.getAllCategories()
+  await categoryStore.getProductsByCategoryApi(currentCategoryId.value)
+})
 
 watch(
   () => route.params.id,
   async () => {
-    currentPage.value = 1;
-    await categoryStore.getProductsByCategoryApi(currentCategoryId.value);
+    currentPage.value = 1
+    await categoryStore.getProductsByCategoryApi(currentCategoryId.value)
   }
-);
-
+)
 </script>
 
 <style scoped>
-@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css");
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 
 .category-product-page {
-  
   direction: rtl;
   background: #f9f9f9;
 }
@@ -448,7 +440,6 @@ watch(
   }
 }
 
-
 @media (max-width: 900px) {
   .breadcrumb {
     margin: 10px 20px;
@@ -490,9 +481,7 @@ watch(
   }
 }
 
-
 @media (max-width: 600px) {
-
   .category-product-page {
     padding-bottom: 40px;
   }
@@ -562,7 +551,6 @@ watch(
   }
 }
 
-
 @media (max-width: 400px) {
   .featured-image-wrapper {
     height: 240px;
@@ -575,5 +563,4 @@ watch(
     padding: 8px;
   }
 }
-
 </style>

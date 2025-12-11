@@ -68,7 +68,7 @@
 
         <div class="buy-section">
           <button
-          v-if="product.is_purchasable"
+            v-if="product.is_purchasable"
             class="add-to-cart golden-button"
             @click="addToCart(product.id)"
             :disabled="alreadyInCart"
@@ -140,7 +140,10 @@
         >
           <img :src="item.image" :alt="item.title" />
           <p class="name">{{ item.title }}</p>
-          <p class="price">{{ toPersianNumber(item.price) }} تومان</p>
+          <p class="price" v-if="item.is_purchasable">
+            {{ toPersianNumber(item.price) }} تومان
+          </p>
+          <p class="price" v-else>{{ item.price }}</p>
         </router-link>
       </div>
     </section>
