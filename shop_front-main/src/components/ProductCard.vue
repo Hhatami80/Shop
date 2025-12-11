@@ -9,11 +9,19 @@
       <p class="product-description">{{ product?.description }}</p>
 
       <div class="product-price">
-        <span class="final-price">{{ formatPrice(product?.price) }} تومان</span>
+        <span class="final-price">
+          <template v-if="product.is_purchasable">
+            {{ formatPrice(product.price) }} تومان
+          </template>
+
+          <template v-else>
+            {{ product.price }}
+          </template>
+        </span>
       </div>
 
       <button class="btn-add-to-cart" @click.stop="$emit('open-modal', product)">
-         بررسی و خرید
+        بررسی و خرید
       </button>
     </div>
   </div>
@@ -47,9 +55,7 @@ const formatPrice = (price) => (price ? price.toLocaleString('fa-IR').replace(/�
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  transition:
-    transform 0.3s,
-    box-shadow 0.3s;
+  transition: transform 0.3s, box-shadow 0.3s;
   cursor: pointer;
 }
 
@@ -130,9 +136,7 @@ const formatPrice = (price) => (price ? price.toLocaleString('fa-IR').replace(/�
   align-items: center;
   gap: 6px;
   box-shadow: 0 4px 15px rgba(249, 199, 16, 0.4);
-  transition:
-    background 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btn-add-to-cart:hover {

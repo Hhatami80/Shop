@@ -9,12 +9,24 @@
       <p class="product-description">{{ product?.description }}</p>
 
       <div class="product-price">
-        <span class="original-price" v-if="hasDiscount">{{ formattedOriginalPrice }}</span>
-        <span class="final-price">{{ formattedDiscountedPrice }}</span>
+        <template v-if="product.is_purchasable && hasDiscount">
+          <span class="original-price"> {{ formattedOriginalPrice }} </span>
+          <span class="final-price"> {{ formattedDiscountedPrice }} </span>
+        </template>
+
+        <template v-else-if="product.is_purchasable">
+          <span class="final-price"> {{ formattedFinalPrice }} </span>
+        </template>
+
+        <template v-else>
+          <span class="final-price not-buyable">
+            {{ product.price }}
+          </span>
+        </template>
       </div>
 
       <button class="btn-add-to-cart" @click.stop="$emit('open-modal', product)">
-         بررسی و خرید
+        بررسی و خرید
       </button>
     </div>
   </div>
@@ -29,18 +41,35 @@ const props = defineProps({
 
 const defaultImage = '/default-product.jpg'
 
-const originalPrice = computed(() => Number(props.product?.price) || 0)
-const discountedPrice = computed(() => Number(props.product?.discounted_price) || 0)
+const originalPrice = computed(() => {
+  return props.product.is_purchasable ? Number(props.product?.price || 0) : null
+})
 
-const hasDiscount = computed(() => discountedPrice.value > 0 && discountedPrice.value < originalPrice.value)
+const discountedPrice = computed(() => {
+  return props.product.is_purchasable ? Number(props.product?.discounted_price || 0) : null
+})
 
-const formattedOriginalPrice = computed(() => 
-  originalPrice.value.toLocaleString('fa-IR').replace(/٬/g, ',') + ' تومان'
-)
+const hasDiscount = computed(() => {
+  return (
+    props.product.is_purchasable &&
+    discountedPrice.value > 0 &&
+    discountedPrice.value < originalPrice.value
+  )
+})
+
+const formattedOriginalPrice = computed(() => {
+  if (!props.product.is_purchasable) return props.product.price
+  return originalPrice.value.toLocaleString('fa-IR') + ' تومان'
+})
 
 const formattedDiscountedPrice = computed(() => {
-  const price = hasDiscount.value ? discountedPrice.value : originalPrice.value
-  return price.toLocaleString('fa-IR').replace(/٬/g, ',') + ' تومان'
+  if (!props.product.is_purchasable) return props.product.price
+  return discountedPrice.value.toLocaleString('fa-IR') + ' تومان'
+})
+
+const formattedFinalPrice = computed(() => {
+  if (!props.product.is_purchasable) return props.product.price
+  return originalPrice.value.toLocaleString('fa-IR') + ' تومان'
 })
 </script>
 

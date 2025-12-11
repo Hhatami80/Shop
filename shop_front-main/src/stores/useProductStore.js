@@ -136,9 +136,11 @@ export const useProductStore = defineStore('product', {
           id: p.id,
           title: p.title,
           description: p.description || '',
-          price: Number(p.price) || 0,
+          price: Number(p.price) || p.price,
           image: p.image.startsWith('http') ? p.image : `${import.meta.env.VITE_API_URL}${p.image}`,
           inStock: true,
+          is_purchasable: p.is_purchasable
+          
         }))
       } catch (error) {
         this.error = 'خطا در دریافت محصولات'

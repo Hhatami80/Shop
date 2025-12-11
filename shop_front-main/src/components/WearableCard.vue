@@ -14,13 +14,17 @@
 
       <div class="price-section">
         <div class="price">
-          {{ formatPrice(product.price) }}
-          <span class="toman">تومان</span>
+          <template v-if="product.is_purchasable">
+            {{ formatPrice(product.price) }} تومان
+          </template>
+
+          <template v-else-if="!product.is_purchasable">
+            {{ product.price }}
+          </template>
+          
         </div>
 
-        <div v-if="product.discountPrice" class="old-price">
-          {{ formatPrice(product.discountPrice) }}
-        </div>
+        
       </div>
 
       <button

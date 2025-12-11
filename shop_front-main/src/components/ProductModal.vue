@@ -63,9 +63,10 @@
                   <button @click="increase">+</button>
                 </div>
                 <button
+                v-if="product.is_purchasable"
                   class="add-to-cart"
                   @click="addToCart"
-                  :disabled="alreadyInCart || product.is_purchasable === false"
+                  :disabled="alreadyInCart"
                 >
                   {{ alreadyInCart ? 'افزوده شد' : 'افزودن به سبد' }}
                 </button>
