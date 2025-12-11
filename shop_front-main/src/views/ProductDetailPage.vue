@@ -57,7 +57,7 @@
           </template>
         </div>
 
-        <div class="quantity">
+        <div class="quantity" v-if="product.is_purchasable">
           <span>تعداد</span>
           <div class="controls">
             <button @click="decrease">−</button>
@@ -68,9 +68,10 @@
 
         <div class="buy-section">
           <button
+          v-if="product.is_purchasable"
             class="add-to-cart golden-button"
             @click="addToCart(product.id)"
-            :disabled="alreadyInCart || !isPurchasable"
+            :disabled="alreadyInCart"
           >
             <template v-if="!isPurchasable"> {{ product.price }} </template>
             <template v-else>
@@ -106,7 +107,7 @@
 
         <div v-if="activeTab === 'details'" class="details">
           <p>{{ product.description }}</p>
-          <p>شناسه محصول: {{ product.id }}</p>
+          <!-- <p>شناسه محصول: {{ product.id }}</p> -->
         </div>
 
         <div v-else class="comments">

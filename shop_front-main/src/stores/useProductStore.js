@@ -159,7 +159,7 @@ export const useProductStore = defineStore('product', {
           ...p,
           is_featured: p.is_featured ?? false,
           brand: p.brand || 'ناشناخته',
-          price: Number(p.price) || 0,
+          price: Number(p.price) || p.price,
           discounted_price: Number(p.discounted_price) || 0,
           discount: Number(p.discount) || 0,
           description: p.description || '',
