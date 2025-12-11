@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { productService } from '@/services/ProductService'
-import {toast} from 'vue3-toastify'
+import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 import { adminService } from '@/services/adminService'
 import { useAdminStore } from './useAdminStore'
@@ -212,6 +212,20 @@ export const useProductStore = defineStore('product', {
         this.submitError = 'خطا در ارسال نظر. لطفاً دوباره تلاش کنید.'
       }
     },
+    async deleteGalleryImage(productId, imageId) {
+      this.loading = true
+      this.error = null
+      try {
+        const response = await productService.deleteGalleryImage(productId, imageId)
+        this.loading = falsr
+        if (response.status == 200) {
+          toast.success("تصویر از گالری حذف شد.")
+        }
+      } catch (error) {
+        this.error = error
+        toast.error(response.data.message || "خطا در حذف تصویر")
+      }
+    },
 
     setPriceFilter(min, max) {
       this.filters.minPrice = min
@@ -232,9 +246,7 @@ export const useProductStore = defineStore('product', {
       this.loading = true
       this.error = null
       try {
-       
         if (newProduct instanceof FormData) {
-          
           if (!newProduct.has('is_featured')) {
             newProduct.append('is_featured', 0)
           }
@@ -267,7 +279,7 @@ export const useProductStore = defineStore('product', {
           toast.success('محصول با موفقیت ویرایش شد')
         }
       } catch (error) {
-        console.log(error);
+        console.log(error)
         throw error
       } finally {
         this.loading = false

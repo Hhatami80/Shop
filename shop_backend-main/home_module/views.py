@@ -35,21 +35,21 @@ class ProductView(APIView):
                               .select_related('category')
                               .prefetch_related('images')
                               .filter(is_active=True, is_done=False))
-            non_pooshine_products = products_query.filter(~Q(category__title="پوشینه")).all()
+            non_pooshine_products = products_query.filter(~Q(category__title="پوشینه")).all()[:10]
             
             np_product_serializer = ProductSerializer(non_pooshine_products, many=True, context={'request': request})
             
-            pooshineh_products = products_query.filter(category__title__contains="پوشینه").all()
+            pooshineh_products = products_query.filter(category__title__contains="پوشینه").all()[:10]
             pooshineh_serializer = ProductSerializer(pooshineh_products, many=True, context={'request': request})
             
             discounted_products = non_pooshine_products
             discounted_products_serializer = ProductSerializer(discounted_products, many=True, context={'request': request})
             
-            new_products = products_query.filter(~Q(category__title="پوشینه")).order_by('-created_date').all()
+            new_products = products_query.filter(~Q(category__title="پوشینه")).order_by('-created_date').all()[:10]
             new_products_serializer = ProductSerializer(new_products, many=True, context={'request': request})
             
             
-            featured_products = products_query.filter(is_featured=True).all()
+            featured_products = products_query.filter(is_featured=True).all()[:10]
             featured_product_serialzier = ProductSerializer(featured_products, many=True, context={'request': request})
             
             return Response({
