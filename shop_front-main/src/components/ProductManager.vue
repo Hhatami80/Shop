@@ -32,7 +32,7 @@
           <label>محصول قابل خرید است </label>
           <input type="checkbox" v-model="form.is_purchasable" />
         </div>
-        <div class="col-half">
+        <div class="col-half" v-if="form.is_purchasable">
           <label for="price" class="label">قیمت اصلی (تومان)</label>
           <input
             id="price"
@@ -40,11 +40,11 @@
             v-model.number="form.price"
             class="input"
             placeholder="قیمت"
-            required
+            :required="form.is_purchasable"
           />
         </div>
 
-        <div class="col-half">
+        <div class="col-half" v-if="form.is_purchasable">
           <label for="discount" class="label">تخفیف (درصد)</label>
           <input
             id="discount"
@@ -379,6 +379,8 @@ const selectedProduct = ref(null)
 const mainImageKey = ref(Date.now())
 const galleryKey = ref(Date.now())
 
+const existingGalleryIds = ref([])
+
 const form = reactive({
   id: null,
   title: '',
@@ -440,6 +442,7 @@ function resetForm() {
   submitError.value = null
   mainImageKey.value = Date.now()
   galleryKey.value = Date.now()
+  existingGalleryIds.value = []
 }
 
 function addProperty() {
@@ -469,11 +472,16 @@ function handleGalleryUpload(event) {
   form.galleryPreviews.push(...files.map((f) => URL.createObjectURL(f)))
 }
 
-function removeGalleryImage(imageId) {
-  form.galleryFiles.splice(imageId, 1)
-  form.galleryPreviews.splice(imageId, 1)
-  if (isEditing.value && form.id) {
+function removeGalleryImage(index) {
+  if (isEditing.value && form.id && index < existingGalleryIds.value.length) {
+    const imageId = existingGalleryIds.value[index]
     productStore.deleteGalleryImage(form.id, imageId)
+    existingGalleryIds.value.splice(index, 1)
+    form.galleryPreviews.splice(index, 1)
+  } else {
+    const newIndex = index - existingGalleryIds.value.length
+    form.galleryFiles.splice(newIndex, 1)
+    form.galleryPreviews.splice(index, 1)
   }
 }
 
@@ -604,8 +612,10 @@ function editProduct(product, index) {
 
   if (Array.isArray(product.images) && product.images.length) {
     form.galleryPreviews = product.images.map((img) => img.image)
+    existingGalleryIds.value = product.images.map((img) => img.id)
   } else {
     form.galleryPreviews = []
+    existingGalleryIds.value = []
   }
 
   form.galleryFiles = []
@@ -639,10 +649,8 @@ function closeModal() {
 onMounted(() => {
   adminStore.getAllProducts()
   categoryStore.getAllCategories()
-  console.log(adminStore.products)
 })
 </script>
-
 <style scoped>
 .product-container {
   padding: 30px;

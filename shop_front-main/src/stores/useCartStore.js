@@ -25,6 +25,9 @@ export const useCartStore = defineStore('cart', {
         this.items = [] 
         return
       }
+      if (loginStore.user.role === 'admin') {
+        return
+      }
 
       this.loading = true
       this.error = null

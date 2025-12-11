@@ -2,38 +2,35 @@
   <transition name="fade">
     <div v-if="visible" :class="['header-sticky', { blurred: useScrollBlur && isBlurred }]">
       <div class="icons">
-        <router-link to="/"><i class="fas fa-home"></i></router-link>
-
+        
         <div class="cart-icon-wrapper">
-          <i class="fas fa-shopping-cart" @click="handleCartClick"></i>
+          <i
+            class="fas fa-shopping-cart"
+            @click="handleCartClick"
+            v-if="loginStore.user.role !== 'admin'"
+          ></i>
           <span v-if="cartStore.totalQuantity > 0" class="cart-badge">
             {{ cartStore.totalQuantity }}
           </span>
         </div>
-
+        
         <i v-if="loginStore.isAuthenticated" class="fas fa-heart"></i>
-
         <router-link
-          v-if="loginStore.isAuthenticated && loginStore.isAdmin"
+        v-if="loginStore.isAuthenticated && loginStore.isAdmin"
           to="/admin/dashboard"
           class="user-icon"
-          
-        >
+          >
           <i class="fas fa-user"></i>
         </router-link>
-        <router-link
-          v-else-if="loginStore.isAuthenticated"
-          to="/user/dashboard"
-          class="user-icon"
-          
-        >
+        <router-link v-else-if="loginStore.isAuthenticated" to="/user/dashboard" class="user-icon">
           <i class="fas fa-user"></i>
         </router-link>
         <router-link v-else to="/login" class="user-icon">
           <i class="fas fa-user"></i>
         </router-link>
+        <router-link to="/"><i class="fas fa-home"></i></router-link>
       </div>
-
+      
       <button ref="stickyMenuBtn" class="menu-btn" @click="toggleMenu">☰</button>
     </div>
   </transition>
@@ -266,8 +263,8 @@ onUnmounted(() => {
 
 .cart-badge {
   position: absolute;
-  bottom: 0; 
-  left: 0; 
+  bottom: 0;
+  left: 0;
 
   background: #ff3547;
   color: #fff;
@@ -276,7 +273,7 @@ onUnmounted(() => {
   font-weight: 700;
 
   padding: 1px 3px;
-  border-radius: 50%; 
+  border-radius: 50%;
 
   min-width: 12px;
   height: 12px;

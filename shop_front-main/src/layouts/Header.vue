@@ -4,10 +4,12 @@
       <button ref="menuBtn" class="menu-btn" @click="toggleMenu">☰</button>
 
       <div class="header-icons">
-        <router-link to="/"><i class="fas fa-home"></i></router-link>
-
         <div class="cart-icon-wrapper">
-          <i class="fas fa-shopping-cart" @click="handleCartClick"></i>
+          <i
+            class="fas fa-shopping-cart"
+            @click="handleCartClick"
+            v-if="loginStore.user?.role !== 'admin'"
+          ></i>
           <span v-if="cartStore.totalQuantity > 0" class="cart-badge">
             {{ cartStore.totalQuantity }}
           </span>
@@ -24,6 +26,7 @@
         <router-link v-else to="/login" class="user-icon">
           <i class="fas fa-user"></i>
         </router-link>
+        <router-link to="/"><i class="fas fa-home"></i></router-link>
       </div>
 
       <img v-if="headerStore.site_logo" :src="headerStore.site_logo" alt="لوگو" class="logo" />
@@ -61,11 +64,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick , watch} from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useHeaderStore } from '@/stores/useHeaderStore'
 import { useLoginStore } from '@/stores/useLoginStore'
 import { useCartStore } from '@/stores/useCartStore'
-import { useRouter , useRoute } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import SearchBox from '@/components/SearchBox.vue'
 import StickyHeader from '@/components/StickyHeader.vue'
 import { toast } from 'vue3-toastify'
@@ -152,7 +155,7 @@ watch(
   () => route.fullPath,
   () => {
     drawerOpen.value = false
-  }
+  },
 )
 </script>
 
@@ -293,8 +296,8 @@ watch(
 
 .cart-badge {
   position: absolute;
-  bottom: 14px; 
-  left: 0; 
+  bottom: 14px;
+  left: 0;
 
   background: #ff3547;
   color: #fff;
@@ -303,7 +306,7 @@ watch(
   font-weight: 700;
 
   padding: 1px 3px;
-  border-radius: 50%; 
+  border-radius: 50%;
 
   min-width: 12px;
   height: 12px;
