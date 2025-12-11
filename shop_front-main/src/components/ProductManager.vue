@@ -469,9 +469,12 @@ function handleGalleryUpload(event) {
   form.galleryPreviews.push(...files.map((f) => URL.createObjectURL(f)))
 }
 
-function removeGalleryImage(index) {
-  form.galleryFiles.splice(index, 1)
-  form.galleryPreviews.splice(index, 1)
+function removeGalleryImage(imageId) {
+  form.galleryFiles.splice(imageId, 1)
+  form.galleryPreviews.splice(imageId, 1)
+  if (isEditing.value && form.id) {
+    productStore.deleteGalleryImage(form.id, imageId)
+  }
 }
 
 async function submitForm() {

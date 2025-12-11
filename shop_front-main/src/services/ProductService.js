@@ -57,4 +57,7 @@ export const productService = {
   remove(productId) {
     return api.delete(`/product-delete/${productId}`)
   },
+  deleteGalleryImage(productId, imageId) {
+    return api.delete(`/products/${productId}/gallery/${imageId}`)
+  }
 }
