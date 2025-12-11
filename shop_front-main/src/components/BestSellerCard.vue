@@ -9,9 +9,14 @@
       <p class="product-desc">{{ product.description }}</p>
 
       <div class="price-section">
-        <span class="price">{{ formatPrice(product.price) }} تومان</span>
-        <span v-if="product.discountPrice" class="old-price">
-          {{ formatPrice(product.discountPrice) }}
+        <span class="price">
+          <template v-if="product.is_purchasable">
+            {{ formatPrice(product.price) }} تومان
+          </template>
+
+          <template v-else-if="!product.is_purchasable">
+            {{ product.price }}
+          </template>
         </span>
       </div>
 
