@@ -568,8 +568,8 @@ async function removeProduct(productId, index) {
     buttonsStyling: false,
     customClass: {
       popup: 'my-swal-popup',
-      confirmButton: 'my-swal-confirm-btn',
-      cancelButton: 'my-swal-cancel-btn',
+      confirmButton: 'my-swal-confirm',
+      cancelButton: 'my-swal-cancel',
     },
   }).then(async (result) => {
     if (result.isConfirmed) {
@@ -584,7 +584,7 @@ async function removeProduct(productId, index) {
           buttonsStyling: false,
           customClass: {
             popup: 'my-swal-popup',
-            confirmButton: 'my-swal-confirm-btn-success',
+            confirmButton: 'my-swal-confirm',
           },
         })
       } catch (error) {
