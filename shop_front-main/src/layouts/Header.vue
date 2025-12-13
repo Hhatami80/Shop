@@ -182,7 +182,7 @@ watch(
 .menu-btn {
   position: absolute;
   right: 20px;
-  top: 25%;
+  top: 7vh;
   transform: translateY(-50%);
   font-size: 30px;
   background: none;
@@ -194,7 +194,7 @@ watch(
 .header-icons {
   position: absolute;
   left: 20px;
-  top: 25%;
+  top: 7vh;
   transform: translateY(-50%);
   display: flex;
   gap: 18px;
@@ -219,7 +219,6 @@ watch(
   align-items: center;
   margin-top: 50px;
   height: 200px;
-  margin-bottom: 40px;
 }
 
 .menu-box {
