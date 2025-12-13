@@ -139,23 +139,18 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title, allow_unicode=True)
 
-        # if the product is not purchasable then set price as blank
-        if not self.is_purchasable:
-            self.price = None
-            self.discount = None
-            self.discounted_price = None
         # Calculate discounted price
-        else:
-            if self.discount:
-                try:
-                    discount_amount = self.discount / 100 * float(self.price)
-                    self.discounted_price = float(self.price) - discount_amount
-                    self.final_price = self.discounted_price
-                except (ValueError, TypeError):
-                    self.discounted_price = None
-            else:
+        
+        if self.discount and self.price:
+            try:
+                discount_amount = self.discount / 100 * float(self.price)
+                self.discounted_price = float(self.price) - discount_amount
+                self.final_price = self.discounted_price
+            except (ValueError, TypeError):
                 self.discounted_price = None
-                self.final_price = self.price
+        else:
+            self.discounted_price = None
+            self.final_price = self.price
 
         if not self.jalali_created_date and self.created_date:
             jalali_date = jdatetime_datetime.fromgregorian(datetime=self.created_date)

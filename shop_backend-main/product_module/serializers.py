@@ -120,7 +120,6 @@ class ProductSerializer(serializers.ModelSerializer):
     average_rating = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
     is_featured = serializers.BooleanField()
-    price = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -153,11 +152,13 @@ class ProductSerializer(serializers.ModelSerializer):
                 )
         return super().to_internal_value(mutable)
 
-    def get_price(self, obj):
-        if obj.is_purchasable:
-            return obj.price
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if instance.is_purchasable and instance.price is not None:
+            ret['price'] = instance.price  # or formatted
         else:
-            return "برای سفارش تماس بگیرید."
+            ret['price'] = "برای سفارش تماس بگیرید."
+        return ret
 
     def get_average_rating(self, obj):
         ratings = obj.ratings.all()
@@ -172,54 +173,74 @@ class ProductSerializer(serializers.ModelSerializer):
         return 0
 
     def create(self, validated_data):
+        
         request = self.context.get("request")
         properties_data = validated_data.pop("properties", [])
         category = validated_data.pop("category_id")
+        is_purchasable = validated_data.pop('is_purchasable', True)
+
+        # Enforce: if not purchasable → price and discount must be None
+        if not is_purchasable:
+            validated_data['price'] = None
+            validated_data['discount'] = None
+
         product = Product.objects.create(category=category, **validated_data)
+
+        # Handle uploaded images
         uploaded_images = request.FILES.getlist("uploaded_images")
         if uploaded_images:
             for image in uploaded_images:
                 ProductGallery.objects.create(product=product, image=image)
 
+        # Handle properties
         for prop in properties_data:
-            if not isinstance(prop, dict):
-                continue
-            if "key" in prop and "value" in prop:
+            if isinstance(prop, dict) and "key" in prop and "value" in prop:
                 ProductProperty.objects.create(
                     product=product, key=prop["key"], value=prop["value"]
                 )
+
         return product
 
+
     def update(self, instance, validated_data):
+        
         request = self.context.get("request")
         properties_data = validated_data.pop("properties", None)
         category = validated_data.pop("category_id", None)
 
+        # Get is_purchasable: from incoming data, or fall back to current instance value
+        is_purchasable = validated_data.pop('is_purchasable', instance.is_purchasable)
+
+        # Critical: if not purchasable, force price and discount to None
+        if not is_purchasable:
+            validated_data['price'] = None
+            validated_data['discount'] = None
+
+        # Update simple fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        if category is not None:
+            instance.category = category
+
+        # Handle new images
         uploaded_images = request.FILES.getlist("uploaded_images")
         if uploaded_images:
             for image in uploaded_images:
                 ProductGallery.objects.create(product=instance, image=image)
 
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-
-        if category:
-            instance.category = category
-
-        instance.save()
-
+        # Handle properties: replace all if provided
         if properties_data is not None:
             instance.properties.all().delete()
-
             for prop in properties_data:
-                if not isinstance(prop, dict):
-                    continue
-                if "key" in prop and "value" in prop:
+                if isinstance(prop, dict) and "key" in prop and "value" in prop:
                     ProductProperty.objects.create(
                         product=instance, key=prop["key"], value=prop["value"]
                     )
 
+        instance.save()
         return instance
+
 
     def validate(self, attrs):
         is_purchasable = attrs.get('is_purchasable', getattr(self.instance, 'is_purchasable', True))
@@ -230,6 +251,7 @@ class ProductSerializer(serializers.ModelSerializer):
             # raise serializers.ValidationError("اگر کالا قابل خرید نیست ، نباید قیمت داشته باشد.")
 
         return attrs
+
 class BrandSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True)
 

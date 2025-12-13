@@ -358,7 +358,7 @@ watch(
   background: #fff;
   overflow: hidden;
   text-align: right;
-  padding-bottom: 10px;
+  padding: 30px;
 }
 
 .product-image-wrapper {
