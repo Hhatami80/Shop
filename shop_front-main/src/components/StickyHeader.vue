@@ -3,11 +3,11 @@
     <div v-if="visible" :class="['header-sticky', { blurred: useScrollBlur && isBlurred }]">
       <div class="icons">
         
-        <div class="cart-icon-wrapper">
+        <div class="cart-icon-wrapper" v-if="!loginStore.isAdmin">
           <i
             class="fas fa-shopping-cart"
             @click="handleCartClick"
-            v-if="loginStore.user.role !== 'admin'"
+            
           ></i>
           <span v-if="cartStore.totalQuantity > 0" class="cart-badge">
             {{ cartStore.totalQuantity }}

@@ -459,7 +459,8 @@ input[type='checkbox'] {
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 600;
-  min-width: 90px;
+  min-width: max-content;
+  text-align: center;
 }
 
 .bg-success {
